@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Conductor, ConductorRequest } from '../interfaces/conductor.interface';
+import { UsuarioGestion } from './usuario-gestion.service';
 import { environment } from '../../../../../environment/environment';
 
 @Injectable({
@@ -49,6 +50,13 @@ export class ConductorService {
    */
   eliminarConductor(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Obtener usuarios conductores disponibles (no registrados aún)
+   */
+  obtenerUsuariosConductoresDisponibles(): Observable<UsuarioGestion[]> {
+    return this.http.get<UsuarioGestion[]>(`${this.apiUrl}/usuarios-disponibles`);
   }
 }
 

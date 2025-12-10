@@ -55,7 +55,7 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.cargarUsuariosConductores();
+    // No cargar usuarios aquí, se cargarán cuando se abra el diálogo
   }
 
   ngOnDestroy(): void {
@@ -75,15 +75,24 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
   cargarUsuariosConductores(): void {
     this.loadingService.show();
 
-    const sub = this.usuarioGestionService.obtenerUsuariosPorRol('Conductor').subscribe({
+    // Si estamos en modo edición, cargar todos los usuarios (para mostrar el actual)
+    // Si estamos en modo creación, cargar solo los disponibles (no registrados)
+    const observable = this.modoEdicion 
+      ? this.usuarioGestionService.obtenerUsuariosPorRol('Conductor')
+      : this.conductorService.obtenerUsuariosConductoresDisponibles();
+
+    const sub = observable.subscribe({
       next: (usuarios) => {
         this.usuariosDisponibles = usuarios || [];
         this.loadingService.hide();
         if (!usuarios || usuarios.length === 0) {
+          const mensaje = this.modoEdicion
+            ? 'No se encontraron usuarios con rol "Conductor" activos.'
+            : 'No hay usuarios conductores disponibles para registrar. Todos los conductores ya están registrados.';
           this.messageService.add({
             severity: 'warn',
             summary: 'Sin usuarios disponibles',
-            detail: 'No se encontraron usuarios con rol "Conductor" activos. Verifique que existan usuarios con este rol en el sistema de gestión.',
+            detail: mensaje,
             life: 6000
           });
         }
@@ -131,12 +140,18 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
 
       // Deshabilitar el campo de usuario en modo edición
       this.conductorForm.get('idUsuarioGestion')?.disable();
+      
+      // Cargar todos los usuarios (para mostrar el actual en modo edición)
+      this.cargarUsuariosConductores();
     } else {
       // Resetear formulario para crear
       this.conductorForm.reset({
         estado: 'activo'
       });
       this.conductorForm.get('idUsuarioGestion')?.enable();
+      
+      // Cargar solo usuarios disponibles (no registrados) para crear
+      this.cargarUsuariosConductores();
     }
   }
 

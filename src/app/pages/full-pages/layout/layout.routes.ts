@@ -13,6 +13,15 @@ export const layoutRoutes: Routes = [
       {
         path: 'home',
         loadComponent: () => import('../../features/home/components/home/home.component').then(m => m.HomeComponent)
+      },
+      {
+        path: 'transporte',
+        children: [
+          {
+            path: 'buses',
+            loadComponent: () => import('../../features/buses/components/bus-list/bus-list.component').then(m => m.BusListComponent)
+          }
+        ]
       }
     ]
   }

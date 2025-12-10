@@ -1,0 +1,141 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '700px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="modoEdicion ? 'Editar Bus' : 'Crear Nuevo Bus'"
+  (onHide)="hideDialog()"
+>
+  <form [formGroup]="busForm" (ngSubmit)="guardar()">
+    <div class="form-grid">
+      <!-- Placa -->
+      <div class="field">
+        <label for="placa" class="required">
+          Placa <span class="required-asterisk">*</span>
+        </label>
+        <input
+          id="placa"
+          type="text"
+          pInputText
+          formControlName="placa"
+          [class.ng-invalid]="isFieldInvalid('placa')"
+          placeholder="Ej: ABC-123"
+          maxlength="10"
+        />
+        <small
+          *ngIf="isFieldInvalid('placa')"
+          class="p-error"
+        >
+          <span *ngIf="f['placa'].errors?.['required']">La placa es obligatoria</span>
+          <span *ngIf="f['placa'].errors?.['maxlength']">La placa no puede exceder 10 caracteres</span>
+        </small>
+      </div>
+
+      <!-- Modelo -->
+      <div class="field">
+        <label for="modelo">
+          Modelo
+        </label>
+        <input
+          id="modelo"
+          type="text"
+          pInputText
+          formControlName="modelo"
+          [class.ng-invalid]="isFieldInvalid('modelo')"
+          placeholder="Ej: Mercedes-Benz"
+          maxlength="50"
+        />
+        <small
+          *ngIf="isFieldInvalid('modelo')"
+          class="p-error"
+        >
+          <span *ngIf="f['modelo'].errors?.['maxlength']">El modelo no puede exceder 50 caracteres</span>
+        </small>
+      </div>
+
+      <!-- Capacidad -->
+      <div class="field">
+        <label for="capacidad" class="required">
+          Capacidad <span class="required-asterisk">*</span>
+        </label>
+        <p-inputNumber
+          id="capacidad"
+          formControlName="capacidad"
+          [min]="1"
+          [max]="200"
+          [showButtons]="true"
+          [useGrouping]="false"
+          [class.ng-invalid]="isFieldInvalid('capacidad')"
+          styleClass="w-full"
+        ></p-inputNumber>
+        <small
+          *ngIf="isFieldInvalid('capacidad')"
+          class="p-error"
+        >
+          <span *ngIf="f['capacidad'].errors?.['required']">La capacidad es obligatoria</span>
+          <span *ngIf="f['capacidad'].errors?.['min']">La capacidad debe ser mayor a 0</span>
+        </small>
+      </div>
+
+      <!-- IMEI GPS -->
+      <div class="field">
+        <label for="imeiGps">
+          IMEI GPS
+        </label>
+        <input
+          id="imeiGps"
+          type="text"
+          pInputText
+          formControlName="imeiGps"
+          [class.ng-invalid]="isFieldInvalid('imeiGps')"
+          placeholder="Ej: 123456789012345"
+          maxlength="50"
+        />
+        <small
+          *ngIf="isFieldInvalid('imeiGps')"
+          class="p-error"
+        >
+          <span *ngIf="f['imeiGps'].errors?.['maxlength']">El IMEI GPS no puede exceder 50 caracteres</span>
+        </small>
+      </div>
+
+      <!-- Estado -->
+      <div class="field">
+        <label for="estado">
+          Estado
+        </label>
+        <p-dropdown
+          id="estado"
+          formControlName="estado"
+          [options]="estados"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccione un estado"
+          styleClass="w-full"
+        ></p-dropdown>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="hideDialog()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
+        icon="pi pi-check"
+        (click)="guardar()"
+        [disabled]="busForm.invalid"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>

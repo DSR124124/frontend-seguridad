@@ -13,22 +13,13 @@
         <p-button *ngIf="terminoBusqueda" icon="pi pi-times" label="Limpiar" styleClass="p-button-danger"
           (onClick)="limpiarBusqueda()"></p-button>
 
-        <p-dropdown
-          [options]="estados"
-          [(ngModel)]="estadoSeleccionado"
-          (onChange)="onEstadoChange()"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Filtrar por estado"
-          styleClass="p-button-info"
-          appendTo="body">
-        </p-dropdown>
+        <p-button icon="pi pi-filter" label="filtros" styleClass="p-button-info" [disabled]="loading"></p-button>
       </div>
     </ng-template>
 
     <ng-template #end>
       <div class="d-flex gap-2">
-        <p-button icon="pi pi-plus" label="Nuevo Conductor" styleClass="p-button-success"
+        <p-button icon="pi pi-plus" label="Nuevo Conductor" styleClass="p-button-primary"
           (onClick)="abrirDialogoCrear()" [disabled]="loading"></p-button>
         <p-button icon="pi pi-refresh" label="Actualizar" styleClass="p-button-info" (onClick)="cargarConductores()"
           [disabled]="loading"></p-button>

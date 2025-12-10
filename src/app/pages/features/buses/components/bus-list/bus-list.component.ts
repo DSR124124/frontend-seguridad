@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Bus } from '../../interfaces/bus.interface';
 import { BusService } from '../../services/bus.service';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
+import { MessageService } from '../../../../../core/services/message.service';
 import { LoadingService } from '../../../../../shared/services/loading.service';
 import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
 import { BusFormComponent } from '../bus-form/bus-form.component';
@@ -15,7 +16,7 @@ import { Subscription } from 'rxjs';
     ...PrimeNGModules,
     BusFormComponent
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [ConfirmationService],
   templateUrl: './bus-list.component.html',
   styleUrl: './bus-list.component.css'
 })
@@ -24,15 +25,7 @@ export class BusListComponent implements OnInit, OnDestroy {
   busesFiltrados: Bus[] = [];
   loading: boolean = false;
   terminoBusqueda: string = '';
-  estadoSeleccionado: string | null = null;
   private loadingSubscription?: Subscription;
-
-  estados = [
-    { label: 'Todos', value: null },
-    { label: 'Operativo', value: 'operativo' },
-    { label: 'Mantenimiento', value: 'mantenimiento' },
-    { label: 'Inactivo', value: 'inactivo' }
-  ];
 
   @ViewChild(BusFormComponent) busFormComponent?: BusFormComponent;
 
@@ -60,23 +53,25 @@ export class BusListComponent implements OnInit, OnDestroy {
 
   cargarBuses(): void {
     this.loadingService.show();
-    const estado = this.estadoSeleccionado || undefined;
     
-    this.busService.listarBuses(estado).subscribe({
+    this.busService.listarBuses().subscribe({
       next: (buses) => {
-        this.buses = buses;
-        this.busesFiltrados = buses;
+        this.buses = buses || [];
+        this.busesFiltrados = this.buses;
         this.loadingService.hide();
+        
+        // Mostrar notificación si no hay buses
+        if (this.buses.length === 0) {
+          this.messageService.info('No hay buses registrados. Puede crear uno nuevo usando el botón "Nuevo Bus".', 'Sin buses', 6000);
+        } else {
+          // Mostrar notificación de éxito al cargar
+          this.messageService.success(`Se cargaron ${this.buses.length} bus(es) correctamente`, 'Buses cargados', 3000);
+        }
       },
       error: (error) => {
         this.loadingService.hide();
-        const errorMessage = error?.message || error?.error?.message || 'Error al cargar los buses';
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage,
-          life: 5000
-        });
+        const errorMessage = error?.error?.message || error?.message || 'Error al cargar los buses';
+        this.messageService.error(errorMessage, 'Error al cargar', 6000);
       }
     });
   }
@@ -100,10 +95,6 @@ export class BusListComponent implements OnInit, OnDestroy {
     this.busesFiltrados = this.buses;
   }
 
-  onEstadoChange(): void {
-    this.cargarBuses();
-  }
-
   abrirDialogoCrear(): void {
     if (this.busFormComponent) {
       this.busFormComponent.showDialog();
@@ -111,10 +102,12 @@ export class BusListComponent implements OnInit, OnDestroy {
   }
 
   onBusCreado(): void {
+    this.messageService.success('Bus registrado correctamente', 'Registro exitoso', 5000);
     this.cargarBuses();
   }
 
   onBusActualizado(): void {
+    this.messageService.success('Bus actualizado correctamente', 'Actualización exitosa', 5000);
     this.cargarBuses();
   }
 
@@ -143,23 +136,13 @@ export class BusListComponent implements OnInit, OnDestroy {
     this.busService.eliminarBus(id).subscribe({
       next: () => {
         this.loadingService.hide();
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Bus eliminado correctamente',
-          life: 5000
-        });
+        this.messageService.success('Bus eliminado correctamente', 'Éxito', 5000);
         this.cargarBuses();
       },
       error: (error) => {
         this.loadingService.hide();
-        const errorMessage = error?.message || error?.error?.message || 'Error al eliminar el bus';
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage,
-          life: 5000
-        });
+        const errorMessage = error?.error?.message || error?.message || 'Error al eliminar el bus';
+        this.messageService.error(errorMessage, 'Error', 6000);
       }
     });
   }

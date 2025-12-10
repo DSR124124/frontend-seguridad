@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Conductor } from '../../interfaces/conductor.interface';
 import { ConductorService } from '../../services/conductor.service';
 import { ConductorFormComponent } from '../conductor-form/conductor-form.component';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
+import { MessageService } from '../../../../../core/services/message.service';
 import { LoadingService } from '../../../../../shared/services/loading.service';
 import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
 import { Subscription } from 'rxjs';
@@ -14,7 +15,7 @@ import { Subscription } from 'rxjs';
     ...PrimeNGModules,
     ConductorFormComponent
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [ConfirmationService],
   templateUrl: './conductor-list.component.html',
   styleUrl: './conductor-list.component.css'
 })
@@ -25,15 +26,7 @@ export class ConductorListComponent implements OnInit, OnDestroy {
   conductoresFiltrados: Conductor[] = [];
   loading: boolean = false;
   terminoBusqueda: string = '';
-  estadoSeleccionado: string | null = null;
   private loadingSubscription?: Subscription;
-
-  estados = [
-    { label: 'Todos', value: null },
-    { label: 'Activo', value: 'activo' },
-    { label: 'Inactivo', value: 'inactivo' },
-    { label: 'Suspendido', value: 'suspendido' }
-  ];
 
   constructor(
     private conductorService: ConductorService,
@@ -58,23 +51,25 @@ export class ConductorListComponent implements OnInit, OnDestroy {
 
   cargarConductores(): void {
     this.loadingService.show();
-    const estado = this.estadoSeleccionado || undefined;
-    
-    this.conductorService.listarConductores(estado).subscribe({
+
+    this.conductorService.listarConductores().subscribe({
       next: (conductores) => {
-        this.conductores = conductores;
-        this.conductoresFiltrados = conductores;
+        this.conductores = conductores || [];
+        this.conductoresFiltrados = this.conductores;
         this.loadingService.hide();
+
+        // Mostrar notificación si no hay conductores
+        if (this.conductores.length === 0) {
+          this.messageService.info('No hay conductores registrados. Puede crear uno nuevo usando el botón "Nuevo Conductor".', 'Sin conductores', 6000);
+        } else {
+          // Mostrar notificación de éxito al cargar
+          this.messageService.success(`Se cargaron ${this.conductores.length} conductor(es) correctamente`, 'Conductores cargados', 3000);
+        }
       },
       error: (error) => {
         this.loadingService.hide();
-        const errorMessage = error?.message || error?.error?.message || 'Error al cargar los conductores';
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage,
-          life: 5000
-        });
+        const errorMessage = error?.error?.message || error?.message || 'Error al cargar los conductores';
+        this.messageService.error(errorMessage, 'Error al cargar', 6000);
       }
     });
   }
@@ -103,10 +98,6 @@ export class ConductorListComponent implements OnInit, OnDestroy {
     this.conductoresFiltrados = this.conductores;
   }
 
-  onEstadoChange(): void {
-    this.cargarConductores();
-  }
-
   confirmarEliminar(conductor: Conductor): void {
     this.confirmationService.confirm({
       message: `¿Está seguro de que desea eliminar el conductor con licencia "${conductor.licenciaNumero}"?`,
@@ -126,23 +117,13 @@ export class ConductorListComponent implements OnInit, OnDestroy {
     this.conductorService.eliminarConductor(id).subscribe({
       next: () => {
         this.loadingService.hide();
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Conductor eliminado correctamente',
-          life: 5000
-        });
+        this.messageService.success('Conductor eliminado correctamente', 'Éxito', 5000);
         this.cargarConductores();
       },
       error: (error) => {
         this.loadingService.hide();
-        const errorMessage = error?.message || error?.error?.message || 'Error al eliminar el conductor';
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage,
-          life: 5000
-        });
+        const errorMessage = error?.error?.message || error?.message || 'Error al eliminar el conductor';
+        this.messageService.error(errorMessage, 'Error', 6000);
       }
     });
   }
@@ -165,10 +146,12 @@ export class ConductorListComponent implements OnInit, OnDestroy {
   }
 
   onConductorCreado(): void {
+    this.messageService.success('Conductor registrado correctamente', 'Registro exitoso', 5000);
     this.cargarConductores();
   }
 
   onConductorActualizado(): void {
+    this.messageService.success('Conductor actualizado correctamente', 'Actualización exitosa', 5000);
     this.cargarConductores();
   }
 

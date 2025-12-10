@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ConductorRequest, Conductor } from '../../interfaces/conductor.interface';
 import { ConductorService } from '../../services/conductor.service';
 import { UsuarioGestionService, UsuarioGestion } from '../../services/usuario-gestion.service';
-import { MessageService } from 'primeng/api';
+import { MessageService } from '../../../../../core/services/message.service';
 import { LoadingService } from '../../../../../shared/services/loading.service';
 import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
 import { Subscription } from 'rxjs';
@@ -15,7 +15,6 @@ import { Subscription } from 'rxjs';
     ...PrimeNGModules,
     ReactiveFormsModule
   ],
-  providers: [MessageService],
   templateUrl: './conductor-form.component.html',
   styleUrl: './conductor-form.component.css'
 })
@@ -89,12 +88,7 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
           const mensaje = this.modoEdicion
             ? 'No se encontraron usuarios con rol "Conductor" activos.'
             : 'No hay usuarios conductores disponibles para registrar. Todos los conductores ya están registrados.';
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Sin usuarios disponibles',
-            detail: mensaje,
-            life: 6000
-          });
+          this.messageService.warn(mensaje, 'Sin usuarios disponibles', 6000);
         }
       },
       error: (error) => {
@@ -111,12 +105,7 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
           detailMessage = `Error al cargar usuarios: ${errorMessage}`;
         }
 
-        this.messageService.add({
-          severity: 'error',
-          summary: `Error ${statusCode ? `(${statusCode})` : ''}`,
-          detail: detailMessage,
-          life: 8000
-        });
+        this.messageService.error(detailMessage, `Error ${statusCode ? `(${statusCode})` : ''}`, 8000);
       }
     });
     this.subscriptions.push(sub);
@@ -170,12 +159,7 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
     this.submitted = true;
 
     if (this.conductorForm.invalid) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Validación',
-        detail: 'Por favor, complete todos los campos requeridos correctamente',
-        life: 5000
-      });
+      this.messageService.warn('Por favor, complete todos los campos requeridos correctamente', 'Validación', 5000);
       return;
     }
 
@@ -194,24 +178,14 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
       const sub = this.conductorService.actualizarConductor(this.conductorId, conductorData).subscribe({
         next: () => {
           this.loadingService.hide();
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Conductor actualizado correctamente',
-            life: 5000
-          });
+          this.messageService.success('Conductor actualizado correctamente', 'Éxito', 5000);
           this.hideDialog();
           this.conductorActualizado.emit();
         },
         error: (error) => {
           this.loadingService.hide();
-          const errorMessage = error?.message || error?.error?.message || 'Error al actualizar el conductor';
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: errorMessage,
-            life: 5000
-          });
+          const errorMessage = error?.error?.message || error?.message || 'Error al actualizar el conductor';
+          this.messageService.error(errorMessage, 'Error', 6000);
         }
       });
       this.subscriptions.push(sub);
@@ -220,24 +194,14 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
       const sub = this.conductorService.crearConductor(conductorData).subscribe({
         next: () => {
           this.loadingService.hide();
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Conductor creado correctamente',
-            life: 5000
-          });
+          this.messageService.success('Conductor registrado correctamente', 'Registro exitoso', 5000);
           this.hideDialog();
           this.conductorCreado.emit();
         },
         error: (error) => {
           this.loadingService.hide();
-          const errorMessage = error?.message || error?.error?.message || 'Error al crear el conductor';
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: errorMessage,
-            life: 5000
-          });
+          const errorMessage = error?.error?.message || error?.message || 'Error al crear el conductor';
+          this.messageService.error(errorMessage, 'Error', 6000);
         }
       });
       this.subscriptions.push(sub);

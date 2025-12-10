@@ -1,0 +1,156 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '700px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="modoEdicion ? 'Editar Conductor' : 'Crear Nuevo Conductor'"
+  (onHide)="hideDialog()"
+>
+  <form [formGroup]="conductorForm" (ngSubmit)="guardar()">
+    <div class="form-grid">
+      <!-- Usuario (Conductor) -->
+      <div class="field">
+        <label for="idUsuarioGestion" class="required">
+          Usuario Conductor <span class="required-asterisk">*</span>
+        </label>
+        <p-dropdown
+          id="idUsuarioGestion"
+          formControlName="idUsuarioGestion"
+          [options]="usuariosDisponibles"
+          optionLabel="nombreCompleto"
+          optionValue="idUsuario"
+          placeholder="Seleccione un usuario conductor"
+          [class.ng-invalid]="isFieldInvalid('idUsuarioGestion')"
+          [disabled]="modoEdicion"
+          [filter]="true"
+          filterBy="nombreCompleto,username,email"
+          [showClear]="!modoEdicion"
+          styleClass="w-full"
+          appendTo="body"
+        >
+          <ng-template let-usuario pTemplate="item">
+            <div>
+              <div><strong>{{ usuario.nombreCompleto || usuario.username }}</strong></div>
+              <small class="text-muted">{{ usuario.email }} - {{ usuario.nombreRol }}</small>
+            </div>
+          </ng-template>
+          <ng-template let-usuario pTemplate="selectedItem">
+            <div>
+              <div><strong>{{ usuario.nombreCompleto || usuario.username }}</strong></div>
+              <small class="text-muted">{{ usuario.email }}</small>
+            </div>
+          </ng-template>
+        </p-dropdown>
+        <small
+          *ngIf="isFieldInvalid('idUsuarioGestion')"
+          class="p-error"
+        >
+          <span *ngIf="f['idUsuarioGestion'].errors?.['required']">El usuario conductor es obligatorio</span>
+        </small>
+      </div>
+
+      <!-- Número de Licencia -->
+      <div class="field">
+        <label for="licenciaNumero" class="required">
+          Número de Licencia <span class="required-asterisk">*</span>
+        </label>
+        <input
+          id="licenciaNumero"
+          type="text"
+          pInputText
+          formControlName="licenciaNumero"
+          [class.ng-invalid]="isFieldInvalid('licenciaNumero')"
+          placeholder="Ej: ABC123456"
+          maxlength="20"
+        />
+        <small
+          *ngIf="isFieldInvalid('licenciaNumero')"
+          class="p-error"
+        >
+          <span *ngIf="f['licenciaNumero'].errors?.['required']">El número de licencia es obligatorio</span>
+          <span *ngIf="f['licenciaNumero'].errors?.['maxlength']">El número de licencia no puede exceder 20 caracteres</span>
+        </small>
+      </div>
+
+      <!-- Categoría -->
+      <div class="field">
+        <label for="categoria">
+          Categoría
+        </label>
+        <p-dropdown
+          id="categoria"
+          formControlName="categoria"
+          [options]="categorias"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccione una categoría"
+          [showClear]="true"
+          styleClass="w-full"
+          appendTo="body"
+        ></p-dropdown>
+      </div>
+
+      <!-- Teléfono de Contacto -->
+      <div class="field">
+        <label for="telefonoContacto">
+          Teléfono de Contacto
+        </label>
+        <input
+          id="telefonoContacto"
+          type="text"
+          pInputText
+          formControlName="telefonoContacto"
+          [class.ng-invalid]="isFieldInvalid('telefonoContacto')"
+          placeholder="Ej: +504 9999-9999"
+          maxlength="20"
+        />
+        <small
+          *ngIf="isFieldInvalid('telefonoContacto')"
+          class="p-error"
+        >
+          <span *ngIf="f['telefonoContacto'].errors?.['maxlength']">El teléfono no puede exceder 20 caracteres</span>
+        </small>
+      </div>
+
+      <!-- Estado -->
+      <div class="field">
+        <label for="estado">
+          Estado
+        </label>
+        <p-dropdown
+          id="estado"
+          formControlName="estado"
+          [options]="estados"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccione un estado"
+          styleClass="w-full"
+          appendTo="body"
+        ></p-dropdown>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="hideDialog()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
+        icon="pi pi-check"
+        (click)="guardar()"
+        [disabled]="conductorForm.invalid"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+

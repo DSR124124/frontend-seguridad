@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Conductor } from '../../interfaces/conductor.interface';
 import { ConductorService } from '../../services/conductor.service';
+import { ConductorFormComponent } from '../conductor-form/conductor-form.component';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { LoadingService } from '../../../../../shared/services/loading.service';
 import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
@@ -11,13 +11,16 @@ import { Subscription } from 'rxjs';
   selector: 'app-conductor-list',
   standalone: true,
   imports: [
-    ...PrimeNGModules
+    ...PrimeNGModules,
+    ConductorFormComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './conductor-list.component.html',
   styleUrl: './conductor-list.component.css'
 })
 export class ConductorListComponent implements OnInit, OnDestroy {
+  @ViewChild(ConductorFormComponent) conductorFormComponent!: ConductorFormComponent;
+
   conductores: Conductor[] = [];
   conductoresFiltrados: Conductor[] = [];
   loading: boolean = false;
@@ -34,7 +37,6 @@ export class ConductorListComponent implements OnInit, OnDestroy {
 
   constructor(
     private conductorService: ConductorService,
-    private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private loadingService: LoadingService
@@ -156,6 +158,22 @@ export class ConductorListComponent implements OnInit, OnDestroy {
       default:
         return 'info';
     }
+  }
+
+  abrirDialogoCrear(): void {
+    this.conductorFormComponent.showDialog();
+  }
+
+  onConductorCreado(): void {
+    this.cargarConductores();
+  }
+
+  onConductorActualizado(): void {
+    this.cargarConductores();
+  }
+
+  editarConductor(conductor: Conductor): void {
+    this.conductorFormComponent.showDialog(conductor);
   }
 }
 

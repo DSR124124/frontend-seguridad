@@ -74,21 +74,45 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
 
   cargarUsuariosConductores(): void {
     this.loadingService.show();
-    this.usuarioGestionService.obtenerUsuariosPorRol('Conductor').subscribe({
+    const sub = this.usuarioGestionService.obtenerUsuariosPorRol('Conductor').subscribe({
       next: (usuarios) => {
-        this.usuariosDisponibles = usuarios;
+        this.usuariosDisponibles = usuarios || [];
         this.loadingService.hide();
+        if (!usuarios || usuarios.length === 0) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Sin usuarios disponibles',
+            detail: 'No se encontraron usuarios con rol "Conductor" activos. Verifique que existan usuarios con este rol en el sistema de gestión.',
+            life: 6000
+          });
+        }
       },
       error: (error) => {
         this.loadingService.hide();
+        const errorMessage = error?.error?.mensaje || error?.error?.message || error?.message || 'Error desconocido';
+        const statusCode = error?.status || '';
+        const url = error?.url || '';
+        
+        let detailMessage = `No se pudieron cargar los usuarios conductores.`;
+        if (statusCode === 403) {
+          detailMessage += ' Acceso denegado. Verifique su sesión.';
+        } else if (statusCode === 404) {
+          detailMessage += ' El endpoint no fue encontrado.';
+        } else if (statusCode === 401) {
+          detailMessage += ' No autorizado. Por favor, inicie sesión nuevamente.';
+        } else {
+          detailMessage += ` ${errorMessage}`;
+        }
+        
         this.messageService.add({
-          severity: 'warn',
-          summary: 'Advertencia',
-          detail: 'No se pudieron cargar los usuarios conductores. Intente nuevamente.',
-          life: 5000
+          severity: 'error',
+          summary: `Error ${statusCode ? `(${statusCode})` : ''} al cargar usuarios`,
+          detail: detailMessage,
+          life: 8000
         });
       }
     });
+    this.subscriptions.push(sub);
   }
 
   showDialog(conductor?: Conductor): void {
@@ -214,6 +238,10 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.conductorForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched || this.submitted));
+  }
+
+  getUsuarioLabel(usuario: UsuarioGestion): string {
+    return usuario.nombreCompleto || usuario.username || usuario.email || '';
   }
 }
 

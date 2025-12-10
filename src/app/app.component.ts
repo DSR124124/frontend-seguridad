@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TokenHandlerService } from './core/services/token-handler.service';
-
+import { ToastModule } from 'primeng/toast';
+import { PrimeNGModules } from './prime-ng/prime-ng';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ...PrimeNGModules],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

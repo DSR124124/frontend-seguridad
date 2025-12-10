@@ -1,0 +1,31 @@
+<div class="error-container">
+  <div class="error-content">
+    <div class="error-icon" [ngClass]="errorInfo?.severity || 'error'">
+      <i [class]="errorInfo?.icon || 'pi pi-exclamation-triangle'"></i>
+    </div>
+
+    <h1 class="error-title">{{ errorInfo?.title || 'Error' }}</h1>
+
+    <p class="error-message">{{ errorInfo?.message || 'Ha ocurrido un error' }}</p>
+
+    <p class="error-description">{{ errorInfo?.description || '' }}</p>
+
+    <div class="error-actions" *ngIf="errorInfo">
+      <p-button
+        *ngIf="errorInfo.showRefresh"
+        label="Recargar Página"
+        icon="pi pi-refresh"
+        styleClass="p-button-primary"
+        (onClick)="refresh()">
+      </p-button>
+
+      <p-button
+        label="Ir al Inicio"
+        icon="pi pi-home"
+        styleClass="p-button-secondary"
+        (onClick)="goHome()">
+      </p-button>
+    </div>
+  </div>
+</div>
+

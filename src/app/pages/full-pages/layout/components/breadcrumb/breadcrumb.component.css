@@ -1,0 +1,12 @@
+.breadcrumb-container {
+  padding: 1rem 1.5rem;
+  background-color: var(--layout-main-bg);
+  border-bottom: 1px solid rgba(28, 34, 77, 0.08);
+}
+
+@media (max-width: 768px) {
+  .breadcrumb-container {
+    padding: 0.75rem 1rem;
+  }
+}
+

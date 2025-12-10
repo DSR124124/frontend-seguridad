@@ -1,0 +1,187 @@
+.menu-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none !important;
+  transition: background-color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+              color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+              border-color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+              box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 5px 10px;
+  margin: 2px 0;
+  position: relative;
+  color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(5px);
+  border: 1px solid transparent;
+  min-height: 36px;
+}
+
+.menu-link:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(74, 122, 255, 0.12)
+  );
+  color: var(--p-primary-inverse-color) !important;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.menu-link.has-children {
+  font-weight: 600;
+}
+
+.menu-link,
+.menu-link > * {
+  color: inherit !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease;
+}
+
+.menu-link i {
+  font-size: 18px;
+  margin-right: 12px;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  opacity: 0.9;
+  transition: opacity 0.3s ease, color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'primeicons' !important;
+  flex-shrink: 0;
+  position: relative;
+  line-height: 1.5;
+}
+
+.menu-link i.pi {
+  font-family: 'primeicons' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-text {
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+}
+
+:host-context(.sidebar-mini) .menu-text {
+  display: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
+:host-context(.sidebar-mini) .menu-link i.menu-icon {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+:host-context(.sidebar-mini) .menu-link .pi-chevron-down {
+  display: none !important;
+}
+
+:host-context(.sidebar-mini) .submenu-container,
+:host-context(.sidebar-mini) .submenu,
+:host-context(.sidebar-mini) .submenu-item {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.submenu {
+  list-style: none;
+  padding-left: 0;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.submenu.expanded {
+  max-height: 1000px;
+  opacity: 1;
+  visibility: visible;
+  padding: 8px 8px 0 0;
+}
+
+.submenu-item {
+  position: relative;
+  margin-left: calc((var(--depth, 0) * 15px));
+}
+
+.menu-link.active {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 122, 255, 0.2),
+    rgba(162, 240, 161, 0.15)
+  ) !important;
+  color: var(--p-primary-inverse-color) !important;
+  font-weight: 600;
+  border-left: 4px solid var(--color-mint-light);
+  box-shadow: 0 4px 20px rgba(74, 122, 255, 0.25);
+}
+
+.menu-link.active i {
+  color: var(--color-mint-light) !important;
+  text-shadow: 0 0 8px rgba(162, 240, 161, 0.4);
+}
+
+.menu-link .pi-chevron-down {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  margin-left: auto;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-right: 0;
+}
+
+html.app-dark .menu-link {
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+html.app-dark .menu-link:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.05),
+    rgba(74, 122, 255, 0.1)
+  ) !important;
+  color: #1c224d !important;
+}
+
+html.app-dark .menu-link.active {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 122, 255, 0.15),
+    rgba(162, 240, 161, 0.1)
+  ) !important;
+  color: #1c224d !important;
+  border-left: 4px solid #4a7aff !important;
+}
+
+html.app-dark .menu-link.active i {
+  color: #4a7aff !important;
+}
+

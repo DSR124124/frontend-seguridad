@@ -1,0 +1,122 @@
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-navy-dark) 0%, var(--color-blue-light) 100%);
+  padding: 2rem;
+}
+
+.error-content {
+  text-align: center;
+  max-width: 600px;
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 3rem;
+  box-shadow: 0 10px 40px rgba(28, 34, 77, 0.3);
+  border: 1px solid rgba(74, 122, 255, 0.1);
+}
+
+.error-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+}
+
+.error-icon i {
+  display: inline-block;
+}
+
+/* Colores según severidad */
+.error-icon.error i {
+  color: var(--color-danger);
+}
+
+.error-icon.warning i {
+  color: var(--color-warning);
+}
+
+.error-icon.info i {
+  color: var(--color-info);
+}
+
+.error-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-navy-dark);
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--color-navy-dark), var(--color-blue-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.error-message {
+  font-size: 1.25rem;
+  color: var(--color-navy-dark);
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.error-description {
+  font-size: 1rem;
+  color: var(--color-gray-medium);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.error-actions ::ng-deep .p-button-primary {
+  background: linear-gradient(135deg, var(--color-navy-dark), var(--color-blue-light)) !important;
+  border: none !important;
+}
+
+.error-actions ::ng-deep .p-button-primary:hover {
+  background: linear-gradient(135deg, var(--color-blue-light), var(--color-mint-light)) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 122, 255, 0.4) !important;
+}
+
+.error-actions ::ng-deep .p-button-secondary {
+  background: var(--color-gray-light) !important;
+  color: var(--color-navy-dark) !important;
+  border: 1px solid var(--color-gray-medium) !important;
+}
+
+.error-actions ::ng-deep .p-button-secondary:hover {
+  background: var(--color-gray-lighter) !important;
+  border-color: var(--color-blue-light) !important;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .error-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .error-icon {
+    font-size: 4rem;
+  }
+
+  .error-title {
+    font-size: 1.5rem;
+  }
+
+  .error-message {
+    font-size: 1.1rem;
+  }
+
+  .error-actions {
+    flex-direction: column;
+  }
+
+  .error-actions ::ng-deep .p-button {
+    width: 100%;
+  }
+}
+

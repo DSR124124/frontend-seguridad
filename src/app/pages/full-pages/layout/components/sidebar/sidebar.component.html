@@ -1,0 +1,34 @@
+<div
+  class="sidebar d-flex flex-column h-100 w-100"
+  [ngClass]="{
+    'sidebar-mini': !open && sidebarVisible,
+    'sidebar-hidden': !sidebarVisible
+  }"
+  [hidden]="!sidebarVisible"
+>
+  <div class="titulo-wrapper" [ngClass]="{ 'titulo-wrapper-colapsado': !open }">
+    <span class="titulo">{{ titulo }}</span>
+  </div>
+
+  <!-- Menú principal -->
+  <ul class="menu">
+    <li
+      *ngFor="let item of menuItems; let i = index"
+      class="elemento menu-item"
+      [ngClass]="{ 'item-activo': currentExpandedItemIndex[0] === i }"
+    >
+      <!-- Llamamos al componente recursivo -->
+      <app-sidebar-item
+        [item]="item"
+        [depth]="0"
+        [index]="i"
+        [expanded]="currentExpandedItemIndex[0] === i"
+        [currentExpandedItemIndex]="currentExpandedItemIndex"
+        [sidebarCollapsed]="!open"
+        (expandChange)="handleExpandChange($event)"
+      >
+      </app-sidebar-item>
+    </li>
+  </ul>
+</div>
+

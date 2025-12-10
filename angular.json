@@ -49,19 +49,12 @@
                 }
               ],
               "outputHashing": "all",
-              "styles": {
-                "minify": true,
-                "inlineCritical": false
-              }
+              "optimization": true
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true,
-              "styles": {
-                "minify": false,
-                "inlineCritical": false
-              }
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"

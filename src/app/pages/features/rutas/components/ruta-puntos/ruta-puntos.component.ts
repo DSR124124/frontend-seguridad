@@ -79,11 +79,35 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
     this.puntoEditando = null;
     this.submitted = false;
 
+    // Verificar si hay error en la carga de Google Maps
+    if ((window as any).googleMapsError) {
+      this.messageService.error('Error al cargar Google Maps. Por favor, verifique su conexión a internet y recargue la página.', 'Error de Carga', 8000);
+    }
+
     // Cargar puntos y inicializar mapa
     this.cargarPuntos();
+
+    // Esperar a que el DOM esté listo y Google Maps esté cargado
     setTimeout(() => {
-      this.inicializarMapa();
-    }, 300);
+      if ((window as any).googleMapsLoaded) {
+        this.inicializarMapa();
+      } else {
+        // Esperar al evento de carga
+        const loadHandler = () => {
+          this.inicializarMapa();
+        };
+        window.addEventListener('googleMapsLoaded', loadHandler, { once: true });
+
+        // Timeout de seguridad
+        setTimeout(() => {
+          if (!this.mapInitialized && typeof google !== 'undefined' && google.maps) {
+            this.inicializarMapa();
+          } else if (!this.mapInitialized) {
+            this.messageService.warn('Google Maps está cargando. El mapa aparecerá en breve.', 'Cargando Mapa', 3000);
+          }
+        }, 2000);
+      }
+    }, 500);
   }
 
   hideDialog(): void {
@@ -117,39 +141,61 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
   }
 
   inicializarMapa(): void {
-    if (this.mapInitialized || typeof google === 'undefined' || !google.maps) {
+    if (this.mapInitialized) {
       if (this.puntos.length > 0) {
         this.actualizarMapa();
       }
       return;
     }
 
-    const mapContainer = document.getElementById('map-puntos-container');
-    if (!mapContainer) {
+    // Verificar si Google Maps está cargado
+    if (typeof google === 'undefined' || !google.maps) {
+      // Esperar a que se cargue Google Maps
+      if ((window as any).googleMapsLoaded) {
+        // Ya está cargado, intentar de nuevo
+        setTimeout(() => this.inicializarMapa(), 100);
+      } else {
+        // Esperar al evento de carga
+        window.addEventListener('googleMapsLoaded', () => {
+          setTimeout(() => this.inicializarMapa(), 100);
+        }, { once: true });
+      }
       return;
     }
 
-    // Centro por defecto (Lima, Perú) o primer punto si existe
-    let defaultCenter = { lat: -12.046374, lng: -77.042793 };
-    if (this.puntos.length > 0) {
-      defaultCenter = { lat: this.puntos[0].latitud, lng: this.puntos[0].longitud };
+    const mapContainer = document.getElementById('map-puntos-container');
+    if (!mapContainer) {
+      // Si el contenedor no existe, intentar de nuevo después de un delay
+      setTimeout(() => this.inicializarMapa(), 200);
+      return;
     }
 
-    this.map = new google.maps.Map(mapContainer, {
-      center: defaultCenter,
-      zoom: this.puntos.length > 0 ? 13 : 10,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    });
-
-    // Listener para clics en el mapa
-    this.map.addListener('click', (event: any) => {
-      if (event.latLng) {
-        this.agregarPuntoDesdeMapa(event.latLng.lat(), event.latLng.lng());
+    try {
+      // Centro por defecto (Lima, Perú) o primer punto si existe
+      let defaultCenter = { lat: -12.046374, lng: -77.042793 };
+      if (this.puntos.length > 0) {
+        defaultCenter = { lat: this.puntos[0].latitud, lng: this.puntos[0].longitud };
       }
-    });
 
-    this.mapInitialized = true;
-    this.actualizarMapa();
+      this.map = new google.maps.Map(mapContainer, {
+        center: defaultCenter,
+        zoom: this.puntos.length > 0 ? 13 : 10,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+
+      // Listener para clics en el mapa
+      this.map.addListener('click', (event: any) => {
+        if (event.latLng) {
+          this.agregarPuntoDesdeMapa(event.latLng.lat(), event.latLng.lng());
+        }
+      });
+
+      this.mapInitialized = true;
+      this.actualizarMapa();
+    } catch (error) {
+      console.error('Error al inicializar Google Maps:', error);
+      this.messageService.error('Error al cargar el mapa. Por favor, recargue la página.', 'Error de Mapa', 6000);
+    }
   }
 
   agregarPuntoDesdeMapa(lat: number, lng: number): void {
@@ -174,84 +220,94 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Limpiar marcadores y polyline existentes
-    this.limpiarMapa();
-
-    const puntos: { lat: number; lng: number }[] = [];
-
-    // Ordenar puntos por orden
-    const puntosOrdenados = [...this.puntos].sort((a, b) => (a.orden || 0) - (b.orden || 0));
-
-    // Crear marcadores para cada punto
-    puntosOrdenados.forEach((punto, index) => {
-      const lat = punto.latitud;
-      const lng = punto.longitud;
-
-      if (lat && lng) {
-        puntos.push({ lat, lng });
-
-        const marker = new google.maps.Marker({
-          position: { lat, lng },
-          map: this.map!,
-          label: {
-            text: (punto.orden || (index + 1)).toString(),
-            color: 'white',
-            fontWeight: 'bold'
-          },
-          title: punto.nombreParadero || `Punto ${punto.orden || index + 1}`,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 12,
-            fillColor: this.colorRuta,
-            fillOpacity: 1,
-            strokeColor: 'white',
-            strokeWeight: 2
-          }
-        });
-
-        // Info window con detalles del punto
-        const infoWindow = new google.maps.InfoWindow({
-          content: `
-            <div>
-              <strong>Punto ${punto.orden || index + 1}</strong><br>
-              ${punto.nombreParadero ? `Paradero: ${punto.nombreParadero}<br>` : ''}
-              Lat: ${lat.toFixed(6)}<br>
-              Lng: ${lng.toFixed(6)}<br>
-              ${punto.esParaderoOficial ? '<span style="color: green;">Paradero Oficial</span>' : ''}
-            </div>
-          `
-        });
-
-        marker.addListener('click', () => {
-          infoWindow.open(this.map!, marker);
-        });
-
-        // Doble clic para editar
-        marker.addListener('dblclick', () => {
-          this.editarPunto(punto);
-        });
-
-        this.markers.push(marker);
-      }
-    });
-
-    // Crear polyline para conectar los puntos
-    if (puntos.length > 1) {
-      this.polyline = new google.maps.Polyline({
-        path: puntos,
-        geodesic: true,
-        strokeColor: this.colorRuta,
-        strokeOpacity: 0.8,
-        strokeWeight: 3,
-        map: this.map!
-      });
+    // Verificar que Google Maps esté disponible
+    if (typeof google === 'undefined' || !google.maps) {
+      return;
     }
 
-    // Ajustar el zoom para mostrar todos los puntos
-    if (puntos.length > 0) {
-      const bounds = new google.maps.LatLngBounds();
-      puntos.forEach(punto => bounds.extend(punto));
-      this.map!.fitBounds(bounds);
+    try {
+      // Limpiar marcadores y polyline existentes
+      this.limpiarMapa();
+
+      const puntos: { lat: number; lng: number }[] = [];
+
+      // Ordenar puntos por orden
+      const puntosOrdenados = [...this.puntos].sort((a, b) => (a.orden || 0) - (b.orden || 0));
+
+      // Crear marcadores para cada punto
+      puntosOrdenados.forEach((punto, index) => {
+        const lat = punto.latitud;
+        const lng = punto.longitud;
+
+        if (lat && lng) {
+          puntos.push({ lat, lng });
+
+          const marker = new google.maps.Marker({
+            position: { lat, lng },
+            map: this.map!,
+            label: {
+              text: (punto.orden || (index + 1)).toString(),
+              color: 'white',
+              fontWeight: 'bold'
+            },
+            title: punto.nombreParadero || `Punto ${punto.orden || index + 1}`,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: this.colorRuta,
+              fillOpacity: 1,
+              strokeColor: 'white',
+              strokeWeight: 2
+            }
+          });
+
+          // Info window con detalles del punto
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+              <div>
+                <strong>Punto ${punto.orden || index + 1}</strong><br>
+                ${punto.nombreParadero ? `Paradero: ${punto.nombreParadero}<br>` : ''}
+                Lat: ${lat.toFixed(6)}<br>
+                Lng: ${lng.toFixed(6)}<br>
+                ${punto.esParaderoOficial ? '<span style="color: green;">Paradero Oficial</span>' : ''}
+              </div>
+            `
+          });
+
+          marker.addListener('click', () => {
+            infoWindow.open(this.map!, marker);
+          });
+
+          // Doble clic para editar
+          marker.addListener('dblclick', () => {
+            this.editarPunto(punto);
+          });
+
+          this.markers.push(marker);
+        }
+      });
+
+      // Crear polyline para conectar los puntos
+      if (puntos.length > 1) {
+        this.polyline = new google.maps.Polyline({
+          path: puntos,
+          geodesic: true,
+          strokeColor: this.colorRuta,
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+          map: this.map!
+        });
+      }
+
+      // Ajustar el zoom para mostrar todos los puntos
+      if (puntos.length > 0) {
+        const bounds = new google.maps.LatLngBounds();
+        puntos.forEach(punto => bounds.extend(punto));
+        this.map!.fitBounds(bounds);
+      }
+    } catch (error) {
+      console.error('Error al actualizar el mapa:', error);
+      this.messageService.error('Error al actualizar el mapa', 'Error', 5000);
     }
   }
 

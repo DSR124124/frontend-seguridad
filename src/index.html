@@ -6,7 +6,21 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnJC_qbY41ZsXjgDLhTmcSK6GkkcL-_pw&libraries=places"></script>
+  <script>
+    window.initGoogleMaps = function() {
+      window.googleMapsLoaded = true;
+      window.dispatchEvent(new Event('googleMapsLoaded'));
+    };
+    window.googleMapsError = function() {
+      window.googleMapsError = true;
+      window.dispatchEvent(new Event('googleMapsError'));
+      console.error('Error al cargar Google Maps API');
+    };
+  </script>
+  <script async defer 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnJC_qbY41ZsXjgDLhTmcSK6GkkcL-_pw&libraries=places&callback=initGoogleMaps"
+    onerror="window.googleMapsError()">
+  </script>
 </head>
 <body>
   <app-root></app-root>

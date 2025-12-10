@@ -24,8 +24,8 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Copiar los archivos construidos desde el stage anterior
 COPY --from=build /app/dist/frontend-seguridad/browser /usr/share/nginx/html
 
-# Exponer el puerto 80
-EXPOSE 80
+# Exponer el puerto 81
+EXPOSE 81
 
 # Comando por defecto para iniciar Nginx
 CMD ["nginx", "-g", "daemon off;"]

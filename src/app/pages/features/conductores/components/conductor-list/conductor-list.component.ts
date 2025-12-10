@@ -128,16 +128,16 @@ export class ConductorListComponent implements OnInit, OnDestroy {
     });
   }
 
-  getSeveridadEstado(estado: string): string {
+  getClaseTagEstado(estado: string): string {
     switch (estado?.toLowerCase()) {
       case 'activo':
-        return 'success';
+        return 'tag-success';
       case 'inactivo':
-        return 'danger';
+        return 'tag-danger';
       case 'suspendido':
-        return 'warning';
+        return 'tag-warning';
       default:
-        return 'info';
+        return 'tag-info';
     }
   }
 

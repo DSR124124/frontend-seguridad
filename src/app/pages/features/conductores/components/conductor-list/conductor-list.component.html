@@ -63,11 +63,11 @@
         <td>{{ conductor.categoria || '-' }}</td>
         <td>{{ conductor.telefonoContacto || '-' }}</td>
         <td>
-          <p-tag [value]="conductor.estado" [severity]="getSeveridadEstado(conductor.estado)"></p-tag>
+          <p-tag [value]="conductor.estado" [class]="getClaseTagEstado(conductor.estado)"></p-tag>
         </td>
         <td>
           <div class="acciones-cell">
-            <p-button icon="pi pi-pencil" styleClass="btn-primary btn-v2" pTooltip="Editar conductor"
+            <p-button icon="pi pi-pencil" styleClass="btn-success btn-v2" pTooltip="Editar conductor"
               tooltipPosition="top" (click)="editarConductor(conductor)"></p-button>
             <p-button icon="pi pi-trash" styleClass="btn-danger btn-v2" pTooltip="Eliminar conductor"
               tooltipPosition="top" (click)="confirmarEliminar(conductor)"></p-button>

@@ -147,16 +147,16 @@ export class BusListComponent implements OnInit, OnDestroy {
     });
   }
 
-  getSeveridadEstado(estado: string): string {
+  getClaseTagEstado(estado: string): string {
     switch (estado?.toLowerCase()) {
       case 'operativo':
-        return 'success';
+        return 'tag-success';
       case 'mantenimiento':
-        return 'warning';
+        return 'tag-warning';
       case 'inactivo':
-        return 'danger';
+        return 'tag-danger';
       default:
-        return 'info';
+        return 'tag-info';
     }
   }
 }

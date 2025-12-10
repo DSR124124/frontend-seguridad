@@ -55,7 +55,7 @@
         <td>{{ bus.capacidad }}</td>
         <td>{{ bus.imeiGps || '-' }}</td>
         <td>
-          <p-tag [value]="bus.estado" [severity]="getSeveridadEstado(bus.estado)"></p-tag>
+          <p-tag [value]="bus.estado" [class]="getClaseTagEstado(bus.estado)"></p-tag>
         </td>
         <td>
           <div class="acciones-cell">

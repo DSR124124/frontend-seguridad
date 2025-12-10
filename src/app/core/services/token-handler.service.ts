@@ -1,11 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { MessageService } from './message.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TokenHandlerService {
   private router = inject(Router);
+  private messageService = inject(MessageService);
 
   initializeTokenFromQueryParams(): void {
     // Leer los query params directamente de la URL del navegador
@@ -15,8 +17,15 @@ export class TokenHandlerService {
     if (token && token.trim() !== '') {
       // Guardar el token en localStorage
       const existingToken = localStorage.getItem('auth_token');
-      if (!existingToken || existingToken !== token) {
+      const isNewToken = !existingToken || existingToken !== token;
+
+      if (isNewToken) {
         localStorage.setItem('auth_token', token);
+
+        // Mostrar mensaje de bienvenida solo si es un token nuevo
+        if (!existingToken) {
+          this.messageService.success('Bienvenido al Sistema de Gestión de Seguridad', 'Acceso exitoso', 5000);
+        }
       }
 
       // Limpiar la URL del token inmediatamente

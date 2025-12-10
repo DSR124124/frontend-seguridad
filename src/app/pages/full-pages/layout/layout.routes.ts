@@ -15,11 +15,15 @@ export const layoutRoutes: Routes = [
         loadComponent: () => import('../../features/home/components/home/home.component').then(m => m.HomeComponent)
       },
       {
-        path: 'transporte',
+        path: 'buses',
         children: [
           {
-            path: 'buses',
+            path: 'lista-buses',
             loadComponent: () => import('../../features/buses/components/bus-list/bus-list.component').then(m => m.BusListComponent)
+          },
+          {
+            path: 'lista-conductores',
+            loadComponent: () => import('../../features/conductores/components/conductor-list/conductor-list.component').then(m => m.ConductorListComponent)
           }
         ]
       }

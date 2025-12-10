@@ -1,0 +1,20 @@
+/* Mensaje vacío */
+.empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-gray-medium, #6c757d);
+}
+
+.empty-message p {
+  margin-top: 1rem;
+  font-size: var(--font-size-medium, 1rem);
+}
+
+/* Columna de acciones */
+.acciones-cell {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+

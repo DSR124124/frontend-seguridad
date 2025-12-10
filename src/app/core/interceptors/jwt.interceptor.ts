@@ -9,13 +9,13 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  // Obtener token del localStorage (compatible con integración desde frontend-gestion)
+  // Obtener token del localStorage
   const token = localStorage.getItem('auth_token');
 
-  if (token) {
+  if (token && token.trim() !== '') {
     req = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.trim()}`
       },
       withCredentials: true
     });

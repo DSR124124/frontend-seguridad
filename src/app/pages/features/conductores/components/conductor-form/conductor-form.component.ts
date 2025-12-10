@@ -74,6 +74,7 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
 
   cargarUsuariosConductores(): void {
     this.loadingService.show();
+
     const sub = this.usuarioGestionService.obtenerUsuariosPorRol('Conductor').subscribe({
       next: (usuarios) => {
         this.usuariosDisponibles = usuarios || [];
@@ -89,24 +90,21 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.loadingService.hide();
-        const errorMessage = error?.error?.mensaje || error?.error?.message || error?.message || 'Error desconocido';
         const statusCode = error?.status || '';
-        const url = error?.url || '';
-        
-        let detailMessage = `No se pudieron cargar los usuarios conductores.`;
+
+        let detailMessage = '';
         if (statusCode === 403) {
-          detailMessage += ' Acceso denegado. Verifique su sesión.';
-        } else if (statusCode === 404) {
-          detailMessage += ' El endpoint no fue encontrado.';
+          detailMessage = 'Acceso denegado. El token puede haber expirado o no ser válido. Por favor, inicie sesión nuevamente desde el sistema de gestión.';
         } else if (statusCode === 401) {
-          detailMessage += ' No autorizado. Por favor, inicie sesión nuevamente.';
+          detailMessage = 'No autorizado. El token ha expirado. Por favor, inicie sesión nuevamente.';
         } else {
-          detailMessage += ` ${errorMessage}`;
+          const errorMessage = error?.error?.mensaje || error?.error?.message || error?.message || 'Error desconocido';
+          detailMessage = `Error al cargar usuarios: ${errorMessage}`;
         }
-        
+
         this.messageService.add({
           severity: 'error',
-          summary: `Error ${statusCode ? `(${statusCode})` : ''} al cargar usuarios`,
+          summary: `Error ${statusCode ? `(${statusCode})` : ''}`,
           detail: detailMessage,
           life: 8000
         });
@@ -130,7 +128,7 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
         telefonoContacto: conductor.telefonoContacto || '',
         estado: conductor.estado
       });
-      
+
       // Deshabilitar el campo de usuario en modo edición
       this.conductorForm.get('idUsuarioGestion')?.disable();
     } else {

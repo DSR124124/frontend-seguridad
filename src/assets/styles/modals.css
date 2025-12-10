@@ -1,0 +1,74 @@
+/* =====================================================
+   MODALS & DIALOGS STYLES - NETTALCO DESIGN SYSTEM
+   ===================================================== */
+
+/* ===== CUSTOM MODAL MASK ===== */
+.custom-modal-mask {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  z-index: 9999 !important;
+}
+
+/* Prevenir interacción con elementos de fondo */
+.custom-modal-mask ~ * {
+  pointer-events: none !important;
+}
+
+.custom-error-dialog {
+  pointer-events: all !important;
+}
+
+/* ===== ERROR DIALOG ===== */
+.custom-error-dialog .p-dialog {
+  border-radius: 8px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid #e74c3c !important;
+  animation: modalFadeIn 0.3s ease-out !important;
+}
+
+.custom-error-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+  color: white !important;
+  border-bottom: 1px solid #c0392b !important;
+  border-radius: 6px 6px 0 0 !important;
+}
+
+.custom-error-dialog .p-dialog-header .p-dialog-title {
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+}
+
+.custom-error-dialog .p-dialog-content {
+  padding: 0 !important;
+  border-radius: 0 0 6px 6px !important;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE DIALOGS ===== */
+@media (max-width: 767.98px) {
+  .p-dialog {
+    margin: 1rem !important;
+    width: calc(100vw - 2rem) !important;
+    max-width: none !important;
+  }
+}
+
+/* Tablet ajustes */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .p-dialog {
+    width: 80vw !important;
+    max-width: 600px !important;
+  }
+}
+

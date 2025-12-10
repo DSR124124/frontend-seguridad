@@ -1,1 +1,191 @@
-/* You can add global styles to this file, and also import other style files */
+/* =====================================================
+   GLOBAL STYLES - NETTALCO DESIGN SYSTEM
+   ===================================================== */
+
+/*
+   Bootstrap 5.3.8 is configured in angular.json
+   - CSS: node_modules/bootstrap/dist/css/bootstrap.min.css
+   - JS: node_modules/bootstrap/dist/js/bootstrap.bundle.min.js
+   You can override Bootstrap styles here or in the modular CSS files
+   Bootstrap utilities are also defined below to ensure they work correctly
+*/
+
+/* =====================================================
+   IMPORT MODULAR STYLE FILES
+   All @import rules must come first before any other CSS rules
+   ===================================================== */
+   @import url("assets/styles/colors.css");
+   @import url("assets/styles/typography.css");
+   @import url("assets/styles/inputs.css");
+   @import url("assets/styles/toolbar.css");
+   @import url("assets/styles/buttons.css");
+   @import url("assets/styles/tags.css");
+   @import url("assets/styles/icons.css");
+   @import url("assets/styles/tables.css");
+   @import url("assets/styles/cards.css");
+   @import url("assets/styles/overlays.css");
+   @import url("assets/styles/components.css");
+   @import url("assets/styles/modals.css");
+   @import url("assets/styles/stepper.css");
+   @import url("assets/styles/effects.css");
+   @import url("assets/styles/driver.css");
+   @import url("assets/styles/responsive.css");
+   @import "primeicons/primeicons.css";
+
+
+   /* =====================================================
+      DARK MODE SUPPORT
+      ===================================================== */
+
+   /* Modo claro (por defecto) */
+   * {
+     box-sizing: border-box;
+   }
+
+   html, body {
+     margin: 0;
+     padding: 0;
+     width: 100%;
+     height: 100%;
+     overflow: hidden;
+     background-color: #ffffff;
+     color: #2d3748;
+     transition: background-color 0.3s ease, color 0.3s ease;
+   }
+
+   app-root {
+     display: block;
+     width: 100%;
+     height: 100vh;
+     margin: 0;
+     padding: 0;
+     overflow: hidden;
+   }
+
+   /* Modo oscuro - cuando tiene la clase .app-dark en el elemento html */
+   html.app-dark {
+     background-color: #1a202c !important;
+     margin: 0 !important;
+     padding: 0 !important;
+     width: 100% !important;
+     height: 100% !important;
+     overflow: hidden !important;
+   }
+
+   html.app-dark body {
+     background-color: #1a202c !important;
+     color: #ffffff !important;
+     margin: 0 !important;
+     padding: 0 !important;
+     width: 100% !important;
+     height: 100% !important;
+     overflow: hidden !important;
+   }
+
+   html.app-dark .container-fluid {
+     background-color: #1a202c !important;
+     color: #ffffff !important;
+   }
+
+   html.app-dark h1,
+   html.app-dark h2,
+   html.app-dark h3,
+   html.app-dark h4,
+   html.app-dark h5,
+   html.app-dark h6,
+   html.app-dark p {
+     color: #ffffff !important;
+   }
+
+   /* =====================================================
+      ADDITIONAL BUTTON MODIFICATIONS
+      ===================================================== */
+
+   /* Mejorando botones modificados */
+   .p-button-modificado .p-button {
+     width: 100% !important;
+     font-size: var(--font-size-button) !important;
+     font-weight: var(--font-weight-medium) !important;
+     letter-spacing: var(--letter-spacing-wide) !important;
+   }
+
+   /* =====================================================
+      BOOTSTRAP UTILITIES - Asegurar que funcionen
+      ===================================================== */
+
+   /* Display Flex */
+   .d-flex {
+     display: flex !important;
+   }
+
+   .d-inline-flex {
+     display: inline-flex !important;
+   }
+
+   /* Gap Utilities */
+   .gap-0 {
+     gap: 0 !important;
+   }
+
+   .gap-1 {
+     gap: 0.25rem !important;
+   }
+
+   .gap-2 {
+     gap: 0.5rem !important;
+   }
+
+   .gap-3 {
+     gap: 1rem !important;
+   }
+
+   .gap-4 {
+     gap: 1.5rem !important;
+   }
+
+   .gap-5 {
+     gap: 3rem !important;
+   }
+
+   /* Flex Direction */
+   .flex-row {
+     flex-direction: row !important;
+   }
+
+   .flex-column {
+     flex-direction: column !important;
+   }
+
+   /* Justify Content */
+   .justify-content-start {
+     justify-content: flex-start !important;
+   }
+
+   .justify-content-end {
+     justify-content: flex-end !important;
+   }
+
+   .justify-content-center {
+     justify-content: center !important;
+   }
+
+   .justify-content-between {
+     justify-content: space-between !important;
+   }
+
+   .justify-content-around {
+     justify-content: space-around !important;
+   }
+
+   /* Align Items */
+   .align-items-start {
+     align-items: flex-start !important;
+   }
+
+   .align-items-end {
+     align-items: flex-end !important;
+   }
+
+   .align-items-center {
+     align-items: center !important;
+   }

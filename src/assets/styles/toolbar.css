@@ -1,0 +1,110 @@
+/* =====================================================
+   TOOLBAR STYLES - NETTALCO DESIGN SYSTEM
+   ===================================================== */
+
+/* ===== PRIMENG TOOLBAR ===== */
+.p-toolbar {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 122, 255, 0.05),
+    rgba(162, 240, 161, 0.03)
+  ) !important;
+  border: 1px solid rgba(28, 34, 77, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 1rem 1.5rem !important;
+  box-shadow: 0 2px 8px rgba(28, 34, 77, 0.06) !important;
+}
+
+/* ===== CUSTOM TOOLBAR ===== */
+.custom-toolbar {
+  background: linear-gradient(
+    90deg,
+    var(--color-navy-dark) 0%,
+    var(--p-secondary-color) 100%
+  ) !important;
+  color: white !important;
+}
+
+/* Modo oscuro - Toolbar con fondo claro */
+html.app-dark .custom-toolbar {
+  background: linear-gradient(
+    90deg,
+    #f7fafc 0%,
+    #edf2f7 100%
+  ) !important;
+  color: #1c224d !important;
+}
+
+/* Modo oscuro - Todos los elementos dentro del toolbar */
+html.app-dark .custom-toolbar * {
+  color: #1c224d !important;
+}
+
+.custom-toolbar-dialog {
+  background: var(--color-light-blue) !important;
+  color: var(--color-navy-dark) !important;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: linear-gradient(
+    90deg,
+    var(--color-navy-dark) 0%,
+    var(--p-secondary-color) 100%
+  ) !important;
+  color: white !important;
+}
+
+/* Modo oscuro - Footer con fondo claro */
+html.app-dark .footer {
+  background: linear-gradient(
+    90deg,
+    #f7fafc 0%,
+    #edf2f7 100%
+  ) !important;
+  color: #1c224d !important;
+}
+
+/* Modo oscuro - Todos los elementos dentro del footer */
+html.app-dark .footer * {
+  color: #1c224d !important;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  background: linear-gradient(
+    180deg,
+    var(--color-navy-dark) 0%,
+    var(--p-secondary-color) 100%
+  ) !important;
+  color: white !important;
+}
+
+/* Modo oscuro - Sidebar con fondo claro */
+html.app-dark .sidebar {
+  background: linear-gradient(
+    180deg,
+    #f7fafc 0%,
+    #edf2f7 100%
+  ) !important;
+  color: #1c224d !important;
+}
+
+.sidebar-mini {
+  background: linear-gradient(
+    180deg,
+    #2a3a6b 0%,
+    #1e2749 100%
+  ) !important;
+}
+
+/* Modo oscuro - Sidebar mini con fondo claro */
+html.app-dark .sidebar-mini {
+  background: linear-gradient(
+    180deg,
+    #f7fafc 0%,
+    #edf2f7 100%
+  ) !important;
+  color: #1c224d !important;
+}
+

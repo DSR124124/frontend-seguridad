@@ -1,0 +1,38 @@
+/* =====================================================
+   STEPPER STYLES - NETTALCO DESIGN SYSTEM
+   ===================================================== */
+
+.p-step .p-step-title {
+  color: var(--color-navy-dark) !important;
+  font-weight: 600 !important;
+}
+
+.p-step .p-step-number {
+  color: var(--color-navy-dark) !important;
+  font-weight: 600 !important;
+}
+
+.p-step-active .p-step-title {
+  color: var(--color-blue-light) !important;
+  font-weight: 600 !important;
+}
+
+.p-step-active .p-step-number {
+  color: var(--color-blue-light) !important;
+  font-weight: 600 !important;
+}
+
+.p-step:has(~ .p-step-active) .p-step-title {
+  color: var(--color-blue-light) !important;
+  font-weight: 600 !important;
+}
+
+.p-step:has(~ .p-step-active) .p-step-number {
+  color: var(--color-blue-light) !important;
+  font-weight: 600 !important;
+}
+
+.p-step:has(~ .p-step-active) .p-stepper-separator {
+  background-color: var(--color-blue-light) !important;
+}
+

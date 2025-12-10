@@ -1,59 +1,171 @@
-# FrontendSeguridad
+# Frontend Seguridad
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.0.
+Sistema de administración de seguridad y transporte integrado como microservicio dentro del sistema de gestión.
 
-## Development server
+## Desarrollo
 
-To start a local development server, run:
+### Requisitos
+- Node.js 20+
+- npm
 
+### Instalación
 ```bash
-ng serve
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+### Ejecutar en desarrollo
 ```bash
-ng generate component component-name
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+La aplicación estará disponible en `http://localhost:4201`
 
+### Build para producción
 ```bash
-ng generate --help
+npm run build
 ```
 
-## Building
+El build se generará en `dist/frontend-seguridad/browser`
 
-To build the project run:
+## Despliegue con Docker
 
+### Construir la imagen
 ```bash
-ng build
+docker build -t frontend-seguridad .
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
+### Ejecutar el contenedor
 ```bash
-ng test
+docker run -d -p 4201:80 --name frontend-seguridad frontend-seguridad
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
+### Con docker-compose
 ```bash
-ng e2e
+docker-compose up -d
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Esto construirá y ejecutará el contenedor en el puerto 4201.
 
-## Additional Resources
+## Integración con Sistema de Gestión
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Este sistema está diseñado para ser integrado dentro del `frontend-gestion` como un sistema externo.
+
+### Configuración
+
+El sistema recibe el token JWT como query parameter cuando es cargado desde el sistema de gestión:
+
+```
+http://localhost:4201?token=JWT_TOKEN
+```
+
+El token se guarda automáticamente en localStorage y se usa para todas las peticiones HTTP.
+
+### Variables de Entorno
+
+Configurar en `src/environment/environment.ts`:
+
+```typescript
+export const environment = {
+  urlAuth: 'https://edugen.brianuceda.xyz/gestion/',
+  urlServicios: 'http://localhost:8080/',
+};
+```
+
+**Nota**: Ajustar las URLs según tu entorno de producción.
+
+### Configuración en frontend-gestion
+
+En `frontend-gestion/src/app/core/services/external-system.service.ts`, actualizar la URL del sistema:
+
+```typescript
+{
+  id: 'seguridad',
+  name: 'Gestión de Seguridad',
+  url: 'http://tu-servidor:4201', // URL de producción
+  // ...
+}
+```
+
+## Estructura del Proyecto
+
+```
+src/
+├── app/
+│   ├── core/
+│   │   ├── interceptors/     # Interceptores HTTP (JWT)
+│   │   ├── services/         # Servicios core (token-handler)
+│   │   └── interfaces/       # Interfaces compartidas
+│   ├── pages/
+│   │   ├── features/         # Módulos de funcionalidades
+│   │   └── full-pages/       # Páginas completas (auth, layout)
+│   ├── shared/               # Componentes y servicios compartidos
+│   └── prime-ng/             # Configuración de PrimeNG
+├── assets/                   # Recursos estáticos
+├── environment/              # Configuración de entornos
+└── theme/                    # Tema personalizado
+```
+
+## Tecnologías
+
+- Angular 19
+- PrimeNG
+- Bootstrap 5
+- TypeScript
+- RxJS
+
+## Despliegue en Producción
+
+### Opción 1: Docker (Recomendado)
+
+1. Construir la imagen:
+```bash
+docker build -t frontend-seguridad:latest .
+```
+
+2. Ejecutar el contenedor:
+```bash
+docker run -d \
+  -p 4201:80 \
+  --name frontend-seguridad \
+  --restart unless-stopped \
+  frontend-seguridad:latest
+```
+
+### Opción 2: Docker Compose
+
+```bash
+docker-compose up -d
+```
+
+### Opción 3: Nginx Directo
+
+1. Construir la aplicación:
+```bash
+npm run build
+```
+
+2. Copiar los archivos a tu servidor Nginx:
+```bash
+cp -r dist/frontend-seguridad/browser/* /usr/share/nginx/html/
+```
+
+3. Configurar Nginx con el archivo `nginx.conf` proporcionado
+
+## Configuración de Base-Href
+
+El sistema está configurado con `base-href: /sistema-seguridad/` en el Dockerfile.
+
+Si necesitas cambiar el base-href, edita el Dockerfile:
+
+```dockerfile
+RUN npm run build -- --configuration production --base-href /tu-ruta/
+```
+
+Y actualiza la configuración de Nginx si es necesario.
+
+## Notas
+
+- El sistema está configurado para funcionar como iframe dentro del sistema de gestión
+- El base-href está configurado como `/sistema-seguridad/` para el despliegue
+- Ajustar la URL en `external-system.service.ts` del frontend-gestion según el despliegue
+- El puerto por defecto es 4201, pero puede cambiarse en docker-compose.yml o en el comando docker run

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TokenHandlerService } from './core/services/token-handler.service';
 
 @Component({
   selector: 'app-root',
@@ -7,6 +8,12 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'frontend-seguridad';
+
+  constructor(private tokenHandlerService: TokenHandlerService) {}
+
+  ngOnInit(): void {
+    this.tokenHandlerService.initializeTokenFromQueryParams();
+  }
 }

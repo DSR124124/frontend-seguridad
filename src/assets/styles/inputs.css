@@ -1,0 +1,117 @@
+/* =====================================================
+   INPUTS & FORMS - NETTALCO DESIGN SYSTEM
+   ===================================================== */
+
+/* ===== INPUTS AND FORM ELEMENTS ===== */
+.p-inputtext,
+.p-dropdown,
+.p-calendar input,
+.p-multiselect {
+  font-size: var(--font-size-input) !important;
+  font-weight: var(--font-weight-normal) !important;
+  line-height: var(--line-height-normal) !important;
+}
+
+.p-inputtext:focus,
+.p-dropdown:not(.p-disabled).p-focus,
+.p-calendar input:focus,
+.p-multiselect:not(.p-disabled).p-focus,
+.p-inputnumber input:focus,
+.p-password input:focus,
+.p-inputtextarea:focus {
+  border-color: var(--color-blue-light) !important;
+  box-shadow: 0 0 0 3px rgba(74, 122, 255, 0.1),
+    0 4px 12px rgba(28, 34, 77, 0.08) !important;
+}
+
+/* ===== DROPDOWN ===== */
+.p-dropdown {
+  border-radius: 10px !important;
+  border: 2px solid rgba(28, 34, 77, 0.1) !important;
+  box-shadow: 0 2px 4px rgba(28, 34, 77, 0.04) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.p-dropdown-panel {
+  border-radius: 12px !important;
+  border: 1px solid rgba(28, 34, 77, 0.1) !important;
+  box-shadow: 0 10px 25px rgba(28, 34, 77, 0.15),
+    0 5px 10px rgba(28, 34, 77, 0.08) !important;
+  backdrop-filter: blur(10px) !important;
+  margin-top: 4px !important;
+}
+
+.p-dropdown-items .p-dropdown-item {
+  padding: 0.75rem 1rem !important;
+  border-radius: 8px !important;
+  margin: 2px 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.p-dropdown-items .p-dropdown-item:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 122, 255, 0.08),
+    rgba(162, 240, 161, 0.06)
+  ) !important;
+  transform: translateX(4px) !important;
+}
+
+.p-dropdown-items .p-dropdown-item.p-highlight {
+  background: linear-gradient(
+    135deg,
+    var(--color-blue-light),
+    var(--color-mint-light)
+  ) !important;
+  color: white !important;
+  font-weight: var(--font-weight-medium) !important;
+}
+
+/* ===== CALENDAR ===== */
+.p-calendar .p-datepicker {
+  border-radius: 16px !important;
+  border: 1px solid rgba(28, 34, 77, 0.1) !important;
+  box-shadow: 0 15px 35px rgba(28, 34, 77, 0.15),
+    0 8px 15px rgba(28, 34, 77, 0.08) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.p-calendar .p-datepicker .p-datepicker-header {
+  background: linear-gradient(
+    135deg,
+    var(--color-navy-dark),
+    var(--color-blue-light)
+  ) !important;
+  color: white !important;
+  border-radius: 16px 16px 0 0 !important;
+  padding: 1rem !important;
+}
+
+.p-calendar .p-datepicker table td > span {
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.p-calendar .p-datepicker table td > span:hover {
+  background: rgba(74, 122, 255, 0.1) !important;
+  transform: scale(1.1) !important;
+}
+
+.p-calendar .p-datepicker table td > span.p-highlight {
+  background: linear-gradient(
+    135deg,
+    var(--color-blue-light),
+    var(--color-mint-light)
+  ) !important;
+  color: white !important;
+}
+
+/* ===== RESPONSIVE INPUTS ===== */
+@media (max-width: 767.98px) {
+  .p-dropdown,
+  .p-inputtext {
+    padding: 0.625rem 0.75rem !important;
+    font-size: var(--font-size-medium) !important;
+  }
+}
+

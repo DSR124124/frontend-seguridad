@@ -1,0 +1,238 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '95vw', maxWidth: '1400px', maxHeight: '90vh' }"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="'Gestionar Puntos de Ruta: ' + nombreRuta"
+  (onHide)="hideDialog()"
+>
+  <div class="puntos-container">
+    <!-- Mapa de Google Maps -->
+    <div class="mapa-section">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5>Mapa Interactivo</h5>
+        <p-button 
+          icon="pi pi-plus" 
+          label="Agregar Punto Manualmente" 
+          styleClass="p-button-sm p-button-success"
+          (onClick)="abrirDialogoCrear()"
+          type="button"
+        ></p-button>
+      </div>
+      <div id="map-puntos-container" style="width: 100%; height: 500px; border-radius: 8px; border: 1px solid #ddd;"></div>
+      <small class="text-muted d-block mt-2">
+        <i class="pi pi-info-circle"></i> Haga clic en el mapa para agregar puntos. Doble clic en un marcador para editarlo.
+      </small>
+    </div>
+
+    <!-- Formulario de Punto -->
+    <div class="formulario-section" *ngIf="puntoEditando || puntoForm.value.latitud">
+      <h5>{{ puntoEditando ? 'Editar Punto' : 'Nuevo Punto' }}</h5>
+      <form [formGroup]="puntoForm" class="punto-form">
+        <div class="form-grid">
+          <div class="field">
+            <label for="orden" class="required">
+              Orden <span class="required-asterisk">*</span>
+            </label>
+            <p-inputNumber
+              id="orden"
+              formControlName="orden"
+              [min]="1"
+              [showButtons]="true"
+              [useGrouping]="false"
+              [class.ng-invalid]="isFieldInvalid('orden')"
+              styleClass="w-full"
+            ></p-inputNumber>
+            <small
+              *ngIf="isFieldInvalid('orden')"
+              class="p-error"
+            >
+              <span *ngIf="f['orden'].errors?.['required']">El orden es obligatorio</span>
+              <span *ngIf="f['orden'].errors?.['min']">El orden debe ser mayor a 0</span>
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="latitud" class="required">
+              Latitud <span class="required-asterisk">*</span>
+            </label>
+            <p-inputNumber
+              id="latitud"
+              formControlName="latitud"
+              [min]="-90"
+              [max]="90"
+              [minFractionDigits]="6"
+              [maxFractionDigits]="6"
+              [showButtons]="false"
+              [class.ng-invalid]="isFieldInvalid('latitud')"
+              styleClass="w-full"
+              placeholder="Ej: -12.046374"
+            ></p-inputNumber>
+            <small
+              *ngIf="isFieldInvalid('latitud')"
+              class="p-error"
+            >
+              <span *ngIf="f['latitud'].errors?.['required']">La latitud es obligatoria</span>
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="longitud" class="required">
+              Longitud <span class="required-asterisk">*</span>
+            </label>
+            <p-inputNumber
+              id="longitud"
+              formControlName="longitud"
+              [min]="-180"
+              [max]="180"
+              [minFractionDigits]="6"
+              [maxFractionDigits]="6"
+              [showButtons]="false"
+              [class.ng-invalid]="isFieldInvalid('longitud')"
+              styleClass="w-full"
+              placeholder="Ej: -77.042793"
+            ></p-inputNumber>
+            <small
+              *ngIf="isFieldInvalid('longitud')"
+              class="p-error"
+            >
+              <span *ngIf="f['longitud'].errors?.['required']">La longitud es obligatoria</span>
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="nombreParadero">
+              Nombre Paradero
+            </label>
+            <input
+              id="nombreParadero"
+              type="text"
+              pInputText
+              formControlName="nombreParadero"
+              placeholder="Ej: Paradero Central"
+            />
+          </div>
+
+          <div class="field">
+            <label for="esParaderoOficial">
+              <p-checkbox
+                id="esParaderoOficial"
+                formControlName="esParaderoOficial"
+                [binary]="true"
+              ></p-checkbox>
+              Es Paradero Oficial
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <p-button 
+            label="Cancelar" 
+            icon="pi pi-times" 
+            styleClass="p-button-text"
+            (onClick)="cancelarEdicion()"
+            type="button"
+          ></p-button>
+          <p-button 
+            [label]="puntoEditando ? 'Actualizar' : 'Guardar'" 
+            icon="pi pi-check" 
+            (onClick)="guardarPunto()"
+            [disabled]="puntoForm.invalid"
+            type="button"
+          ></p-button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Lista de Puntos -->
+    <div class="lista-puntos-section">
+      <h5>Puntos Registrados ({{ puntos.length }})</h5>
+      <p-table 
+        [value]="puntos" 
+        [paginator]="true" 
+        [rows]="10"
+        styleClass="p-datatable-sm"
+        [sortField]="'orden'"
+        [sortOrder]="1"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 10%">Orden</th>
+            <th style="width: 20%">Paradero</th>
+            <th style="width: 15%">Latitud</th>
+            <th style="width: 15%">Longitud</th>
+            <th style="width: 15%">Tipo</th>
+            <th style="width: 25%">Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-punto>
+          <tr>
+            <td><strong>{{ punto.orden }}</strong></td>
+            <td>{{ punto.nombreParadero || '-' }}</td>
+            <td>{{ punto.latitud?.toFixed(6) || '-' }}</td>
+            <td>{{ punto.longitud?.toFixed(6) || '-' }}</td>
+            <td>
+              <p-tag 
+                [value]="punto.esParaderoOficial ? 'Oficial' : 'Regular'" 
+                [class]="punto.esParaderoOficial ? 'tag-success' : 'tag-info'"
+              ></p-tag>
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <p-button 
+                  icon="pi pi-map-marker" 
+                  styleClass="p-button-sm p-button-info p-button-text"
+                  (onClick)="seleccionarPuntoEnMapa(punto)"
+                  pTooltip="Centrar mapa en este punto"
+                  tooltipPosition="top"
+                ></p-button>
+                <p-button 
+                  icon="pi pi-pencil" 
+                  styleClass="p-button-sm p-button-success p-button-text"
+                  (onClick)="editarPunto(punto)"
+                  pTooltip="Editar punto"
+                  tooltipPosition="top"
+                ></p-button>
+                <p-button 
+                  icon="pi pi-trash" 
+                  styleClass="p-button-sm p-button-danger p-button-text"
+                  (onClick)="confirmarEliminar(punto)"
+                  pTooltip="Eliminar punto"
+                  tooltipPosition="top"
+                ></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center p-4">
+              <div class="empty-message">
+                <i class="pi pi-inbox" style="font-size: 2rem; color: #ccc;"></i>
+                <p>No hay puntos registrados. Haga clic en el mapa para agregar puntos.</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button
+        pButton
+        type="button"
+        label="Cerrar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="hideDialog()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Confirmación de eliminación -->
+<p-confirmDialog></p-confirmDialog>
+

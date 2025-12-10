@@ -1,0 +1,146 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '700px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="modoEdicion ? 'Editar Ruta' : 'Crear Nueva Ruta'"
+  (onHide)="hideDialog()"
+>
+  <form [formGroup]="rutaForm" (ngSubmit)="guardar()">
+    <div class="form-grid">
+      <!-- Nombre -->
+      <div class="field">
+        <label for="nombre" class="required">
+          Nombre <span class="required-asterisk">*</span>
+        </label>
+        <input
+          id="nombre"
+          type="text"
+          pInputText
+          formControlName="nombre"
+          [class.ng-invalid]="isFieldInvalid('nombre')"
+          placeholder="Ej: Ruta Centro - Norte"
+          maxlength="100"
+        />
+        <small
+          *ngIf="isFieldInvalid('nombre')"
+          class="p-error"
+        >
+          <span *ngIf="f['nombre'].errors?.['required']">El nombre es obligatorio</span>
+          <span *ngIf="f['nombre'].errors?.['maxlength']">El nombre no puede exceder 100 caracteres</span>
+        </small>
+      </div>
+
+      <!-- Vehículo Default -->
+      <div class="field">
+        <label for="idVehiculoDefault" class="required">
+          Vehículo Default <span class="required-asterisk">*</span>
+        </label>
+        <p-dropdown
+          id="idVehiculoDefault"
+          formControlName="idVehiculoDefault"
+          [options]="buses"
+          optionLabel="placa"
+          optionValue="idBus"
+          placeholder="Seleccione un vehículo"
+          styleClass="w-full"
+          appendTo="body"
+          [class.ng-invalid]="isFieldInvalid('idVehiculoDefault')"
+        >
+          <ng-template let-bus pTemplate="item">
+            <div>{{ bus.placa }} - {{ bus.modelo || 'Sin modelo' }}</div>
+          </ng-template>
+        </p-dropdown>
+        <small
+          *ngIf="isFieldInvalid('idVehiculoDefault')"
+          class="p-error"
+        >
+          <span *ngIf="f['idVehiculoDefault'].errors?.['required']">El vehículo es obligatorio</span>
+        </small>
+      </div>
+
+      <!-- Descripción -->
+      <div class="field full-width">
+        <label for="descripcion">
+          Descripción
+        </label>
+        <textarea
+          id="descripcion"
+          pInputTextarea
+          formControlName="descripcion"
+          [class.ng-invalid]="isFieldInvalid('descripcion')"
+          placeholder="Descripción de la ruta..."
+          [rows]="3"
+          maxlength="500"
+        ></textarea>
+        <small
+          *ngIf="isFieldInvalid('descripcion')"
+          class="p-error"
+        >
+          <span *ngIf="f['descripcion'].errors?.['maxlength']">La descripción no puede exceder 500 caracteres</span>
+        </small>
+      </div>
+
+      <!-- Color Mapa -->
+      <div class="field">
+        <label for="colorMapa">
+          Color en Mapa
+        </label>
+        <div class="d-flex align-items-center gap-2">
+          <input
+            id="colorMapa"
+            type="color"
+            formControlName="colorMapa"
+            [class.ng-invalid]="isFieldInvalid('colorMapa')"
+            style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+          />
+          <input
+            type="text"
+            pInputText
+            formControlName="colorMapa"
+            [class.ng-invalid]="isFieldInvalid('colorMapa')"
+            placeholder="#0000FF"
+            maxlength="7"
+            style="flex: 1;"
+          />
+        </div>
+        <small
+          *ngIf="isFieldInvalid('colorMapa')"
+          class="p-error"
+        >
+          <span *ngIf="f['colorMapa'].errors?.['pattern']">El color debe estar en formato hexadecimal (ej: #0000FF)</span>
+        </small>
+      </div>
+    </div>
+
+    <div class="info-message mt-3">
+      <p class="text-muted">
+        <i class="pi pi-info-circle"></i>
+        Después de crear la ruta, podrá agregar puntos usando el botón "Gestionar Puntos" en la lista de rutas.
+      </p>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="hideDialog()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
+        icon="pi pi-check"
+        (click)="guardar()"
+        [disabled]="rutaForm.invalid"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+

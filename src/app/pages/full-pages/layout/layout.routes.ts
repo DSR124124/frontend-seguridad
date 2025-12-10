@@ -26,6 +26,15 @@ export const layoutRoutes: Routes = [
             loadComponent: () => import('../../features/conductores/components/conductor-list/conductor-list.component').then(m => m.ConductorListComponent)
           }
         ]
+      },
+      {
+        path: 'rutas',
+        children: [
+          {
+            path: 'lista-rutas',
+            loadComponent: () => import('../../features/rutas/components/ruta-list/ruta-list.component').then(m => m.RutaListComponent)
+          }
+        ]
       }
     ]
   }

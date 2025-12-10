@@ -1,0 +1,32 @@
+.rutas-container {
+  padding: 1.5rem;
+}
+
+.custom-toolbar {
+  margin-bottom: 1rem;
+}
+
+.tabla-datos {
+  margin-top: 1rem;
+}
+
+.acciones-cell {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.empty-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #999;
+}
+
+.empty-message p {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+}
+

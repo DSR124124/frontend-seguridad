@@ -43,6 +43,21 @@ export class SidebarService {
           },
         ],
         visible: true,
+      },
+      {
+        id: 'rutas',
+        label: 'Rutas',
+        icon: 'pi pi-map',
+        items: [
+          {
+            id: 'lista-rutas',
+            label: 'Lista de Rutas',
+            icon: 'pi pi-list',
+            routerLink: ['/rutas/lista-rutas'],
+            visible: true,
+          },
+        ],
+        visible: true,
       }
     ];
 

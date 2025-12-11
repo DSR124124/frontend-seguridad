@@ -51,6 +51,45 @@
   gap: 0.25rem;
 }
 
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.status-indicator.connected {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-indicator.connected i {
+  color: #28a745;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-indicator.error i {
+  color: #dc3545;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .contador-buses {
   display: flex;
   align-items: center;

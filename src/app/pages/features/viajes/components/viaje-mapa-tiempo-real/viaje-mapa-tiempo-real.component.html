@@ -38,11 +38,20 @@
             </p-button>
           </div>
         </div>
+        <span class="status-indicator" [class.connected]="connectionStatus === 'connected'"
+              [class.error]="connectionStatus === 'error'"
+              [title]="connectionStatus === 'connected' ? 'Actualización en tiempo real activa' : 'Error de conexión'">
+          <i class="pi" [class.pi-circle-fill]="connectionStatus === 'connected'"
+             [class.pi-exclamation-circle]="connectionStatus === 'error'"></i>
+          <span *ngIf="connectionStatus === 'connected'">En vivo</span>
+          <span *ngIf="connectionStatus === 'error'">Desconectado</span>
+        </span>
         <p-button
           icon="pi pi-refresh"
           label="Actualizar"
-          styleClass="p-button-info"
-          (onClick)="cargarUbicaciones()">
+          styleClass="p-button-text p-button-sm"
+          (onClick)="cargarUbicaciones(true)"
+          [title]="'Actualizar manualmente'">
         </p-button>
         <span class="contador-buses">
           <i class="pi pi-car"></i>

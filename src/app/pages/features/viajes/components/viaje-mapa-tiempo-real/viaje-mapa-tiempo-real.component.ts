@@ -6,7 +6,9 @@ import { ViajeActivoConUbicacion } from '../../interfaces/viaje-activo-ubicacion
 import { MessageService } from '../../../../../core/services/message.service';
 import { LoadingService } from '../../../../../shared/services/loading.service';
 import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
-import { Subscription, interval } from 'rxjs';
+import { Subscription, interval, timer } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 // Declaración de tipos para Google Maps
 declare var google: any;
@@ -33,7 +35,9 @@ export class ViajeMapaTiempoRealComponent implements OnInit, OnDestroy {
   busesSeleccionados: string[] = [];
 
   private updateSubscription?: Subscription;
-  private readonly UPDATE_INTERVAL = 5000; // 5 segundos
+  private readonly UPDATE_INTERVAL = 3000; // 3 segundos - más frecuente sin loading
+  private isInitialLoad = true;
+  connectionStatus: 'connected' | 'disconnected' | 'error' = 'connected';
 
   constructor(
     private viajeService: ViajeService,
@@ -104,31 +108,122 @@ export class ViajeMapaTiempoRealComponent implements OnInit, OnDestroy {
   }
 
   iniciarActualizacionAutomatica(): void {
-    this.cargarUbicaciones();
-    this.updateSubscription = interval(this.UPDATE_INTERVAL).subscribe(() => {
-      this.cargarUbicaciones();
+    // Carga inicial con loading
+    this.cargarUbicaciones(true);
+
+    // Actualizaciones automáticas sin loading spinner
+    this.updateSubscription = timer(this.UPDATE_INTERVAL, this.UPDATE_INTERVAL).pipe(
+      switchMap(() => {
+        if (!this.mapInitialized) {
+          return of(null);
+        }
+        return this.viajeService.obtenerViajesActivosConUbicacion().pipe(
+          catchError(error => {
+            this.connectionStatus = 'error';
+            // Solo mostrar error si es la primera vez o si lleva mucho tiempo desconectado
+            if (this.isInitialLoad) {
+              const errorMessage = error?.error?.message || error?.error?.error || error?.message || 'Error al cargar las ubicaciones';
+              this.messageService.error(errorMessage, 'Error', 6000);
+            }
+            return of(null);
+          })
+        );
+      })
+    ).subscribe({
+      next: (viajes) => {
+        if (viajes) {
+          this.connectionStatus = 'connected';
+          this.isInitialLoad = false;
+          this.actualizarDatos(viajes);
+        }
+      }
     });
   }
 
-  cargarUbicaciones(): void {
+  cargarUbicaciones(showLoading: boolean = false): void {
     if (!this.mapInitialized) {
       return;
     }
 
-    this.loadingService.show();
+    if (showLoading) {
+      this.loadingService.show();
+    }
+
     this.viajeService.obtenerViajesActivosConUbicacion().subscribe({
       next: (viajes) => {
-        this.viajes = viajes || [];
-        this.actualizarListaBuses();
-        this.aplicarFiltroBuses();
-        this.loadingService.hide();
+        this.connectionStatus = 'connected';
+        this.isInitialLoad = false;
+        this.actualizarDatos(viajes);
+        if (showLoading) {
+          this.loadingService.hide();
+        }
       },
       error: (error) => {
-        this.loadingService.hide();
+        this.connectionStatus = 'error';
+        if (showLoading) {
+          this.loadingService.hide();
+        }
         const errorMessage = error?.error?.message || error?.error?.error || error?.message || 'Error al cargar las ubicaciones';
         this.messageService.error(errorMessage, 'Error', 6000);
       }
     });
+  }
+
+  private actualizarDatos(viajes: ViajeActivoConUbicacion[]): void {
+    // Solo actualizar si hay cambios reales
+    const nuevosViajes = viajes || [];
+    const hayCambios = this.hayCambiosSignificativos(this.viajes, nuevosViajes);
+
+    if (hayCambios || this.isInitialLoad) {
+      this.viajes = nuevosViajes;
+      this.actualizarListaBuses();
+      this.aplicarFiltroBuses();
+    }
+  }
+
+  private hayCambiosSignificativos(viajesAnteriores: ViajeActivoConUbicacion[], viajesNuevos: ViajeActivoConUbicacion[]): boolean {
+    // Comparar cantidad de viajes
+    if (viajesAnteriores.length !== viajesNuevos.length) {
+      return true;
+    }
+
+    // Comparar IDs de viajes
+    const idsAnteriores = new Set(viajesAnteriores.map(v => v.idViaje));
+    const idsNuevos = new Set(viajesNuevos.map(v => v.idViaje));
+    if (idsAnteriores.size !== idsNuevos.size ||
+        !Array.from(idsAnteriores).every(id => idsNuevos.has(id))) {
+      return true;
+    }
+
+    // Comparar posiciones (solo si cambió significativamente - más de 10 metros)
+    for (const nuevoViaje of viajesNuevos) {
+      const viajeAnterior = viajesAnteriores.find(v => v.idViaje === nuevoViaje.idViaje);
+      if (viajeAnterior) {
+        if (viajeAnterior.latitude && viajeAnterior.longitude &&
+            nuevoViaje.latitude && nuevoViaje.longitude) {
+          const distancia = this.calcularDistancia(
+            viajeAnterior.latitude, viajeAnterior.longitude,
+            nuevoViaje.latitude, nuevoViaje.longitude
+          );
+          if (distancia > 0.01) { // ~1 km en grados, aproximadamente 10 metros
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  private calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Radio de la Tierra en km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   }
 
   actualizarListaBuses(): void {
@@ -184,7 +279,25 @@ export class ViajeMapaTiempoRealComponent implements OnInit, OnDestroy {
       const position = { lat: viaje.latitude, lng: viaje.longitude };
 
       if (this.markers.has(viaje.idViaje)) {
-        this.markers.get(viaje.idViaje)!.setPosition(position);
+        const marker = this.markers.get(viaje.idViaje)!;
+        const currentPos = marker.getPosition();
+
+        // Solo actualizar si la posición cambió significativamente
+        if (!currentPos ||
+            Math.abs(currentPos.lat() - position.lat) > 0.0001 ||
+            Math.abs(currentPos.lng() - position.lng) > 0.0001) {
+          marker.setPosition(position);
+        }
+
+        // Actualizar rotación si cambió
+        if (viaje.heading !== undefined && viaje.heading !== null) {
+          marker.setIcon({
+            ...marker.getIcon(),
+            rotation: viaje.heading
+          });
+        }
+
+        // Actualizar contenido del info window
         this.infoWindows.get(viaje.idViaje)?.setContent(this.crearContenidoInfoWindow(viaje));
       } else {
         const marker = new google.maps.Marker({
@@ -217,7 +330,8 @@ export class ViajeMapaTiempoRealComponent implements OnInit, OnDestroy {
       }
     });
 
-    if (this.viajesFiltrados.length > 0) {
+    // Solo ajustar vista en la carga inicial o cuando cambia el número de viajes
+    if (this.isInitialLoad && this.viajesFiltrados.length > 0) {
       this.ajustarVista();
     }
   }

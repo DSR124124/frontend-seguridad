@@ -58,6 +58,28 @@ export class SidebarService {
           },
         ],
         visible: true,
+      },
+      {
+        id: 'viajes',
+        label: 'Viajes',
+        icon: 'pi pi-calendar',
+        items: [
+          {
+            id: 'lista-viajes',
+            label: 'Lista de Viajes',
+            icon: 'pi pi-list',
+            routerLink: ['/viajes/lista-viajes'],
+            visible: true,
+          },
+          {
+            id: 'mapa-tiempo-real',
+            label: 'Mapa en Tiempo Real',
+            icon: 'pi pi-map',
+            routerLink: ['/viajes/mapa-tiempo-real'],
+            visible: true,
+          },
+        ],
+        visible: true,
       }
     ];
 

@@ -1,0 +1,56 @@
+.viajes-container {
+  padding: 1.5rem;
+}
+
+.custom-toolbar {
+  margin-bottom: 1rem;
+}
+
+.acciones-cell {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.empty-message p {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+}
+
+.tag-info {
+  background-color: #0dcaf0;
+  color: white;
+}
+
+.tag-success {
+  background-color: #198754;
+  color: white;
+}
+
+.tag-primary {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.tag-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.tag-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-v2 {
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+}
+

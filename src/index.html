@@ -7,27 +7,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script>
+    window.googleMapsLoaded = false;
+    window.googleMapsError = false;
+
     window.initGoogleMaps = function() {
-      window.googleMapsLoaded = true;
-      window.dispatchEvent(new Event('googleMapsLoaded'));
+      try {
+        if (typeof google !== 'undefined' && google.maps) {
+          window.googleMapsLoaded = true;
+          window.googleMapsError = false;
+          window.dispatchEvent(new Event('googleMapsLoaded'));
+        } else {
+          window.googleMapsError = true;
+          window.dispatchEvent(new Event('googleMapsError'));
+        }
+      } catch (error) {
+        window.googleMapsError = true;
+        window.dispatchEvent(new Event('googleMapsError'));
+      }
     };
-    window.googleMapsError = function() {
+
+    window.googleMapsScriptError = function() {
       window.googleMapsError = true;
       window.dispatchEvent(new Event('googleMapsError'));
-      console.error('Error al cargar Google Maps API');
-      // Mostrar mensaje de error más descriptivo
-      const errorMsg = document.createElement('div');
-      errorMsg.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #f44336; color: white; padding: 15px 20px; border-radius: 4px; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
-      errorMsg.innerHTML = '<strong>Error de Google Maps:</strong> La API de Maps JavaScript no está activada. Por favor, habilite la API en Google Cloud Console.';
-      document.body.appendChild(errorMsg);
-      setTimeout(() => errorMsg.remove(), 10000);
     };
+
+    if (typeof google !== 'undefined' && google.maps) {
+      window.googleMapsLoaded = true;
+      window.dispatchEvent(new Event('googleMapsLoaded'));
+    }
   </script>
   <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnJC_qbY41ZsXjgDLhTmcSK6GkkcL-_pw&libraries=places,marker&loading=async&callback=initGoogleMaps"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2skgzjYVconN1DvxGSIaJOj5pD6fr0iY&libraries=places,directions,visualization&loading=async&callback=initGoogleMaps&v=weekly"
     async
     defer
-    onerror="window.googleMapsError()">
+    onerror="window.googleMapsScriptError()">
   </script>
 </head>
 <body>

@@ -10,6 +10,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ChipModule } from 'primeng/chip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { CalendarModule } from 'primeng/calendar';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
@@ -58,9 +59,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 import { CommonModule } from '@angular/common';
 import { MessageModule } from 'primeng/message';
-// ChartModule comentado temporalmente - requiere configuración especial de chart.js
-// Si necesitas gráficos, descomenta esto y asegúrate de tener chart.js correctamente configurado
-// import { ChartModule } from 'primeng/chart';
+import { ChartModule } from 'primeng/chart';
 import { TimelineModule } from 'primeng/timeline';
 import { IftaLabelModule } from 'primeng/iftalabel';
 
@@ -82,11 +81,12 @@ export const PrimeNGModules = [
   ButtonModule,
   CardModule,
   CarouselModule,
-  // ChartModule, // Comentado - descomenta si necesitas gráficos
+  ChartModule,
   CheckboxModule,
   ChipModule,
   ConfirmDialogModule,
   ConfirmPopupModule,
+  CalendarModule,
   DatePickerModule,
   DialogModule,
   DividerModule,

@@ -1,0 +1,64 @@
+<div class="mapa-tiempo-real-container">
+  <p-toolbar class="mapa-toolbar">
+    <ng-template #start>
+      <h2 class="toolbar-title">Mapa de Buses en Tiempo Real</h2>
+    </ng-template>
+    <ng-template #end>
+      <div class="toolbar-controls">
+        <div class="selector-buses">
+          <label for="buses-select" class="selector-label">
+            <i class="pi pi-filter"></i> Filtrar Buses:
+          </label>
+          <p-multiSelect
+            id="buses-select"
+            [options]="busesDisponibles"
+            [(ngModel)]="busesSeleccionados"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccione buses"
+            [showClear]="true"
+            [filter]="true"
+            [style]="{ 'min-width': '250px' }"
+            (onChange)="aplicarFiltroBuses()"
+            [disabled]="busesDisponibles.length === 0">
+          </p-multiSelect>
+          <div class="botones-filtro" *ngIf="busesDisponibles.length > 0">
+            <p-button
+              icon="pi pi-check-square"
+              label="Todos"
+              styleClass="p-button-text p-button-sm"
+              (onClick)="seleccionarTodosBuses()"
+              [disabled]="false">
+            </p-button>
+            <p-button
+              icon="pi pi-times-circle"
+              label="Ninguno"
+              styleClass="p-button-text p-button-sm"
+              (onClick)="deseleccionarTodosBuses()">
+            </p-button>
+          </div>
+        </div>
+        <p-button
+          icon="pi pi-refresh"
+          label="Actualizar"
+          styleClass="p-button-info"
+          (onClick)="cargarUbicaciones()">
+        </p-button>
+        <span class="contador-buses">
+          <i class="pi pi-car"></i>
+          {{ viajesFiltrados.length }} / {{ viajes.length }} bus{{ viajes.length !== 1 ? 'es' : '' }} activo{{ viajes.length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+    </ng-template>
+  </p-toolbar>
+
+  <div id="map-tiempo-real-container" class="map-container"></div>
+
+  <div class="mapa-info" *ngIf="viajes.length === 0">
+    <p>No hay buses activos en este momento.</p>
+  </div>
+  <div class="mapa-info" *ngIf="viajes.length > 0 && viajesFiltrados.length === 0">
+    <p>No hay buses seleccionados para mostrar. Seleccione al menos un bus del filtro.</p>
+  </div>
+</div>
+

@@ -3,9 +3,11 @@ import { RouterOutlet } from '@angular/router';
 import { TokenHandlerService } from './core/services/token-handler.service';
 import { ToastModule } from 'primeng/toast';
 import { PrimeNGModules } from './prime-ng/prime-ng';
+import { LoadingSpinnerComponent } from './shared/components/loading-spinner/loading-spinner.component';
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ...PrimeNGModules],
+  imports: [RouterOutlet, ...PrimeNGModules, LoadingSpinnerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

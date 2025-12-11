@@ -1,0 +1,189 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '800px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="modoEdicion ? 'Editar Viaje' : 'Crear Nuevo Viaje'"
+  (onHide)="hideDialog()"
+>
+  <form [formGroup]="viajeForm" (ngSubmit)="guardar()">
+    <div class="form-grid">
+      <!-- Ruta -->
+      <div class="field">
+        <label for="idRuta" class="required">
+          Ruta <span class="required-asterisk">*</span>
+        </label>
+        <p-select
+          id="idRuta"
+          formControlName="idRuta"
+          [options]="rutas"
+          optionLabel="nombre"
+          optionValue="idRuta"
+          placeholder="Seleccione una ruta"
+          styleClass="w-full"
+          appendTo="body"
+          [class.ng-invalid]="isFieldInvalid('idRuta')"
+        >
+          <ng-template let-ruta pTemplate="item">
+            <div>{{ ruta.nombre }}</div>
+          </ng-template>
+        </p-select>
+        <small
+          *ngIf="isFieldInvalid('idRuta')"
+          class="p-error"
+        >
+          <span *ngIf="f['idRuta'].errors?.['required']">La ruta es obligatoria</span>
+        </small>
+      </div>
+
+      <!-- Bus -->
+      <div class="field">
+        <label for="idBus" class="required">
+          Bus <span class="required-asterisk">*</span>
+        </label>
+        <p-select
+          id="idBus"
+          formControlName="idBus"
+          [options]="buses"
+          optionLabel="placa"
+          optionValue="idBus"
+          placeholder="Seleccione un bus"
+          styleClass="w-full"
+          appendTo="body"
+          [class.ng-invalid]="isFieldInvalid('idBus')"
+        >
+          <ng-template let-bus pTemplate="item">
+            <div>{{ bus.placa }} - {{ bus.modelo || 'Sin modelo' }}</div>
+          </ng-template>
+        </p-select>
+        <small
+          *ngIf="isFieldInvalid('idBus')"
+          class="p-error"
+        >
+          <span *ngIf="f['idBus'].errors?.['required']">El bus es obligatorio</span>
+        </small>
+      </div>
+
+      <!-- Conductor -->
+      <div class="field">
+        <label for="idConductor" class="required">
+          Conductor <span class="required-asterisk">*</span>
+        </label>
+        <p-select
+          id="idConductor"
+          formControlName="idConductor"
+          [options]="conductores"
+          optionLabel="licenciaNumero"
+          optionValue="idUsuarioGestion"
+          placeholder="Seleccione un conductor"
+          styleClass="w-full"
+          appendTo="body"
+          [class.ng-invalid]="isFieldInvalid('idConductor')"
+        >
+          <ng-template let-conductor pTemplate="item">
+            <div>{{ conductor.licenciaNumero }} - {{ conductor.nombreCompleto || conductor.username || 'Sin nombre' }}</div>
+          </ng-template>
+        </p-select>
+        <small
+          *ngIf="isFieldInvalid('idConductor')"
+          class="p-error"
+        >
+          <span *ngIf="f['idConductor'].errors?.['required']">El conductor es obligatorio</span>
+        </small>
+      </div>
+
+      <!-- Fecha Inicio Programada -->
+      <div class="field">
+        <label for="fechaInicioProgramada" class="required">
+          Fecha Inicio Programada <span class="required-asterisk">*</span>
+        </label>
+        <p-calendar
+          id="fechaInicioProgramada"
+          formControlName="fechaInicioProgramada"
+          [showTime]="true"
+          [hourFormat]="'24'"
+          dateFormat="dd/mm/yy"
+          styleClass="w-full"
+          [class.ng-invalid]="isFieldInvalid('fechaInicioProgramada')"
+          placeholder="Seleccione fecha y hora de inicio"
+        ></p-calendar>
+        <small
+          *ngIf="isFieldInvalid('fechaInicioProgramada')"
+          class="p-error"
+        >
+          <span *ngIf="f['fechaInicioProgramada'].errors?.['required']">La fecha de inicio es obligatoria</span>
+        </small>
+      </div>
+
+      <!-- Fecha Fin Programada -->
+      <div class="field">
+        <label for="fechaFinProgramada" class="required">
+          Fecha Fin Programada <span class="required-asterisk">*</span>
+        </label>
+        <p-calendar
+          id="fechaFinProgramada"
+          formControlName="fechaFinProgramada"
+          [showTime]="true"
+          [hourFormat]="'24'"
+          dateFormat="dd/mm/yy"
+          styleClass="w-full"
+          [class.ng-invalid]="isFieldInvalid('fechaFinProgramada')"
+          placeholder="Seleccione fecha y hora de fin"
+        ></p-calendar>
+        <small
+          *ngIf="isFieldInvalid('fechaFinProgramada')"
+          class="p-error"
+        >
+          <span *ngIf="f['fechaFinProgramada'].errors?.['required']">La fecha de fin es obligatoria</span>
+        </small>
+      </div>
+
+      <!-- Estado -->
+      <div class="field">
+        <label for="estado" class="required">
+          Estado <span class="required-asterisk">*</span>
+        </label>
+        <p-select
+          id="estado"
+          formControlName="estado"
+          [options]="estados"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccione un estado"
+          styleClass="w-full"
+          appendTo="body"
+          [class.ng-invalid]="isFieldInvalid('estado')"
+        ></p-select>
+        <small
+          *ngIf="isFieldInvalid('estado')"
+          class="p-error"
+        >
+          <span *ngIf="f['estado'].errors?.['required']">El estado es obligatorio</span>
+        </small>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="hideDialog()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
+        icon="pi pi-check"
+        (click)="guardar()"
+        [disabled]="viajeForm.invalid"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+

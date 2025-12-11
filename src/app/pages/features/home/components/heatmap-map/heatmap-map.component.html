@@ -1,0 +1,66 @@
+<p-card class="heatmap-card">
+  <ng-template pTemplate="header">
+    <div class="card-header">
+      <h3>Mapa de Calor - Aglomeraciones en Paraderos</h3>
+      <p class="card-description">Visualización geográfica de las aglomeraciones por paradero</p>
+    </div>
+  </ng-template>
+
+  <div class="map-controls" *ngIf="datosHeatmap.length > 0">
+    <div class="filter-group">
+      <label for="ruta-select">Filtrar por ruta:</label>
+      <select
+        id="ruta-select"
+        class="filter-select"
+        [value]="rutaSeleccionada ?? ''"
+        (change)="cambiarRuta($any($event.target).value ? +$any($event.target).value : null)">
+        <option value="">Todas las rutas</option>
+        @for (ruta of getRutasDisponibles(); track ruta.idRuta) {
+          <option [value]="ruta.idRuta">{{ ruta.nombreRuta }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="paradero-select">Filtrar por paradero:</label>
+      <select
+        id="paradero-select"
+        class="filter-select"
+        [value]="paraderoSeleccionado ?? ''"
+        (change)="cambiarParadero($any($event.target).value ? +$any($event.target).value : null)">
+        <option value="">Todos los paraderos</option>
+        @for (paradero of getParaderosDisponibles(); track paradero.idPunto) {
+          <option [value]="paradero.idPunto">{{ paradero.nombreParadero }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div id="heatmap-container" class="map-container"></div>
+
+  <div class="map-legend" *ngIf="datosHeatmap.length > 0">
+    <div class="legend-scale">
+      <span class="legend-label">Escala de usuarios:</span>
+      <span class="legend-range">{{ escalaMin }} - {{ escalaMax }} usuarios</span>
+    </div>
+    <div class="legend-colors">
+      <div class="legend-item">
+        <span class="legend-color" style="background: #4ade80;"></span>
+        <span>Baja intensidad (1-600)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background: #fbbf24;"></span>
+        <span>Media intensidad (600-1200)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background: #f97316;"></span>
+        <span>Alta intensidad (1200-1800)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background: #dc2626;"></span>
+        <span>Máxima intensidad (1800-2000)</span>
+      </div>
+    </div>
+  </div>
+</p-card>
+

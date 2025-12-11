@@ -1,0 +1,15 @@
+@if (showSpinner) {
+  <div [class]="fullScreen ? 'loading-overlay' : 'loading-container'">
+    <div class="loading-content">
+      <p-progressSpinner 
+        [style]="{ width: spinnerSize, height: spinnerSize }"
+        strokeWidth="4"
+        animationDuration=".8s">
+      </p-progressSpinner>
+      @if (message) {
+        <p class="loading-message">{{ message }}</p>
+      }
+    </div>
+  </div>
+}
+

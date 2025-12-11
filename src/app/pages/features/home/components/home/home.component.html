@@ -1,15 +1,69 @@
 <div class="home-container">
-  <p-card>
-    <ng-template pTemplate="header">
-      <div class="card-header">
-        <h1>{{ title }}</h1>
-      </div>
-    </ng-template>
-    
-    <div class="home-content">
-      <p>Bienvenido al Sistema de Gestión de Seguridad y Transporte</p>
-      <p>Este sistema te permite administrar la seguridad y el transporte de manera eficiente.</p>
+  <div class="home-header">
+    <h1>Análisis de Aglomeración - Rutas y Paraderos</h1>
+    <p-button
+      icon="pi pi-refresh"
+      label="Actualizar"
+      styleClass="p-button-info"
+      (onClick)="actualizar()"
+      [disabled]="loading">
+    </p-button>
+  </div>
+
+  <div *ngIf="!loading && estadisticas" class="dashboard-content">
+    <!-- KPIs Principales -->
+    <div class="kpi-grid">
+      <p-card class="kpi-card">
+        <div class="kpi-content">
+          <div class="kpi-icon">
+            <i class="pi pi-users" style="font-size: 2.5rem; color: #3B82F6;"></i>
+          </div>
+          <div class="kpi-info">
+            <h3>Total Personas Registradas</h3>
+            <p class="kpi-value">{{ estadisticas.totalPersonasRegistradas | number }}</p>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card class="kpi-card">
+        <div class="kpi-content">
+          <div class="kpi-icon">
+            <i class="pi pi-calendar" style="font-size: 2.5rem; color: #10B981;"></i>
+          </div>
+          <div class="kpi-info">
+            <h3>Personas Registradas Hoy</h3>
+            <p class="kpi-value">{{ estadisticas.personasRegistradasHoy | number }}</p>
+          </div>
+        </div>
+      </p-card>
     </div>
-  </p-card>
+
+    <!-- Mapa de Calor con Google Maps -->
+    <app-heatmap-map
+      [datosHeatmap]="estadisticas.datosHeatmap"
+      [datosStackedBar]="estadisticas.datosStackedBar"
+      [paraderos]="paraderos">
+    </app-heatmap-map>
+
+    <!-- Gráfico: BARRAS APILADAS (Stacked Bar) -->
+    <p-card class="chart-card-full">
+      <ng-template pTemplate="header">
+        <h3>Volumen por Ruta Desglosado por Paradero</h3>
+        <p class="chart-description">Muestra la distribución de usuarios por ruta, segmentada por paradero</p>
+      </ng-template>
+      <p-chart
+        type="bar"
+        [data]="chartDataStackedBar"
+        [options]="chartOptionsStackedBar"
+        [style]="{'height': '500px'}">
+      </p-chart>
+    </p-card>
+  </div>
+
+  <div *ngIf="!loading && !estadisticas" class="empty-state">
+    <i class="pi pi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+    <p>No hay datos disponibles</p>
+  </div>
 </div>
 
+<p-toast></p-toast>

@@ -35,6 +35,19 @@ export const layoutRoutes: Routes = [
             loadComponent: () => import('../../features/rutas/components/ruta-list/ruta-list.component').then(m => m.RutaListComponent)
           }
         ]
+      },
+      {
+        path: 'viajes',
+        children: [
+          {
+            path: 'lista-viajes',
+            loadComponent: () => import('../../features/viajes/components/viaje-list/viaje-list.component').then(m => m.ViajeListComponent)
+          },
+          {
+            path: 'mapa-tiempo-real',
+            loadComponent: () => import('../../features/viajes/components/viaje-mapa-tiempo-real/viaje-mapa-tiempo-real.component').then(m => m.ViajeMapaTiempoRealComponent)
+          }
+        ]
       }
     ]
   }

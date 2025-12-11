@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnDestroy, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RutaPuntoService, RutaPunto, RutaPuntoRequest } from '../../services/ruta-punto.service';
@@ -23,7 +23,7 @@ declare var google: any;
   templateUrl: './ruta-puntos.component.html',
   styleUrl: './ruta-puntos.component.css'
 })
-export class RutaPuntosComponent implements OnInit, OnDestroy {
+export class RutaPuntosComponent implements OnDestroy {
   @Input() rutaId!: number;
   @Input() colorRuta: string = '#0000FF';
   @Input() nombreRuta: string = '';
@@ -33,12 +33,18 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
   puntoForm!: FormGroup;
   puntoEditando: RutaPunto | null = null;
   submitted: boolean = false;
+  mostrarFormulario: boolean = false;
+  puntoSeleccionado: { lat: number; lng: number } | null = null;
+  modoAgregarPunto: boolean = false; // Controla si se permite agregar puntos desde el mapa
 
   // Google Maps
   map: any = null;
   markers: any[] = [];
   polyline: any = null;
+  directionsService: any = null;
+  directionsRenderer: any = null;
   mapInitialized: boolean = false;
+  marcadorTemporal: any = null;
 
   private subscriptions: Subscription[] = [];
 
@@ -47,13 +53,10 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
     private rutaPuntoService: RutaPuntoService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private cdr: ChangeDetectorRef
   ) {
     this.initForm();
-  }
-
-  ngOnInit(): void {
-    // El mapa se inicializa cuando se muestra el diálogo
   }
 
   ngOnDestroy(): void {
@@ -64,8 +67,6 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
   initForm(): void {
     this.puntoForm = this.fb.group({
       orden: [null, [Validators.required, Validators.min(1)]],
-      latitud: [null, [Validators.required]],
-      longitud: [null, [Validators.required]],
       nombreParadero: [''],
       esParaderoOficial: [false]
     });
@@ -73,52 +74,102 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
 
   showDialog(rutaId: number, colorRuta?: string, nombreRuta?: string): void {
     this.rutaId = rutaId;
-    if (colorRuta) this.colorRuta = colorRuta;
+    if (colorRuta) {
+      this.colorRuta = colorRuta;
+      // Actualizar el color del renderer si ya está inicializado
+      if (this.directionsRenderer) {
+        this.directionsRenderer.setOptions({
+          polylineOptions: {
+            strokeColor: this.colorRuta,
+            strokeWeight: 4,
+            strokeOpacity: 0.8
+          }
+        });
+      }
+    }
     if (nombreRuta) this.nombreRuta = nombreRuta;
     this.visible = true;
     this.puntoEditando = null;
     this.submitted = false;
+    this.modoAgregarPunto = false;
 
-    // Verificar si hay error en la carga de Google Maps
+    // Verificar si hay error previo
     if ((window as any).googleMapsError) {
       this.messageService.error(
-        'Error al cargar Google Maps. La API de Maps JavaScript no está activada. Por favor, habilite la API en Google Cloud Console y verifique que la clave API sea válida.',
-        'Error de Google Maps API',
-        10000
+        'La API de Google Maps no está disponible. Verifique su conexión a internet y que la API key sea válida.',
+        'Error de Google Maps',
+        8000
       );
+      this.cargarPuntos();
       return;
     }
 
-    // Cargar puntos y inicializar mapa
     this.cargarPuntos();
 
-    // Esperar a que el DOM esté listo y Google Maps esté cargado
+    // Esperar a que el diálogo se renderice y luego inicializar el mapa
     setTimeout(() => {
-      if ((window as any).googleMapsLoaded) {
-        this.inicializarMapa();
-      } else {
-        // Esperar al evento de carga
-        const loadHandler = () => {
-          this.inicializarMapa();
-        };
-        window.addEventListener('googleMapsLoaded', loadHandler, { once: true });
+      this.verificarYInicializarMapa();
+    }, 300);
+  }
 
-        // Timeout de seguridad
-        setTimeout(() => {
-          if (!this.mapInitialized && typeof google !== 'undefined' && google.maps) {
-            this.inicializarMapa();
-          } else if (!this.mapInitialized) {
-            this.messageService.warn('Google Maps está cargando. El mapa aparecerá en breve.', 'Cargando Mapa', 3000);
-          }
-        }, 2000);
+  private verificarYInicializarMapa(): void {
+    const mostrarError = () => {
+      this.messageService.error(
+        'Error al cargar Google Maps. Verifique su conexión y que la API key sea válida.',
+        'Error de Google Maps',
+        8000
+      );
+    };
+
+    if ((window as any).googleMapsLoaded && typeof google !== 'undefined' && google.maps) {
+      this.inicializarMapa();
+      return;
+    }
+
+    if ((window as any).googleMapsError) {
+      mostrarError();
+      return;
+    }
+
+    const checkInterval = setInterval(() => {
+      if ((window as any).googleMapsLoaded && typeof google !== 'undefined' && google.maps) {
+        clearInterval(checkInterval);
+        this.inicializarMapa();
+      } else if ((window as any).googleMapsError) {
+        clearInterval(checkInterval);
+        mostrarError();
       }
-    }, 500);
+    }, 100);
+
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      if (!this.mapInitialized && typeof google === 'undefined') {
+        this.messageService.error(
+          'Timeout al cargar Google Maps. Verifique su conexión a internet.',
+          'Error de Google Maps',
+          8000
+        );
+      }
+    }, 10000);
+
+    window.addEventListener('googleMapsLoaded', () => {
+      clearInterval(checkInterval);
+      this.inicializarMapa();
+    }, { once: true });
+
+    window.addEventListener('googleMapsError', () => {
+      clearInterval(checkInterval);
+      mostrarError();
+    }, { once: true });
   }
 
   hideDialog(): void {
     this.visible = false;
     this.puntoEditando = null;
     this.puntos = [];
+    this.mostrarFormulario = false;
+    this.puntoSeleccionado = null;
+    this.modoAgregarPunto = false;
     this.limpiarMapa();
     this.mapInitialized = false;
     this.puntoForm.reset();
@@ -153,34 +204,31 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Verificar si Google Maps está cargado
+    // Verificar errores
+    if ((window as any).googleMapsError) {
+      this.messageService.error(
+        'La API de Google Maps no está disponible. Verifique que esté activada en Google Cloud Console y que la API key sea válida.',
+        'Error de Google Maps',
+        8000
+      );
+      return;
+    }
+
     if (typeof google === 'undefined' || !google.maps) {
-      // Esperar a que se cargue Google Maps
-      if ((window as any).googleMapsLoaded) {
-        // Ya está cargado, intentar de nuevo
-        setTimeout(() => this.inicializarMapa(), 100);
-      } else {
-        // Esperar al evento de carga
-        window.addEventListener('googleMapsLoaded', () => {
-          setTimeout(() => this.inicializarMapa(), 100);
-        }, { once: true });
-      }
+      setTimeout(() => this.inicializarMapa(), 200);
       return;
     }
 
     const mapContainer = document.getElementById('map-puntos-container');
     if (!mapContainer) {
-      // Si el contenedor no existe, intentar de nuevo después de un delay
       setTimeout(() => this.inicializarMapa(), 200);
       return;
     }
 
     try {
-      // Centro por defecto (Lima, Perú) o primer punto si existe
-      let defaultCenter = { lat: -12.046374, lng: -77.042793 };
-      if (this.puntos.length > 0) {
-        defaultCenter = { lat: this.puntos[0].latitud, lng: this.puntos[0].longitud };
-      }
+      const defaultCenter = this.puntos.length > 0
+        ? { lat: this.puntos[0].latitud, lng: this.puntos[0].longitud }
+        : { lat: -12.046374, lng: -77.042793 }; // Lima, Perú por defecto
 
       this.map = new google.maps.Map(mapContainer, {
         center: defaultCenter,
@@ -188,36 +236,74 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
 
-      // Listener para clics en el mapa
+      // Agregar listener para clicks en el mapa (cuando está en modo agregar o editando)
       this.map.addListener('click', (event: any) => {
-        if (event.latLng) {
+        if (event.latLng && (this.modoAgregarPunto || this.puntoEditando)) {
           this.agregarPuntoDesdeMapa(event.latLng.lat(), event.latLng.lng());
         }
       });
 
+      // Inicializar Directions Service y Renderer
+      this.directionsService = new google.maps.DirectionsService();
+      this.actualizarDirectionsRenderer();
       this.mapInitialized = true;
-      this.actualizarMapa();
-    } catch (error) {
-      console.error('Error al inicializar Google Maps:', error);
-      this.messageService.error('Error al cargar el mapa. Por favor, recargue la página.', 'Error de Mapa', 6000);
+
+      if (this.puntos.length > 0) {
+        this.actualizarMapa();
+      }
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Error desconocido al cargar el mapa';
+      this.messageService.error(
+        `Error al cargar el mapa: ${errorMessage}. Verifique que la API key sea válida y tenga los permisos necesarios.`,
+        'Error de Google Maps',
+        8000
+      );
     }
   }
 
   agregarPuntoDesdeMapa(lat: number, lng: number): void {
-    const siguienteOrden = this.puntos.length > 0
-      ? Math.max(...this.puntos.map(p => p.orden || 0)) + 1
-      : 1;
+    // Eliminar marcador temporal anterior si existe
+    if (this.marcadorTemporal) {
+      this.marcadorTemporal.setMap(null);
+      this.marcadorTemporal = null;
+    }
 
-    this.puntoForm.patchValue({
-      orden: siguienteOrden,
-      latitud: lat,
-      longitud: lng,
-      nombreParadero: '',
-      esParaderoOficial: false
-    });
+    // Guardar el punto seleccionado
+    this.puntoSeleccionado = { lat, lng };
 
-    // Abrir diálogo para completar datos
-    this.puntoEditando = null;
+    // Si se está editando, actualizar las coordenadas del punto que se está editando
+    if (this.puntoEditando) {
+      this.puntoEditando.latitud = lat;
+      this.puntoEditando.longitud = lng;
+    }
+
+    // Agregar marcador temporal en la posición del clic
+    if (this.map && typeof google !== 'undefined' && google.maps) {
+      this.marcadorTemporal = new google.maps.Marker({
+        position: { lat, lng },
+        map: this.map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 12,
+          fillColor: '#FF0000',
+          fillOpacity: 0.9,
+          strokeColor: 'white',
+          strokeWeight: 3
+        },
+        animation: google.maps.Animation.DROP,
+        zIndex: 1000
+      });
+    }
+
+    // Si el formulario ya está abierto (en modo agregar o editar), mantenerlo abierto
+    // Solo cerrar si no está en modo agregar ni editando
+    if (!this.modoAgregarPunto && !this.puntoEditando) {
+      this.mostrarFormulario = false;
+      this.puntoEditando = null;
+    }
+    this.submitted = false;
+
+    this.cdr.detectChanges();
   }
 
   actualizarMapa(): void {
@@ -247,61 +333,25 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
         if (lat && lng) {
           puntos.push({ lat, lng });
 
-          // Intentar usar AdvancedMarkerElement si está disponible, sino usar Marker tradicional
-          let marker: any;
-          const position = { lat, lng };
-          const labelText = (punto.orden || (index + 1)).toString();
-          const title = punto.nombreParadero || `Punto ${punto.orden || index + 1}`;
+          const marker = new google.maps.Marker({
+            position: { lat, lng },
+            map: this.map!,
+            label: {
+              text: (punto.orden || (index + 1)).toString(),
+              color: 'white',
+              fontWeight: 'bold'
+            },
+            title: punto.nombreParadero || `Punto ${punto.orden || index + 1}`,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: this.colorRuta,
+              fillOpacity: 1,
+              strokeColor: 'white',
+              strokeWeight: 2
+            }
+          });
 
-          if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
-            // Usar AdvancedMarkerElement (recomendado)
-            const pinElement = document.createElement('div');
-            pinElement.style.cssText = `
-              width: 24px;
-              height: 24px;
-              background-color: ${this.colorRuta};
-              border: 2px solid white;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: white;
-              font-weight: bold;
-              font-size: 12px;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            `;
-            pinElement.textContent = labelText;
-            pinElement.title = title;
-
-            marker = new google.maps.marker.AdvancedMarkerElement({
-              position,
-              map: this.map!,
-              content: pinElement,
-              title: title
-            });
-          } else {
-            // Fallback a Marker tradicional (deprecated pero funcional)
-            marker = new google.maps.Marker({
-              position,
-              map: this.map!,
-              label: {
-                text: labelText,
-                color: 'white',
-                fontWeight: 'bold'
-              },
-              title: title,
-              icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 12,
-                fillColor: this.colorRuta,
-                fillOpacity: 1,
-                strokeColor: 'white',
-                strokeWeight: 2
-              }
-            });
-          }
-
-          // Info window con detalles del punto
           const infoWindow = new google.maps.InfoWindow({
             content: `
               <div>
@@ -314,99 +364,148 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
             `
           });
 
-          // Agregar listeners según el tipo de marcador
-          if (google.maps.marker && google.maps.marker.AdvancedMarkerElement && marker instanceof google.maps.marker.AdvancedMarkerElement) {
-            // AdvancedMarkerElement usa addListener de forma diferente
-            marker.addListener('click', () => {
-              infoWindow.open(this.map!, marker);
-            });
-            marker.addListener('dblclick', () => {
-              this.editarPunto(punto);
-            });
-          } else {
-            // Marker tradicional
-            marker.addListener('click', () => {
-              infoWindow.open(this.map!, marker);
-            });
-            marker.addListener('dblclick', () => {
-              this.editarPunto(punto);
-            });
-          }
+          marker.addListener('click', () => infoWindow.open(this.map!, marker));
+          marker.addListener('dblclick', () => this.editarPunto(punto));
 
           this.markers.push(marker);
         }
       });
 
-      // Crear polyline para conectar los puntos
-      if (puntos.length > 1) {
-        this.polyline = new google.maps.Polyline({
-          path: puntos,
-          geodesic: true,
-          strokeColor: this.colorRuta,
-          strokeOpacity: 0.8,
-          strokeWeight: 3,
-          map: this.map!
-        });
-      }
-
-      // Ajustar el zoom para mostrar todos los puntos
-      if (puntos.length > 0) {
+      if (puntos.length > 1 && this.directionsService && this.directionsRenderer) {
+        this.trazarRutaConDirections(puntos);
+      } else if (puntos.length > 0) {
         const bounds = new google.maps.LatLngBounds();
         puntos.forEach(punto => bounds.extend(punto));
         this.map!.fitBounds(bounds);
       }
     } catch (error) {
-      console.error('Error al actualizar el mapa:', error);
       this.messageService.error('Error al actualizar el mapa', 'Error', 5000);
     }
   }
 
-  limpiarMapa(): void {
-    // Eliminar marcadores
-    this.markers.forEach(marker => {
-      if (marker.setMap) {
-        marker.setMap(null);
-      } else if (marker.map) {
-        marker.map = null;
+  actualizarDirectionsRenderer(): void {
+    if (!this.map) return;
+
+    this.directionsRenderer = new google.maps.DirectionsRenderer({
+      map: this.map,
+      suppressMarkers: true, // No mostrar marcadores por defecto, usaremos los nuestros
+      polylineOptions: {
+        strokeColor: this.colorRuta,
+        strokeWeight: 4,
+        strokeOpacity: 0.8
       }
     });
+  }
+
+  trazarRutaConDirections(puntos: { lat: number; lng: number }[]): void {
+    if (!this.directionsService || !this.directionsRenderer || puntos.length < 2) {
+      return;
+    }
+
+    this.directionsRenderer.setOptions({
+      polylineOptions: {
+        strokeColor: this.colorRuta,
+        strokeWeight: 4,
+        strokeOpacity: 0.8
+      }
+    });
+
+    const waypoints = puntos.length > 2
+      ? puntos.slice(1, -1).map(p => ({ location: p, stopover: true }))
+      : undefined;
+
+    this.directionsService.route({
+      origin: puntos[0],
+      destination: puntos[puntos.length - 1],
+      travelMode: google.maps.TravelMode.DRIVING,
+      optimizeWaypoints: false,
+      waypoints
+    }, (result: any, status: any) => {
+      if (status === google.maps.DirectionsStatus.OK) {
+        this.directionsRenderer.setDirections(result);
+        const bounds = new google.maps.LatLngBounds();
+        result.routes[0].overview_path.forEach((point: any) => bounds.extend(point));
+        this.map!.fitBounds(bounds);
+      } else {
+        this.trazarRutaPolylineRespaldo(puntos);
+      }
+    });
+  }
+
+  trazarRutaPolylineRespaldo(puntos: { lat: number; lng: number }[]): void {
+    if (this.polyline) {
+      this.polyline.setMap(null);
+    }
+
+    this.polyline = new google.maps.Polyline({
+      path: puntos,
+      geodesic: true,
+      strokeColor: this.colorRuta,
+      strokeOpacity: 0.8,
+      strokeWeight: 3,
+      map: this.map!
+    });
+
+    const bounds = new google.maps.LatLngBounds();
+    puntos.forEach(punto => bounds.extend(punto));
+    this.map!.fitBounds(bounds);
+  }
+
+  limpiarMapa(): void {
+    this.markers.forEach(marker => marker?.setMap?.(null));
     this.markers = [];
 
-    // Eliminar polyline
     if (this.polyline) {
       this.polyline.setMap(null);
       this.polyline = null;
     }
+
+    if (this.marcadorTemporal) {
+      this.marcadorTemporal.setMap(null);
+      this.marcadorTemporal = null;
+    }
+
+    if (this.directionsRenderer) {
+      this.directionsRenderer.setDirections({ routes: [] });
+    }
   }
 
   abrirDialogoCrear(): void {
+    // Limpiar selección anterior
+    if (this.marcadorTemporal) {
+      this.marcadorTemporal.setMap(null);
+      this.marcadorTemporal = null;
+    }
+    this.puntoSeleccionado = null;
+
+    // Activar modo agregar punto para permitir clicks en el mapa
+    this.modoAgregarPunto = true;
+
     const siguienteOrden = this.puntos.length > 0
       ? Math.max(...this.puntos.map(p => p.orden || 0)) + 1
       : 1;
 
     this.puntoForm.reset({
       orden: siguienteOrden,
-      latitud: null,
-      longitud: null,
       nombreParadero: '',
       esParaderoOficial: false
     });
     this.puntoEditando = null;
     this.submitted = false;
+    this.mostrarFormulario = true;
   }
 
   editarPunto(punto: RutaPunto): void {
     this.puntoEditando = punto;
     this.puntoForm.patchValue({
       orden: punto.orden,
-      latitud: punto.latitud,
-      longitud: punto.longitud,
       nombreParadero: punto.nombreParadero || '',
       esParaderoOficial: punto.esParaderoOficial || false
     });
     this.submitted = false;
+    this.mostrarFormulario = true;
+    this.modoAgregarPunto = false;
 
-    // Centrar mapa en el punto
     if (this.map && punto.latitud && punto.longitud) {
       this.map.setCenter({ lat: punto.latitud, lng: punto.longitud });
       this.map.setZoom(16);
@@ -417,29 +516,56 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
     this.puntoEditando = null;
     this.puntoForm.reset();
     this.submitted = false;
+    this.mostrarFormulario = false;
+    this.puntoSeleccionado = null;
+    this.modoAgregarPunto = false;
+
+    // Eliminar marcador temporal al cancelar
+    if (this.marcadorTemporal) {
+      this.marcadorTemporal.setMap(null);
+      this.marcadorTemporal = null;
+    }
   }
 
   guardarPunto(): void {
     this.submitted = true;
 
-    if (this.puntoForm.invalid) {
-      this.messageService.warn('Por favor, complete todos los campos requeridos correctamente', 'Validación', 5000);
+    // Validar solo el orden (latitud y longitud se manejan internamente)
+    if (!this.puntoForm.get('orden')?.valid) {
+      this.messageService.warn('Por favor, complete el campo orden correctamente', 'Validación', 5000);
       return;
+    }
+
+    // Validar que haya coordenadas disponibles
+    let latitud: number;
+    let longitud: number;
+
+    if (this.puntoEditando) {
+      // Si se está editando, usar las coordenadas del punto original
+      latitud = this.puntoEditando.latitud;
+      longitud = this.puntoEditando.longitud;
+    } else {
+      // Si es nuevo punto, usar las coordenadas del punto seleccionado en el mapa
+      if (!this.puntoSeleccionado) {
+        this.messageService.warn('Debe seleccionar un punto en el mapa antes de guardar', 'Validación', 5000);
+        return;
+      }
+      latitud = this.puntoSeleccionado.lat;
+      longitud = this.puntoSeleccionado.lng;
     }
 
     const puntoData: RutaPuntoRequest = {
       idRuta: this.rutaId,
       orden: this.puntoForm.value.orden,
-      latitud: this.puntoForm.value.latitud,
-      longitud: this.puntoForm.value.longitud,
+      latitud: latitud,
+      longitud: longitud,
       nombreParadero: this.puntoForm.value.nombreParadero || undefined,
       esParaderoOficial: this.puntoForm.value.esParaderoOficial || false
     };
 
     this.loadingService.show();
 
-    if (this.puntoEditando && this.puntoEditando.idPunto) {
-      // Actualizar punto existente
+    if (this.puntoEditando?.idPunto) {
       const sub = this.rutaPuntoService.actualizarPunto(this.puntoEditando.idPunto, puntoData).subscribe({
         next: () => {
           this.loadingService.hide();
@@ -455,11 +581,17 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
       });
       this.subscriptions.push(sub);
     } else {
-      // Crear nuevo punto
       const sub = this.rutaPuntoService.crearPunto(puntoData).subscribe({
         next: () => {
           this.loadingService.hide();
           this.messageService.success('Punto creado correctamente', 'Éxito', 5000);
+          // Eliminar marcador temporal al guardar
+          if (this.marcadorTemporal) {
+            this.marcadorTemporal.setMap(null);
+            this.marcadorTemporal = null;
+          }
+          this.puntoSeleccionado = null;
+          this.modoAgregarPunto = false;
           this.cancelarEdicion();
           this.cargarPuntos();
         },
@@ -520,6 +652,21 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.puntoForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched || this.submitted));
+  }
+
+  puedeGuardar(): boolean {
+    // Validar que el orden sea válido
+    if (!this.puntoForm.get('orden')?.valid) {
+      return false;
+    }
+
+    // Si se está editando, solo necesita orden válido
+    if (this.puntoEditando) {
+      return true;
+    }
+
+    // Si es nuevo punto, también necesita tener un punto seleccionado en el mapa
+    return !!this.puntoSeleccionado;
   }
 }
 

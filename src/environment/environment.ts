@@ -1,5 +1,6 @@
+
 export const environment = {
-  urlAuth: 'https://edugen.brianuceda.xyz/gestion/',
-  urlServicios: 'https://edugen.brianuceda.xyz/servicios/',
+  urlAuth: 'http://localhost:8080/gestion/',
+  urlServicios: 'http://localhost:8081/servicios/',
 };
 

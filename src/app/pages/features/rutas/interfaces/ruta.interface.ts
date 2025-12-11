@@ -19,8 +19,6 @@ export interface Ruta {
 export interface RutaRequest {
   nombre: string;
   descripcion?: string;
-  idVehiculoDefault: number;
   colorMapa?: string;
-  puntos: PuntoRuta[];
 }
 

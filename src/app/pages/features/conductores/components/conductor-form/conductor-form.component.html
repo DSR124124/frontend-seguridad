@@ -14,7 +14,7 @@
         <label for="idUsuarioGestion" class="required">
           Usuario Conductor <span class="required-asterisk">*</span>
         </label>
-        <p-dropdown
+        <p-select
           id="idUsuarioGestion"
           formControlName="idUsuarioGestion"
           [options]="usuariosDisponibles"
@@ -41,7 +41,7 @@
               <small class="text-muted">{{ usuario.email }}</small>
             </div>
           </ng-template>
-        </p-dropdown>
+        </p-select>
         <small
           *ngIf="isFieldInvalid('idUsuarioGestion')"
           class="p-error"
@@ -78,7 +78,7 @@
         <label for="categoria">
           Categoría
         </label>
-        <p-dropdown
+        <p-select
           id="categoria"
           formControlName="categoria"
           [options]="categorias"
@@ -88,7 +88,7 @@
           [showClear]="true"
           styleClass="w-full"
           appendTo="body"
-        ></p-dropdown>
+        ></p-select>
       </div>
 
       <!-- Teléfono de Contacto -->
@@ -118,7 +118,7 @@
         <label for="estado">
           Estado
         </label>
-        <p-dropdown
+        <p-select
           id="estado"
           formControlName="estado"
           [options]="estados"
@@ -127,7 +127,7 @@
           placeholder="Seleccione un estado"
           styleClass="w-full"
           appendTo="body"
-        ></p-dropdown>
+        ></p-select>
       </div>
     </div>
   </form>

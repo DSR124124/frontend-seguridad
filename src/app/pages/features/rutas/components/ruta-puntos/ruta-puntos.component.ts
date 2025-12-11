@@ -81,7 +81,12 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
 
     // Verificar si hay error en la carga de Google Maps
     if ((window as any).googleMapsError) {
-      this.messageService.error('Error al cargar Google Maps. Por favor, verifique su conexión a internet y recargue la página.', 'Error de Carga', 8000);
+      this.messageService.error(
+        'Error al cargar Google Maps. La API de Maps JavaScript no está activada. Por favor, habilite la API en Google Cloud Console y verifique que la clave API sea válida.',
+        'Error de Google Maps API',
+        10000
+      );
+      return;
     }
 
     // Cargar puntos y inicializar mapa
@@ -242,24 +247,59 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
         if (lat && lng) {
           puntos.push({ lat, lng });
 
-          const marker = new google.maps.Marker({
-            position: { lat, lng },
-            map: this.map!,
-            label: {
-              text: (punto.orden || (index + 1)).toString(),
-              color: 'white',
-              fontWeight: 'bold'
-            },
-            title: punto.nombreParadero || `Punto ${punto.orden || index + 1}`,
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 12,
-              fillColor: this.colorRuta,
-              fillOpacity: 1,
-              strokeColor: 'white',
-              strokeWeight: 2
-            }
-          });
+          // Intentar usar AdvancedMarkerElement si está disponible, sino usar Marker tradicional
+          let marker: any;
+          const position = { lat, lng };
+          const labelText = (punto.orden || (index + 1)).toString();
+          const title = punto.nombreParadero || `Punto ${punto.orden || index + 1}`;
+
+          if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
+            // Usar AdvancedMarkerElement (recomendado)
+            const pinElement = document.createElement('div');
+            pinElement.style.cssText = `
+              width: 24px;
+              height: 24px;
+              background-color: ${this.colorRuta};
+              border: 2px solid white;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-weight: bold;
+              font-size: 12px;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            `;
+            pinElement.textContent = labelText;
+            pinElement.title = title;
+
+            marker = new google.maps.marker.AdvancedMarkerElement({
+              position,
+              map: this.map!,
+              content: pinElement,
+              title: title
+            });
+          } else {
+            // Fallback a Marker tradicional (deprecated pero funcional)
+            marker = new google.maps.Marker({
+              position,
+              map: this.map!,
+              label: {
+                text: labelText,
+                color: 'white',
+                fontWeight: 'bold'
+              },
+              title: title,
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 12,
+                fillColor: this.colorRuta,
+                fillOpacity: 1,
+                strokeColor: 'white',
+                strokeWeight: 2
+              }
+            });
+          }
 
           // Info window con detalles del punto
           const infoWindow = new google.maps.InfoWindow({
@@ -274,14 +314,24 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
             `
           });
 
-          marker.addListener('click', () => {
-            infoWindow.open(this.map!, marker);
-          });
-
-          // Doble clic para editar
-          marker.addListener('dblclick', () => {
-            this.editarPunto(punto);
-          });
+          // Agregar listeners según el tipo de marcador
+          if (google.maps.marker && google.maps.marker.AdvancedMarkerElement && marker instanceof google.maps.marker.AdvancedMarkerElement) {
+            // AdvancedMarkerElement usa addListener de forma diferente
+            marker.addListener('click', () => {
+              infoWindow.open(this.map!, marker);
+            });
+            marker.addListener('dblclick', () => {
+              this.editarPunto(punto);
+            });
+          } else {
+            // Marker tradicional
+            marker.addListener('click', () => {
+              infoWindow.open(this.map!, marker);
+            });
+            marker.addListener('dblclick', () => {
+              this.editarPunto(punto);
+            });
+          }
 
           this.markers.push(marker);
         }
@@ -313,7 +363,13 @@ export class RutaPuntosComponent implements OnInit, OnDestroy {
 
   limpiarMapa(): void {
     // Eliminar marcadores
-    this.markers.forEach(marker => marker.setMap(null));
+    this.markers.forEach(marker => {
+      if (marker.setMap) {
+        marker.setMap(null);
+      } else if (marker.map) {
+        marker.map = null;
+      }
+    });
     this.markers = [];
 
     // Eliminar polyline

@@ -37,7 +37,7 @@
         <label for="idVehiculoDefault" class="required">
           Vehículo Default <span class="required-asterisk">*</span>
         </label>
-        <p-dropdown
+        <p-select
           id="idVehiculoDefault"
           formControlName="idVehiculoDefault"
           [options]="buses"
@@ -51,7 +51,7 @@
           <ng-template let-bus pTemplate="item">
             <div>{{ bus.placa }} - {{ bus.modelo || 'Sin modelo' }}</div>
           </ng-template>
-        </p-dropdown>
+        </p-select>
         <small
           *ngIf="isFieldInvalid('idVehiculoDefault')"
           class="p-error"

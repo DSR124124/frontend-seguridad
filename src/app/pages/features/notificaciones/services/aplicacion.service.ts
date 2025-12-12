@@ -7,7 +7,7 @@ import { HttpUtilsService } from '../../../../shared/services/http-utils.service
 export interface Aplicacion {
   idAplicacion: number;
   nombreAplicacion: string;
-  codigoAplicacion: string;
+  codigoProducto: string;
   descripcion?: string;
   activo: boolean;
 }

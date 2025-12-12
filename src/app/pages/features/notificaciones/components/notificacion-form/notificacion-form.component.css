@@ -47,6 +47,41 @@
   font-size: 0.875rem;
 }
 
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.checkbox-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  cursor: pointer;
+  flex: 1;
+  margin: 0;
+}
+
+.checkbox-label strong {
+  color: #333;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.checkbox-description {
+  color: #6c757d;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
 @media (max-width: 768px) {
   .field.col-6 {
     grid-column: span 12;

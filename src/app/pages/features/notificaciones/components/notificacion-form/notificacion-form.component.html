@@ -107,7 +107,7 @@
         <label for="fechaEnvio">
           Fecha de Envío
         </label>
-        <p-calendar
+        <p-datePicker
           id="fechaEnvio"
           formControlName="fechaEnvio"
           [showTime]="true"
@@ -116,14 +116,14 @@
           placeholder="Seleccione fecha y hora"
           styleClass="w-full"
           appendTo="body"
-        ></p-calendar>
+        ></p-datePicker>
       </div>
 
       <div class="field col-6">
         <label for="fechaExpiracion">
           Fecha de Expiración
         </label>
-        <p-calendar
+        <p-datePicker
           id="fechaExpiracion"
           formControlName="fechaExpiracion"
           [showTime]="true"
@@ -132,7 +132,7 @@
           placeholder="Seleccione fecha y hora"
           styleClass="w-full"
           appendTo="body"
-        ></p-calendar>
+        ></p-datePicker>
       </div>
 
       <!-- Usuarios Destinatarios -->
@@ -160,23 +160,45 @@
 
       <!-- Opciones -->
       <div class="field col-12">
-        <div class="d-flex gap-3 flex-wrap">
-          <p-checkbox
-            formControlName="requiereConfirmacion"
-            label="Requiere Confirmación"
-            [binary]="true"
-          ></p-checkbox>
-          <p-checkbox
-            formControlName="mostrarComoRecordatorio"
-            label="Mostrar como Recordatorio"
-            [binary]="true"
-          ></p-checkbox>
-          <p-checkbox
-            formControlName="activo"
-            label="Activa"
-            [binary]="true"
-          ></p-checkbox>
-        </div>
+        <p-fieldset legend="Opciones de Notificación" [toggleable]="false" styleClass="w-full">
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <p-checkbox
+                formControlName="requiereConfirmacion"
+                inputId="requiereConfirmacion"
+                [binary]="true"
+              ></p-checkbox>
+              <label for="requiereConfirmacion" class="checkbox-label">
+                <strong>Requiere Confirmación</strong>
+                <small class="checkbox-description">El usuario debe confirmar explícitamente que ha leído y entendido la notificación</small>
+              </label>
+            </div>
+
+            <div class="checkbox-item">
+              <p-checkbox
+                formControlName="mostrarComoRecordatorio"
+                inputId="mostrarComoRecordatorio"
+                [binary]="true"
+              ></p-checkbox>
+              <label for="mostrarComoRecordatorio" class="checkbox-label">
+                <strong>Mostrar como Recordatorio</strong>
+                <small class="checkbox-description">La notificación aparecerá como recordatorio hasta que sea leída</small>
+              </label>
+            </div>
+
+            <div class="checkbox-item">
+              <p-checkbox
+                formControlName="activo"
+                inputId="activo"
+                [binary]="true"
+              ></p-checkbox>
+              <label for="activo" class="checkbox-label">
+                <strong>Notificación Activa</strong>
+                <small class="checkbox-description">La notificación estará disponible para los usuarios destinatarios</small>
+              </label>
+            </div>
+          </div>
+        </p-fieldset>
       </div>
     </div>
   </form>

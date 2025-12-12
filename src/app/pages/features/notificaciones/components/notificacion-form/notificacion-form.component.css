@@ -1,0 +1,55 @@
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field.col-12 {
+  grid-column: span 12;
+}
+
+.field.col-6 {
+  grid-column: span 6;
+}
+
+.field label {
+  font-weight: 500;
+  color: #333;
+}
+
+.field label.required {
+  color: #333;
+}
+
+.required-asterisk {
+  color: #e74c3c;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.p-error {
+  color: #e74c3c;
+  font-size: 0.875rem;
+}
+
+.p-text-secondary {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .field.col-6 {
+    grid-column: span 12;
+  }
+}
+

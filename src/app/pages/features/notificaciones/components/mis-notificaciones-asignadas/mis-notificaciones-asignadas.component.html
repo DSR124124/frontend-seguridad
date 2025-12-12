@@ -1,0 +1,128 @@
+<div class="notificaciones-container">
+  <p-toolbar class="custom-toolbar">
+    <ng-template #start>
+      <div class="d-flex gap-2 flex-wrap">
+        <p-iconfield iconPosition="left">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input type="text" pInputText placeholder="Buscar por título o mensaje..."
+            [(ngModel)]="terminoBusqueda" (input)="aplicarFiltros()" />
+        </p-iconfield>
+
+        <p-dropdown 
+          [options]="tiposNotificacion" 
+          [(ngModel)]="filtroTipo" 
+          placeholder="Tipo"
+          (onChange)="aplicarFiltros()"
+          styleClass="w-12rem">
+        </p-dropdown>
+
+        <p-dropdown 
+          [options]="prioridades" 
+          [(ngModel)]="filtroPrioridad" 
+          placeholder="Prioridad"
+          (onChange)="aplicarFiltros()"
+          styleClass="w-12rem">
+        </p-dropdown>
+
+        <p-checkbox [(ngModel)]="mostrarSoloNoLeidas" 
+          label="Solo no leídas" 
+          (onChange)="aplicarFiltros()"
+          [binary]="true">
+        </p-checkbox>
+
+        <p-button *ngIf="terminoBusqueda || filtroTipo || filtroPrioridad || mostrarSoloNoLeidas" 
+          icon="pi pi-times" label="Limpiar" styleClass="p-button-danger"
+          (onClick)="limpiarFiltros()"></p-button>
+      </div>
+    </ng-template>
+
+    <ng-template #end>
+      <div class="d-flex gap-2">
+        <p-button icon="pi pi-refresh" label="Actualizar" styleClass="p-button-info" 
+          (onClick)="cargarNotificaciones()" [disabled]="loading"></p-button>
+      </div>
+    </ng-template>
+  </p-toolbar>
+
+  <p-divider></p-divider>
+
+  <p-table [value]="notificacionesFiltradas" [loading]="loading" [paginator]="true" [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} notificaciones"
+    styleClass="tabla-datos">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 5%">ID</th>
+        <th style="width: 20%">Título</th>
+        <th style="width: 15%">Mensaje</th>
+        <th style="width: 8%">Tipo</th>
+        <th style="width: 8%">Prioridad</th>
+        <th style="width: 10%">Aplicación</th>
+        <th style="width: 8%">Estado</th>
+        <th style="width: 12%">Fecha</th>
+        <th style="width: 14%">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-notificacion>
+      <tr [class.notificacion-no-leida]="!notificacion.leida">
+        <td>{{ notificacion.idNotificacion }}</td>
+        <td>
+          <strong>{{ notificacion.titulo }}</strong>
+          <span *ngIf="!notificacion.leida" class="badge-no-leida">Nueva</span>
+        </td>
+        <td>{{ notificacion.mensaje.substring(0, 50) }}...</td>
+        <td>
+          <p-tag [value]="getLabelTipo(notificacion.tipoNotificacion)" 
+            [severity]="getSeverityTipo(notificacion.tipoNotificacion)"></p-tag>
+        </td>
+        <td>
+          <p-tag [value]="getLabelPrioridad(notificacion.prioridad)" 
+            [severity]="getSeverityPrioridad(notificacion.prioridad)"></p-tag>
+        </td>
+        <td>{{ notificacion.nombreAplicacion || '-' }}</td>
+        <td>
+          <p-tag [value]="notificacion.leida ? 'Leída' : 'No leída'" 
+            [severity]="notificacion.leida ? 'success' : 'warning'"></p-tag>
+          <br *ngIf="notificacion.confirmada">
+          <p-tag *ngIf="notificacion.confirmada" value="Confirmada" severity="info"></p-tag>
+        </td>
+        <td>
+          <span [title]="formatearFecha(notificacion.fechaCreacion)">
+            {{ formatearFecha(notificacion.fechaCreacion) }}
+          </span>
+        </td>
+        <td>
+          <div class="acciones-cell">
+            <p-button *ngIf="!notificacion.leida" 
+              icon="pi pi-check" 
+              styleClass="btn-success btn-v2" 
+              pTooltip="Marcar como leída" 
+              tooltipPosition="top"
+              (click)="marcarComoLeida(notificacion)"></p-button>
+            <p-button *ngIf="notificacion.requiereConfirmacion && !notificacion.confirmada" 
+              icon="pi pi-check-circle" 
+              styleClass="btn-info btn-v2" 
+              pTooltip="Confirmar" 
+              tooltipPosition="top"
+              (click)="confirmarNotificacion(notificacion)"></p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9" class="text-center p-4">
+          <div class="empty-message">
+            <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No se encontraron notificaciones asignadas</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+

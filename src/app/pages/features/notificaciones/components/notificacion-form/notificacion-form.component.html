@@ -1,0 +1,205 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '800px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="modoEdicion ? 'Editar Notificación' : 'Crear Nueva Notificación'"
+  (onHide)="hideDialog()"
+>
+  <form [formGroup]="notificacionForm" (ngSubmit)="guardar()">
+    <div class="form-grid">
+      <!-- Título -->
+      <div class="field col-12">
+        <label for="titulo" class="required">
+          Título <span class="required-asterisk">*</span>
+        </label>
+        <input
+          id="titulo"
+          type="text"
+          pInputText
+          formControlName="titulo"
+          [class.ng-invalid]="isFieldInvalid('titulo')"
+          placeholder="Ej: Nueva actualización disponible"
+          maxlength="200"
+        />
+        <small
+          *ngIf="isFieldInvalid('titulo')"
+          class="p-error"
+        >
+          <span *ngIf="f['titulo'].errors?.['required']">El título es obligatorio</span>
+          <span *ngIf="f['titulo'].errors?.['maxlength']">El título no puede exceder 200 caracteres</span>
+        </small>
+      </div>
+
+      <!-- Mensaje -->
+      <div class="field col-12">
+        <label for="mensaje" class="required">
+          Mensaje <span class="required-asterisk">*</span>
+        </label>
+        <textarea
+          id="mensaje"
+          pTextarea
+          formControlName="mensaje"
+          [class.ng-invalid]="isFieldInvalid('mensaje')"
+          placeholder="Escriba el mensaje de la notificación..."
+          [rows]="4"
+          maxlength="1000"
+        ></textarea>
+        <small
+          *ngIf="isFieldInvalid('mensaje')"
+          class="p-error"
+        >
+          <span *ngIf="f['mensaje'].errors?.['required']">El mensaje es obligatorio</span>
+          <span *ngIf="f['mensaje'].errors?.['maxlength']">El mensaje no puede exceder 1000 caracteres</span>
+        </small>
+      </div>
+
+      <!-- Tipo y Prioridad -->
+      <div class="field col-6">
+        <label for="tipoNotificacion" class="required">
+          Tipo <span class="required-asterisk">*</span>
+        </label>
+        <p-select
+          id="tipoNotificacion"
+          formControlName="tipoNotificacion"
+          [options]="tiposNotificacion"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccione un tipo"
+          styleClass="w-full"
+          appendTo="body"
+          [class.ng-invalid]="isFieldInvalid('tipoNotificacion')"
+        ></p-select>
+        <small
+          *ngIf="isFieldInvalid('tipoNotificacion')"
+          class="p-error"
+        >
+          <span *ngIf="f['tipoNotificacion'].errors?.['required']">El tipo es obligatorio</span>
+        </small>
+      </div>
+
+      <div class="field col-6">
+        <label for="prioridad" class="required">
+          Prioridad <span class="required-asterisk">*</span>
+        </label>
+        <p-select
+          id="prioridad"
+          formControlName="prioridad"
+          [options]="prioridades"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccione una prioridad"
+          styleClass="w-full"
+          appendTo="body"
+          [class.ng-invalid]="isFieldInvalid('prioridad')"
+        ></p-select>
+        <small
+          *ngIf="isFieldInvalid('prioridad')"
+          class="p-error"
+        >
+          <span *ngIf="f['prioridad'].errors?.['required']">La prioridad es obligatoria</span>
+        </small>
+      </div>
+
+      <!-- Fechas -->
+      <div class="field col-6">
+        <label for="fechaEnvio">
+          Fecha de Envío
+        </label>
+        <p-calendar
+          id="fechaEnvio"
+          formControlName="fechaEnvio"
+          [showTime]="true"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          placeholder="Seleccione fecha y hora"
+          styleClass="w-full"
+          appendTo="body"
+        ></p-calendar>
+      </div>
+
+      <div class="field col-6">
+        <label for="fechaExpiracion">
+          Fecha de Expiración
+        </label>
+        <p-calendar
+          id="fechaExpiracion"
+          formControlName="fechaExpiracion"
+          [showTime]="true"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          placeholder="Seleccione fecha y hora"
+          styleClass="w-full"
+          appendTo="body"
+        ></p-calendar>
+      </div>
+
+      <!-- Usuarios Destinatarios -->
+      <div class="field col-12">
+        <label for="usuarios" class="required">
+          Usuarios Destinatarios <span class="required-asterisk">*</span>
+        </label>
+        <p-multiSelect
+          id="usuarios"
+          [options]="usuarios"
+          [(ngModel)]="usuariosSeleccionados"
+          [ngModelOptions]="{standalone: true}"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccione uno o más usuarios"
+          [filter]="true"
+          [showClear]="true"
+          styleClass="w-full"
+          appendTo="body"
+        ></p-multiSelect>
+        <small class="p-text-secondary">
+          Debe seleccionar al menos un usuario destinatario
+        </small>
+      </div>
+
+      <!-- Opciones -->
+      <div class="field col-12">
+        <div class="d-flex gap-3 flex-wrap">
+          <p-checkbox
+            formControlName="requiereConfirmacion"
+            label="Requiere Confirmación"
+            [binary]="true"
+          ></p-checkbox>
+          <p-checkbox
+            formControlName="mostrarComoRecordatorio"
+            label="Mostrar como Recordatorio"
+            [binary]="true"
+          ></p-checkbox>
+          <p-checkbox
+            formControlName="activo"
+            label="Activa"
+            [binary]="true"
+          ></p-checkbox>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="hideDialog()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        [label]="modoEdicion ? 'Actualizar' : 'Crear'"
+        icon="pi pi-check"
+        (click)="guardar()"
+        [disabled]="notificacionForm.invalid || usuariosSeleccionados.length === 0"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+

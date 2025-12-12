@@ -48,6 +48,19 @@ export const layoutRoutes: Routes = [
             loadComponent: () => import('../../features/viajes/components/viaje-mapa-tiempo-real/viaje-mapa-tiempo-real.component').then(m => m.ViajeMapaTiempoRealComponent)
           }
         ]
+      },
+      {
+        path: 'notificaciones',
+        children: [
+          {
+            path: 'mis-notificaciones-creadas',
+            loadComponent: () => import('../../features/notificaciones/components/mis-notificaciones-creadas/mis-notificaciones-creadas.component').then(m => m.MisNotificacionesCreadasComponent)
+          },
+          {
+            path: 'mis-notificaciones-asignadas',
+            loadComponent: () => import('../../features/notificaciones/components/mis-notificaciones-asignadas/mis-notificaciones-asignadas.component').then(m => m.MisNotificacionesAsignadasComponent)
+          }
+        ]
       }
     ]
   }

@@ -1,0 +1,33 @@
+.notificaciones-container {
+  padding: 1rem;
+}
+
+.custom-toolbar {
+  margin-bottom: 1rem;
+}
+
+.tabla-datos {
+  margin-top: 1rem;
+}
+
+.acciones-cell {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.empty-message {
+  padding: 2rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.empty-message i {
+  margin-bottom: 1rem;
+}
+
+.empty-message p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+

@@ -1,0 +1,47 @@
+.notificaciones-container {
+  padding: 1rem;
+}
+
+.custom-toolbar {
+  margin-bottom: 1rem;
+}
+
+.tabla-datos {
+  margin-top: 1rem;
+}
+
+.acciones-cell {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.empty-message {
+  padding: 2rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.empty-message i {
+  margin-bottom: 1rem;
+}
+
+.empty-message p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.notificacion-no-leida {
+  background-color: #f0f8ff;
+  font-weight: 500;
+}
+
+.badge-no-leida {
+  background-color: #ff6b6b;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+

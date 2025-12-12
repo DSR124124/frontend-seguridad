@@ -80,6 +80,28 @@ export class SidebarService {
           },
         ],
         visible: true,
+      },
+      {
+        id: 'notificaciones',
+        label: 'Notificaciones',
+        icon: 'pi pi-bell',
+        items: [
+          {
+            id: 'mis-notificaciones-creadas',
+            label: 'Mis Notificaciones Creadas',
+            icon: 'pi pi-send',
+            routerLink: ['/notificaciones/mis-notificaciones-creadas'],
+            visible: true,
+          },
+          {
+            id: 'mis-notificaciones-asignadas',
+            label: 'Mis Notificaciones Asignadas',
+            icon: 'pi pi-inbox',
+            routerLink: ['/notificaciones/mis-notificaciones-asignadas'],
+            visible: true,
+          },
+        ],
+        visible: true,
       }
     ];
 

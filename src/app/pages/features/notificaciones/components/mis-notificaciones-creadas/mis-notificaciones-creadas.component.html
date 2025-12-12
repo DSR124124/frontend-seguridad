@@ -1,3 +1,5 @@
+<app-loading-spinner></app-loading-spinner>
+
 <div class="notificaciones-container">
   <p-toolbar class="custom-toolbar">
     <ng-template #start>
@@ -37,14 +39,14 @@
         <p-button icon="pi pi-plus" label="Nueva Notificación" styleClass="p-button-primary"
           (onClick)="abrirDialogoCrear()"></p-button>
         <p-button icon="pi pi-refresh" label="Actualizar" styleClass="p-button-info" 
-          (onClick)="cargarNotificaciones()" [disabled]="loading"></p-button>
+          (onClick)="cargarNotificaciones()"></p-button>
       </div>
     </ng-template>
   </p-toolbar>
 
   <p-divider></p-divider>
 
-  <p-table [value]="notificacionesFiltradas" [loading]="loading" [paginator]="true" [rows]="10"
+  <p-table [value]="notificacionesFiltradas" [paginator]="true" [rows]="10"
     [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} notificaciones"
     styleClass="tabla-datos">

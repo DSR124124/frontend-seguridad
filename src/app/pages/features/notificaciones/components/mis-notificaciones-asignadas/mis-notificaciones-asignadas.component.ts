@@ -1,31 +1,30 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NotificacionUsuarioDTO } from '../../interfaces/notificacion.interface';
 import { NotificacionService } from '../../services/notificacion.service';
 import { AuthUserService } from '../../../../../core/services/auth-user.service';
 import { MessageService } from 'primeng/api';
 import { LoadingService } from '../../../../../shared/services/loading.service';
 import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
-import { Subscription } from 'rxjs';
+import { LoadingSpinnerComponent } from '../../../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-mis-notificaciones-asignadas',
   standalone: true,
   imports: [
-    ...PrimeNGModules
+    ...PrimeNGModules,
+    LoadingSpinnerComponent
   ],
   templateUrl: './mis-notificaciones-asignadas.component.html',
   styleUrl: './mis-notificaciones-asignadas.component.css'
 })
-export class MisNotificacionesAsignadasComponent implements OnInit, OnDestroy {
+export class MisNotificacionesAsignadasComponent implements OnInit {
   notificaciones: NotificacionUsuarioDTO[] = [];
   notificacionesFiltradas: NotificacionUsuarioDTO[] = [];
-  loading: boolean = false;
   terminoBusqueda: string = '';
   filtroTipo: string = '';
   filtroPrioridad: string = '';
   mostrarSoloNoLeidas: boolean = false;
   idUsuario: number | null = null;
-  private loadingSubscription?: Subscription;
 
   tiposNotificacion = [
     { label: 'Todas', value: '' },
@@ -52,9 +51,6 @@ export class MisNotificacionesAsignadasComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.loadingSubscription = this.loadingService.loading$.subscribe(
-      loading => this.loading = loading
-    );
     this.idUsuario = this.authUserService.obtenerIdUsuario();
     if (this.idUsuario) {
       this.cargarNotificaciones();
@@ -65,12 +61,6 @@ export class MisNotificacionesAsignadasComponent implements OnInit, OnDestroy {
         detail: 'No se pudo obtener el ID del usuario',
         life: 5000
       });
-    }
-  }
-
-  ngOnDestroy(): void {
-    if (this.loadingSubscription) {
-      this.loadingSubscription.unsubscribe();
     }
   }
 

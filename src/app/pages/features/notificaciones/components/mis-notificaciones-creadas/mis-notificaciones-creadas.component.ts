@@ -1,34 +1,33 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Notificacion } from '../../interfaces/notificacion.interface';
 import { NotificacionService } from '../../services/notificacion.service';
 import { AuthUserService } from '../../../../../core/services/auth-user.service';
 import { MessageService } from 'primeng/api';
 import { LoadingService } from '../../../../../shared/services/loading.service';
 import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
-import { Subscription } from 'rxjs';
 import { NotificacionFormComponent } from '../notificacion-form/notificacion-form.component';
 import { ConfirmationService } from 'primeng/api';
+import { LoadingSpinnerComponent } from '../../../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-mis-notificaciones-creadas',
   standalone: true,
   imports: [
     ...PrimeNGModules,
-    NotificacionFormComponent
+    NotificacionFormComponent,
+    LoadingSpinnerComponent
   ],
   providers: [ConfirmationService],
   templateUrl: './mis-notificaciones-creadas.component.html',
   styleUrl: './mis-notificaciones-creadas.component.css'
 })
-export class MisNotificacionesCreadasComponent implements OnInit, OnDestroy {
+export class MisNotificacionesCreadasComponent implements OnInit {
   notificaciones: Notificacion[] = [];
   notificacionesFiltradas: Notificacion[] = [];
-  loading: boolean = false;
   terminoBusqueda: string = '';
   filtroTipo: string = '';
   filtroPrioridad: string = '';
   idUsuario: number | null = null;
-  private loadingSubscription?: Subscription;
 
   tiposNotificacion = [
     { label: 'Todas', value: '' },
@@ -56,9 +55,6 @@ export class MisNotificacionesCreadasComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.loadingSubscription = this.loadingService.loading$.subscribe(
-      loading => this.loading = loading
-    );
     this.idUsuario = this.authUserService.obtenerIdUsuario();
     if (this.idUsuario) {
       this.cargarNotificaciones();
@@ -69,12 +65,6 @@ export class MisNotificacionesCreadasComponent implements OnInit, OnDestroy {
         detail: 'No se pudo obtener el ID del usuario',
         life: 5000
       });
-    }
-  }
-
-  ngOnDestroy(): void {
-    if (this.loadingSubscription) {
-      this.loadingSubscription.unsubscribe();
     }
   }
 

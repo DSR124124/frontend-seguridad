@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { NotificacionUsuarioDTO } from '../../interfaces/notificacion.interface';
 import { NotificacionService } from '../../services/notificacion.service';
+import { NotificacionWebsocketService } from '../../services/notificacion-websocket.service';
+import { NotificacionCounterService } from '../../services/notificacion-counter.service';
 import { AuthUserService } from '../../../../../core/services/auth-user.service';
 import { MessageService } from 'primeng/api';
 import { LoadingService } from '../../../../../shared/services/loading.service';
 import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
 import { LoadingSpinnerComponent } from '../../../../../shared/components/loading-spinner/loading-spinner.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-mis-notificaciones-asignadas',
@@ -17,7 +20,7 @@ import { LoadingSpinnerComponent } from '../../../../../shared/components/loadin
   templateUrl: './mis-notificaciones-asignadas.component.html',
   styleUrl: './mis-notificaciones-asignadas.component.css'
 })
-export class MisNotificacionesAsignadasComponent implements OnInit {
+export class MisNotificacionesAsignadasComponent implements OnInit, OnDestroy {
   notificaciones: NotificacionUsuarioDTO[] = [];
   notificacionesFiltradas: NotificacionUsuarioDTO[] = [];
   terminoBusqueda: string = '';
@@ -25,6 +28,10 @@ export class MisNotificacionesAsignadasComponent implements OnInit {
   filtroPrioridad: string = '';
   mostrarSoloNoLeidas: boolean = false;
   idUsuario: number | null = null;
+
+  private notificacionCounterService = inject(NotificacionCounterService);
+  private notificacionWsService = inject(NotificacionWebsocketService);
+  private wsSubscription?: Subscription;
 
   tiposNotificacion = [
     { label: 'Todas', value: '' },
@@ -54,6 +61,7 @@ export class MisNotificacionesAsignadasComponent implements OnInit {
     this.idUsuario = this.authUserService.obtenerIdUsuario();
     if (this.idUsuario) {
       this.cargarNotificaciones();
+      this.escucharNotificacionesEnTiempoReal();
     } else {
       this.messageService.add({
         severity: 'error',
@@ -62,6 +70,29 @@ export class MisNotificacionesAsignadasComponent implements OnInit {
         life: 5000
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.wsSubscription) {
+      this.wsSubscription.unsubscribe();
+    }
+  }
+
+  private escucharNotificacionesEnTiempoReal(): void {
+    if (!this.idUsuario) return;
+
+    this.wsSubscription = this.notificacionWsService
+      .suscribirseANotificacionesCreadasPorMi()
+      .subscribe({
+        next: (notificacion) => {
+          // Cuando llega una nueva notificación, recargar la lista
+          // El contador se actualizará automáticamente a través del servicio
+          this.cargarNotificaciones();
+        },
+        error: (error) => {
+          console.error('Error en suscripción WebSocket:', error);
+        }
+      });
   }
 
   cargarNotificaciones(): void {
@@ -73,6 +104,9 @@ export class MisNotificacionesAsignadasComponent implements OnInit {
         this.notificaciones = notificaciones || [];
         this.aplicarFiltros();
         this.loadingService.hide();
+        
+        // Actualizar el contador después de cargar
+        this.notificacionCounterService.refresh();
       },
       error: (error) => {
         this.loadingService.hide();
@@ -188,6 +222,10 @@ export class MisNotificacionesAsignadasComponent implements OnInit {
         this.loadingService.hide();
         notificacion.leida = true;
         notificacion.fechaLectura = new Date().toISOString();
+        
+        // Actualizar el contador de notificaciones no leídas
+        this.notificacionCounterService.refresh();
+        
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',

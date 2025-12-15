@@ -37,12 +37,10 @@ export class NotificacionWebsocketService {
   }
 
   /**
-   * Se suscribe al topic de notificaciones nuevas y emite solo
-   * aquellas cuyo creador sea el usuario actual.
+   * Se suscribe al topic de notificaciones nuevas y emite todas las notificaciones.
+   * El filtrado por usuario se hace en el componente que consume este observable.
    */
   suscribirseANotificacionesCreadasPorMi(): Observable<Notificacion> {
-    const idUsuario = this.authUserService.obtenerIdUsuario();
-
     return this.connected$.pipe(
       filter((c) => c),
       take(1),
@@ -54,37 +52,36 @@ export class NotificacionWebsocketService {
               (message: IMessage) => {
                 try {
                   const payload = JSON.parse(message.body) as any;
-                  if (payload.creadoPor === idUsuario) {
-                    // Adaptamos ligeramente a la interfaz Notificacion que usa el listado
-                    const notificacion: Notificacion = {
-                      idNotificacion: payload.idNotificacion!,
-                      titulo: payload.titulo!,
-                      mensaje: payload.mensaje!,
-                      tipoNotificacion: payload.tipoNotificacion!,
-                      prioridad: payload.prioridad!,
-                      idAplicacion: payload.idAplicacion!,
-                      nombreAplicacion: payload.nombreAplicacion!,
-                      creadoPor: payload.creadoPor!,
-                      creadorNombre: payload.creadorNombre!,
-                      fechaCreacion: payload.fechaCreacion?.toString() ?? '',
-                      fechaEnvio: payload.fechaEnvio?.toString() ?? null,
-                      requiereConfirmacion: payload.requiereConfirmacion ?? false,
-                      mostrarComoRecordatorio: payload.mostrarComoRecordatorio ?? true,
-                      activo: payload.activo ?? true,
-                      datosAdicionales: payload.datosAdicionales ?? null,
-                      fechaModificacion: payload.fechaModificacion?.toString() ?? '',
-                      totalDestinatarios: payload.totalDestinatarios ?? 0,
-                      totalLeidas: payload.totalLeidas ?? 0,
-                      totalConfirmadas: payload.totalConfirmadas ?? 0
-                    };
+                  
+                  // Emitir todas las notificaciones (el filtrado se hace en el componente)
+                  const notificacion: Notificacion = {
+                    idNotificacion: payload.idNotificacion!,
+                    titulo: payload.titulo!,
+                    mensaje: payload.mensaje!,
+                    tipoNotificacion: payload.tipoNotificacion!,
+                    prioridad: payload.prioridad!,
+                    idAplicacion: payload.idAplicacion!,
+                    nombreAplicacion: payload.nombreAplicacion!,
+                    creadoPor: payload.creadoPor!,
+                    creadorNombre: payload.creadorNombre!,
+                    fechaCreacion: payload.fechaCreacion?.toString() ?? '',
+                    fechaEnvio: payload.fechaEnvio?.toString() ?? null,
+                    requiereConfirmacion: payload.requiereConfirmacion ?? false,
+                    mostrarComoRecordatorio: payload.mostrarComoRecordatorio ?? true,
+                    activo: payload.activo ?? true,
+                    datosAdicionales: payload.datosAdicionales ?? null,
+                    fechaModificacion: payload.fechaModificacion?.toString() ?? '',
+                    totalDestinatarios: payload.totalDestinatarios ?? 0,
+                    totalLeidas: payload.totalLeidas ?? 0,
+                    totalConfirmadas: payload.totalConfirmadas ?? 0
+                  };
 
-                    // Mostrar notificación del navegador (si está disponible)
-                    this.mostrarNotificacionNavegador(notificacion);
+                  // Mostrar notificación del navegador (si está disponible)
+                  this.mostrarNotificacionNavegador(notificacion);
 
-                    observer.next(notificacion);
-                  }
-                } catch {
-                  // Ignorar mensajes inválidos
+                  observer.next(notificacion);
+                } catch (error) {
+                  console.error('Error al parsear mensaje WebSocket:', error);
                 }
               }
             );

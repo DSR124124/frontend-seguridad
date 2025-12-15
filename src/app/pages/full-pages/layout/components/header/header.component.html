@@ -11,6 +11,20 @@
   </div>
 
   <div class="header-right">
+    <p-button 
+      styleClass="p-button-secondary p-button-rounded notification-button" 
+      (click)="onNotificationClick()"
+      [attr.aria-label]="'Notificaciones'"
+      pTooltip="Notificaciones"
+      tooltipPosition="bottom">
+      <i class="pi pi-bell"></i>
+      <p-badge 
+        *ngIf="unreadCount > 0" 
+        [value]="unreadCount > 99 ? '99+' : unreadCount.toString()" 
+        severity="danger"
+        styleClass="notification-badge">
+      </p-badge>
+    </p-button>
   </div>
 </header>
 

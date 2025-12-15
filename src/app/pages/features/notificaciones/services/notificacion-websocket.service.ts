@@ -78,6 +78,9 @@ export class NotificacionWebsocketService {
                       totalConfirmadas: payload.totalConfirmadas ?? 0
                     };
 
+                    // Mostrar notificación del navegador (si está disponible)
+                    this.mostrarNotificacionNavegador(notificacion);
+
                     observer.next(notificacion);
                   }
                 } catch {
@@ -90,6 +93,42 @@ export class NotificacionWebsocketService {
           })
       )
     );
+  }
+
+  /**
+   * Muestra una notificación nativa del navegador si el usuario
+   * ha concedido permisos (o los concede al solicitarlos).
+   */
+  private mostrarNotificacionNavegador(notificacion: Notificacion): void {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      return;
+    }
+
+    const mostrar = () => {
+      const bodyLines: string[] = [];
+      if (notificacion.mensaje) {
+        bodyLines.push(notificacion.mensaje);
+      }
+      if (notificacion.nombreAplicacion) {
+        bodyLines.push(`app ${notificacion.nombreAplicacion}`);
+      }
+
+      new Notification(notificacion.titulo, {
+        body: bodyLines.join('\n'),
+        icon: '/assets/icons/icon-192.png', // ajusta la ruta si tienes un icono
+      });
+    };
+
+    if (Notification.permission === 'granted') {
+      mostrar();
+    } else if (Notification.permission === 'default') {
+      Notification.requestPermission().then((perm) => {
+        if (perm === 'granted') {
+          mostrar();
+        }
+      });
+    }
+    // Si es 'denied', no hacemos nada
   }
 
   private buildWsUrl(): string {

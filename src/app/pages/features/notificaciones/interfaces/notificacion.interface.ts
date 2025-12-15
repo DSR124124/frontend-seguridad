@@ -9,7 +9,6 @@ export interface Notificacion {
   creadoPor: number;
   creadorNombre: string | null;
   fechaCreacion: string;
-  fechaExpiracion: string | null;
   fechaEnvio: string | null;
   requiereConfirmacion: boolean;
   mostrarComoRecordatorio: boolean;
@@ -28,7 +27,6 @@ export interface NotificacionDTO {
   prioridad?: string;
   idAplicacion: number;
   creadoPor: number;
-  fechaExpiracion?: string | null;
   fechaEnvio?: string | null;
   requiereConfirmacion?: boolean;
   mostrarComoRecordatorio?: boolean;
@@ -44,7 +42,6 @@ export interface NotificacionUsuarioDTO {
   tipoNotificacion: string;
   prioridad: string;
   fechaCreacion: string;
-  fechaExpiracion: string | null;
   requiereConfirmacion: boolean;
   datosAdicionales: any | null;
   nombreAplicacion: string | null;

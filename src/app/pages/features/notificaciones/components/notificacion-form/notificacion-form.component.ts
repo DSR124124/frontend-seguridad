@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, Output, EventEmitter, ViewChild } from '@
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NotificacionDTO, Notificacion } from '../../interfaces/notificacion.interface';
 import { NotificacionService } from '../../services/notificacion.service';
-import { AplicacionService } from '../../services/aplicacion.service';
 import { UsuarioService } from '../../services/usuario.service';
 import { AuthUserService } from '../../../../../core/services/auth-user.service';
 import { MessageService } from 'primeng/api';
@@ -55,7 +54,6 @@ export class NotificacionFormComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private notificacionService: NotificacionService,
-    private aplicacionService: AplicacionService,
     private usuarioService: UsuarioService,
     private authUserService: AuthUserService,
     private messageService: MessageService,
@@ -66,7 +64,8 @@ export class NotificacionFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.idUsuario = this.authUserService.obtenerIdUsuario();
-    this.cargarAplicacion();
+    // La aplicación ya no se obtiene por código; se usa un ID fijo desde environment
+    this.idAplicacion = environment.idAplicacionNotificaciones ?? null;
     this.cargarUsuarios();
   }
 
@@ -80,31 +79,10 @@ export class NotificacionFormComponent implements OnInit, OnDestroy {
       mensaje: ['', [Validators.required, Validators.maxLength(1000)]],
       tipoNotificacion: ['info', [Validators.required]],
       prioridad: ['normal', [Validators.required]],
-      fechaExpiracion: [null],
       fechaEnvio: [null],
       requiereConfirmacion: [false],
       mostrarComoRecordatorio: [true],
       activo: [true]
-    });
-  }
-
-  cargarAplicacion(): void {
-    this.loadingService.show();
-    this.aplicacionService.obtenerPorCodigo(environment.codigoSistema).subscribe({
-      next: (aplicacion) => {
-        this.idAplicacion = aplicacion.idAplicacion;
-        this.loadingService.hide();
-      },
-      error: (error) => {
-        this.loadingService.hide();
-        const errorMessage = error?.message || error?.error?.message || 'Error al cargar la aplicación';
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage,
-          life: 5000
-        });
-      }
     });
   }
 
@@ -138,7 +116,6 @@ export class NotificacionFormComponent implements OnInit, OnDestroy {
         mensaje: notificacion.mensaje,
         tipoNotificacion: notificacion.tipoNotificacion,
         prioridad: notificacion.prioridad,
-        fechaExpiracion: notificacion.fechaExpiracion ? new Date(notificacion.fechaExpiracion) : null,
         fechaEnvio: notificacion.fechaEnvio ? new Date(notificacion.fechaEnvio) : null,
         requiereConfirmacion: notificacion.requiereConfirmacion,
         mostrarComoRecordatorio: notificacion.mostrarComoRecordatorio,
@@ -212,7 +189,6 @@ export class NotificacionFormComponent implements OnInit, OnDestroy {
       prioridad: formValue.prioridad,
       idAplicacion: this.idAplicacion,
       creadoPor: this.idUsuario,
-      fechaExpiracion: formValue.fechaExpiracion ? formValue.fechaExpiracion.toISOString() : null,
       fechaEnvio: formValue.fechaEnvio ? formValue.fechaEnvio.toISOString() : null,
       requiereConfirmacion: formValue.requiereConfirmacion || false,
       mostrarComoRecordatorio: formValue.mostrarComoRecordatorio !== false,

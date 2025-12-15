@@ -102,30 +102,14 @@
         </small>
       </div>
 
-      <!-- Fechas -->
-      <div class="field col-6">
+      <!-- Fecha de envío -->
+      <div class="field col-12 md:col-6">
         <label for="fechaEnvio">
           Fecha de Envío
         </label>
         <p-datePicker
           id="fechaEnvio"
           formControlName="fechaEnvio"
-          [showTime]="true"
-          [showIcon]="true"
-          dateFormat="dd/mm/yy"
-          placeholder="Seleccione fecha y hora"
-          styleClass="w-full"
-          appendTo="body"
-        ></p-datePicker>
-      </div>
-
-      <div class="field col-6">
-        <label for="fechaExpiracion">
-          Fecha de Expiración
-        </label>
-        <p-datePicker
-          id="fechaExpiracion"
-          formControlName="fechaExpiracion"
           [showTime]="true"
           [showIcon]="true"
           dateFormat="dd/mm/yy"
@@ -219,7 +203,6 @@
         [label]="modoEdicion ? 'Actualizar' : 'Crear'"
         icon="pi pi-check"
         (click)="guardar()"
-        [disabled]="notificacionForm.invalid || usuariosSeleccionados.length === 0"
       ></button>
     </div>
   </ng-template>

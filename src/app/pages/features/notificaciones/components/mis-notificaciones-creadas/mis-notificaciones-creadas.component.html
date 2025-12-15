@@ -8,27 +8,16 @@
           <p-inputicon>
             <i class="pi pi-search"></i>
           </p-inputicon>
-          <input type="text" pInputText placeholder="Buscar por título o mensaje..."
-            [(ngModel)]="terminoBusqueda" (input)="aplicarFiltros()" />
+          <input
+            type="text"
+            pInputText
+            placeholder="Buscar por título o mensaje..."
+            [(ngModel)]="terminoBusqueda"
+            (input)="aplicarFiltros()"
+          />
         </p-iconfield>
-
-        <p-dropdown 
-          [options]="tiposNotificacion" 
-          [(ngModel)]="filtroTipo" 
-          placeholder="Tipo"
-          (onChange)="aplicarFiltros()"
-          styleClass="w-12rem">
-        </p-dropdown>
-
-        <p-dropdown 
-          [options]="prioridades" 
-          [(ngModel)]="filtroPrioridad" 
-          placeholder="Prioridad"
-          (onChange)="aplicarFiltros()"
-          styleClass="w-12rem">
-        </p-dropdown>
-
-        <p-button *ngIf="terminoBusqueda || filtroTipo || filtroPrioridad" 
+        <p-button
+          *ngIf="terminoBusqueda"
           icon="pi pi-times" label="Limpiar" styleClass="p-button-danger"
           (onClick)="limpiarFiltros()"></p-button>
       </div>
@@ -38,7 +27,7 @@
       <div class="d-flex gap-2">
         <p-button icon="pi pi-plus" label="Nueva Notificación" styleClass="p-button-primary"
           (onClick)="abrirDialogoCrear()"></p-button>
-        <p-button icon="pi pi-refresh" label="Actualizar" styleClass="p-button-info" 
+        <p-button icon="pi pi-refresh" label="Actualizar" styleClass="p-button-info"
           (onClick)="cargarNotificaciones()"></p-button>
       </div>
     </ng-template>
@@ -71,16 +60,22 @@
           <small class="text-secondary">{{ notificacion.mensaje.substring(0, 50) }}...</small>
         </td>
         <td>
-          <p-tag [value]="getLabelTipo(notificacion.tipoNotificacion)" 
-            [severity]="getSeverityTipo(notificacion.tipoNotificacion)"></p-tag>
+          <p-tag
+            [value]="getLabelTipo(notificacion.tipoNotificacion)"
+            [ngClass]="getTagClaseTipo(notificacion.tipoNotificacion)">
+          </p-tag>
         </td>
         <td>
-          <p-tag [value]="getLabelPrioridad(notificacion.prioridad)" 
-            [severity]="getSeverityPrioridad(notificacion.prioridad)"></p-tag>
+          <p-tag
+            [value]="getLabelPrioridad(notificacion.prioridad)"
+            [ngClass]="getTagClasePrioridad(notificacion.prioridad)">
+          </p-tag>
         </td>
         <td>
-          <p-tag [value]="notificacion.activo ? 'Activa' : 'Inactiva'" 
-            [severity]="notificacion.activo ? 'success' : 'danger'"></p-tag>
+          <p-tag
+            [value]="notificacion.activo ? 'Activa' : 'Inactiva'"
+            [ngClass]="getTagClaseEstado(notificacion.activo)">
+          </p-tag>
         </td>
         <td>
           <div class="d-flex flex-column gap-1">
@@ -117,8 +112,8 @@
 </div>
 
 <!-- Componente de crear/editar notificación -->
-<app-notificacion-form 
-  #notificacionFormComponent 
+<app-notificacion-form
+  #notificacionFormComponent
   (notificacionCreada)="onNotificacionCreada()"
   (notificacionActualizada)="onNotificacionActualizada()">
 </app-notificacion-form>

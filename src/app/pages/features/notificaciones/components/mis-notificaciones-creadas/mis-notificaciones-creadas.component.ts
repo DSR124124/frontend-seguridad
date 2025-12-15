@@ -8,6 +8,7 @@ import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
 import { NotificacionFormComponent } from '../notificacion-form/notificacion-form.component';
 import { ConfirmationService } from 'primeng/api';
 import { LoadingSpinnerComponent } from '../../../../../shared/components/loading-spinner/loading-spinner.component';
+import { NotificacionWebsocketService } from '../../services/notificacion-websocket.service';
 
 @Component({
   selector: 'app-mis-notificaciones-creadas',
@@ -25,39 +26,22 @@ export class MisNotificacionesCreadasComponent implements OnInit {
   notificaciones: Notificacion[] = [];
   notificacionesFiltradas: Notificacion[] = [];
   terminoBusqueda: string = '';
-  filtroTipo: string = '';
-  filtroPrioridad: string = '';
   idUsuario: number | null = null;
-
-  tiposNotificacion = [
-    { label: 'Todas', value: '' },
-    { label: 'Info', value: 'info' },
-    { label: 'Warning', value: 'warning' },
-    { label: 'Error', value: 'error' },
-    { label: 'Success', value: 'success' },
-    { label: 'Critical', value: 'critical' }
-  ];
-
-  prioridades = [
-    { label: 'Todas', value: '' },
-    { label: 'Baja', value: 'baja' },
-    { label: 'Normal', value: 'normal' },
-    { label: 'Alta', value: 'alta' },
-    { label: 'Urgente', value: 'urgente' }
-  ];
 
   constructor(
     private notificacionService: NotificacionService,
     private authUserService: AuthUserService,
     private messageService: MessageService,
     private loadingService: LoadingService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private notificacionWsService: NotificacionWebsocketService
   ) {}
 
   ngOnInit(): void {
     this.idUsuario = this.authUserService.obtenerIdUsuario();
     if (this.idUsuario) {
       this.cargarNotificaciones();
+      this.escucharNotificacionesEnTiempoReal();
     } else {
       this.messageService.add({
         severity: 'error',
@@ -66,6 +50,16 @@ export class MisNotificacionesCreadasComponent implements OnInit {
         life: 5000
       });
     }
+  }
+
+  private escucharNotificacionesEnTiempoReal(): void {
+    this.notificacionWsService
+      .suscribirseANotificacionesCreadasPorMi()
+      .subscribe((notificacion) => {
+        // Insertar al inicio de la lista y volver a aplicar filtros
+        this.notificaciones = [notificacion, ...this.notificaciones];
+        this.aplicarFiltros();
+      });
   }
 
   cargarNotificaciones(): void {
@@ -105,43 +99,43 @@ export class MisNotificacionesCreadasComponent implements OnInit {
       );
     }
 
-    if (this.filtroTipo) {
-      filtradas = filtradas.filter(notif => notif.tipoNotificacion === this.filtroTipo);
-    }
-
-    if (this.filtroPrioridad) {
-      filtradas = filtradas.filter(notif => notif.prioridad === this.filtroPrioridad);
-    }
-
     this.notificacionesFiltradas = filtradas;
   }
 
   limpiarFiltros(): void {
     this.terminoBusqueda = '';
-    this.filtroTipo = '';
-    this.filtroPrioridad = '';
     this.aplicarFiltros();
   }
 
-  getSeverityTipo(tipo: string): string {
-    const severities: { [key: string]: string } = {
-      'info': 'info',
-      'warning': 'warn',
-      'error': 'danger',
-      'success': 'success',
-      'critical': 'danger'
+  getTagClaseTipo(tipo: string): string[] {
+    const base = ['tag-sm', 'tag-rounded'];
+    const map: { [key: string]: string } = {
+      'info': 'tag-info',
+      'warning': 'tag-warning',
+      'error': 'tag-danger',
+      'success': 'tag-success',
+      'critical': 'tag-danger'
     };
-    return severities[tipo] || 'info';
+    const colorClass = map[tipo] || 'tag-info';
+    return ['p-tag', ...base, colorClass];
   }
 
-  getSeverityPrioridad(prioridad: string): string {
-    const severities: { [key: string]: string } = {
-      'baja': 'secondary',
-      'normal': 'info',
-      'alta': 'warn',
-      'urgente': 'danger'
+  getTagClasePrioridad(prioridad: string): string[] {
+    const base = ['tag-sm', 'tag-rounded'];
+    const map: { [key: string]: string } = {
+      'baja': 'tag-priority-low',
+      'normal': 'tag-priority-medium',
+      'alta': 'tag-priority-high',
+      'urgente': 'tag-priority-urgent'
     };
-    return severities[prioridad] || 'info';
+    const colorClass = map[prioridad] || 'tag-priority-medium';
+    return ['p-tag', ...base, colorClass];
+  }
+
+  getTagClaseEstado(activo: boolean): string[] {
+    const base = ['tag-sm', 'tag-rounded'];
+    const estadoClass = activo ? 'tag-status-active' : 'tag-status-inactive';
+    return ['p-tag', ...base, estadoClass];
   }
 
   getLabelTipo(tipo: string): string {

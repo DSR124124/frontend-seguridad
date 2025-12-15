@@ -1,0 +1,16 @@
+{
+  "/gestion": {
+    "target": "https://edugen.brianuceda.xyz",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info"
+  },
+  "/servicios": {
+    "target": "https://edugen.brianuceda.xyz",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info"
+  }
+}
+
+

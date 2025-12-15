@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
 import { Subscription } from 'rxjs';
-import { NotificacionCounterService } from '../../../features/notificaciones/services/notificacion-counter.service';
+import { NotificacionCounterService } from '../../../../features/notificaciones/services/notificacion-counter.service';
 
 @Component({
   selector: 'app-header',
@@ -34,7 +34,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     // Suscribirse a los cambios del contador
     this.subscription = this.notificacionCounterService.getUnreadCount().subscribe({
-      next: (count) => {
+      next: (count: number) => {
         this.unreadCount = count;
       }
     });

@@ -1,8 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SidebarItemComponent } from '../sidebar-item/sidebar-item.component';
 import { SidebarService } from '../../services/sidebar.service';
+import { NotificacionCounterService } from '../../../../features/notificaciones/services/notificacion-counter.service';
 import { SidebarItem } from '../../interfaces/sidebar-item.interface';
 import { Subscription } from 'rxjs';
 
@@ -24,6 +25,8 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
 
   menuItems: SidebarItem[] = [];
   private itemsSubscription?: Subscription;
+  private notificationCounterSubscription?: Subscription;
+  private notificacionCounterService = inject(NotificacionCounterService);
 
   open: boolean = true;
   sidebarVisible: boolean = true;
@@ -50,12 +53,33 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
 
     this.sidebarVisible = this.visible;
     this.open = !this.collapsed;
+
+    // Inicializar el servicio de contador de notificaciones
+    this.notificacionCounterService.initialize();
+
+    // Suscribirse a los cambios del contador y actualizar el badge del sidebar
+    this.notificationCounterSubscription = this.notificacionCounterService.getUnreadCount().subscribe({
+      next: (count: number) => {
+        this.updateNotificationBadge(count);
+      }
+    });
   }
 
   ngOnDestroy() {
     if (this.itemsSubscription) {
       this.itemsSubscription.unsubscribe();
     }
+    if (this.notificationCounterSubscription) {
+      this.notificationCounterSubscription.unsubscribe();
+    }
+  }
+
+  private updateNotificationBadge(count: number): void {
+    const badgeText = count > 0 ? (count > 99 ? '99+' : count.toString()) : undefined;
+    this.sidebarService.updateItem('mis-notificaciones-asignadas', {
+      badge: badgeText,
+      badgeClass: count > 0 ? 'badge-danger' : undefined
+    });
   }
 
   onToggle() {

@@ -11,6 +11,9 @@
   <i *ngIf="item.icon" [ngClass]="item.icon.split(' ')" class="menu-icon"></i>
   <i *ngIf="!item.icon" class="pi pi-circle menu-icon"></i>
   <span class="menu-text">{{ item.label }}</span>
+  <span *ngIf="item.badge" class="menu-badge" [ngClass]="item.badgeClass || 'badge-default'">
+    {{ item.badge }}
+  </span>
   <ng-container *ngIf="item.items">
     <i
       class="pi pi-chevron-down"

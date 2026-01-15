@@ -1,0 +1,42 @@
+/* ============================================
+   ESTILOS PARA TOOLBAR - PRIMENG Y PERSONALIZADOS
+   ============================================ */
+
+/* ===== TOOLBAR PRIMENG MEJORADO ===== */
+.p-toolbar {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 122, 255, 0.05),
+    rgba(162, 240, 161, 0.03)
+  ) !important;
+  border: 1px solid rgba(28, 34, 77, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 0.75rem 1.5rem !important;
+  box-shadow: 0 2px 8px rgba(28, 34, 77, 0.06) !important;
+}
+
+/* ===== TOOLBAR PERSONALIZADO ===== */
+.custom-toolbar {
+  background: linear-gradient(
+    90deg,
+    var(--color-navy-dark) 0%,
+    var(--p-secondary-color) 100%
+  ) !important;
+  color: white !important;
+}
+
+.custom-toolbar-dialog {
+  background: var(--color-light-blue) !important;
+  color: var(--color-navy-dark) !important;
+  padding: 0.75rem 1.5rem !important;
+}
+
+/* ===== RESPONSIVE PARA TOOLBAR ===== */
+/* Tablet: 900px */
+@media (max-width: 900px) {
+  .custom-toolbar {
+    min-width: 300px !important;
+    padding: 0.75rem !important;
+  }
+}
+

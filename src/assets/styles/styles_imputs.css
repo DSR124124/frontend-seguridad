@@ -1,0 +1,67 @@
+.p-select {
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Estilos de color para p-select usando colores de la empresa */
+.p-select:not(.p-disabled):hover {
+  border-color: var(--color-secondary) !important;
+}
+
+.p-select:not(.p-disabled).p-focus {
+  border-color: var(--color-secondary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(8, 40, 83, 0.25) !important;
+  outline: 1px solid var(--color-secondary) !important;
+  outline-offset: 2px !important;
+}
+
+.p-inputtext {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Estilos de color para p-inputtext usando colores de la empresa */
+.p-inputtext:not(.p-disabled):hover,
+.p-inputtext:enabled:hover {
+  border-color: var(--color-secondary) !important;
+}
+
+.p-inputtext:not(.p-disabled):focus,
+.p-inputtext:enabled:focus {
+  border-color: var(--color-secondary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(63, 140, 249, 0.25) !important;
+  outline: 2px solid var(--color-secondary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Sobrescribir variables CSS de PrimeNG para evitar el verde */
+:root {
+  --p-inputtext-focus-border-color: var(--color-secondary) !important;
+  --p-select-focus-border-color: var(--color-secondary) !important;
+  --p-inputtext-focus-ring-color: var(--color-secondary) !important;
+  --p-select-focus-ring-color: var(--color-secondary) !important;
+}
+
+/* Estilos para las opciones del dropdown p-select */
+.p-select-overlay .p-select-option:not(.p-disabled):hover {
+  background-color: var(--color-secondary-disabled) !important;
+  color: var(--color-text-dark) !important;
+}
+
+.p-select-overlay .p-select-option.p-select-option-selected {
+  background-color: var(--color-secondary) !important;
+  color: var(--color-text-light) !important;
+}
+
+.p-select-overlay .p-select-option.p-select-option-selected:hover {
+  background-color: var(--color-secondary-hover) !important;
+  color: var(--color-text-light) !important;
+}
+
+.p-select-overlay .p-select-option.p-highlight {
+  background-color: var(--color-secondary-disabled) !important;
+  color: var(--color-text-dark) !important;
+}
+

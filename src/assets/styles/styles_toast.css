@@ -1,0 +1,70 @@
+/* Toast styles - high specificity to override PrimeNG defaults where needed */
+
+/* Close button positioning and size */
+body .p-toast .p-toast-item .p-toast-message button[aria-label="Close"],
+body .p-toast .p-toast-item .p-toast-message .p-toast-close-icon,
+body .p-toast-message-icon-close-button {
+  position: absolute !important;
+  top: 0.5rem !important;
+  right: 0.5rem !important;
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+  min-width: 1.75rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.16s ease !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+}
+
+/* Message container sizing */
+body .p-toast .p-toast-item .p-toast-message-content,
+body .p-toast .p-toast-item .p-toast-message {
+  max-width: 480px !important;
+  width: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure text wraps */
+body .p-toast .p-toast-item .p-toast-message .p-toast-summary,
+body .p-toast .p-toast-item .p-toast-message .p-toast-detail {
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
+/* Mobile: make toasts full-width and centered */
+@media (max-width: 768px) {
+  body .p-toast.p-toast-top-right,
+  body .p-toast.p-toast-top-left,
+  body .p-toast.p-toast-top-center {
+    left: 0 !important;
+    right: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    padding: 0.5rem !important;
+    pointer-events: none !important;
+  }
+
+  body .p-toast .p-toast-item .p-toast-message-content,
+  body .p-toast .p-toast-item .p-toast-message {
+    width: calc(100% - 2rem) !important;
+    max-width: none !important;
+    margin: 0.25rem 0 !important;
+    border-radius: 8px !important;
+    pointer-events: auto !important;
+  }
+
+  body .p-toast .p-toast-item .p-toast-message {
+    padding-right: 3rem !important; /* ensure close button doesn't overlap text */
+  }
+}
+
+/* Accessibility focus */
+body .p-toast .p-toast-item .p-toast-message:focus {
+  outline: 2px solid rgba(0,0,0,0.08) !important;
+}

@@ -1,191 +1,634 @@
-/* =====================================================
-   GLOBAL STYLES - NETTALCO DESIGN SYSTEM
-   ===================================================== */
+@import "primeicons/primeicons.css";
+/* Importar estilos específicos de botones */
+@import "./assets/styles/styles_botones.css";
+/* Importar estilos específicos de tags */
+@import "./assets/styles/styles_tags.css";
+/* Importar estilos específicos de iconos */
+@import "./assets/styles/styles_iconos.css";
+/* Importar estilos específicos de tablas */
+@import "./assets/styles/styles_tabla.css";
+/* Importar estilos específicos de tablist */
+@import "./assets/styles/styles_tablist.css";
+/* Importar estilos específicos de toast */
+@import "./assets/styles/styles_toast.css";
+/* Importar estilos específicos de cards */
+@import "./assets/styles/styles-cards.css";
+/* Importar estilos específicos de driver.js */
+@import "./assets/styles/styles_driver.css";
+/* Importar estilos específicos de toolbar */
+@import "./assets/styles/styles_toolbar.css";
+/* Importar estilos específicos de tipografía */
+@import "./assets/styles/styles_typography.css";
+/* Importar estilos específicos de stepper */
+@import "./assets/styles/styles_stepper.css";
+/* Importar estilos específicos de calendar */
+@import "./assets/styles/styles_calendar.css";
+/* Importar estilos específicos de inputs */
+@import "./assets/styles/styles_imputs.css";
 
-/*
-   Bootstrap 5.3.8 is configured in angular.json
-   - CSS: node_modules/bootstrap/dist/css/bootstrap.min.css
-   - JS: node_modules/bootstrap/dist/js/bootstrap.bundle.min.js
-   You can override Bootstrap styles here or in the modular CSS files
-   Bootstrap utilities are also defined below to ensure they work correctly
-*/
+@font-face {
+  font-family: "Anek Latin";
+  src: url("assets/fonts/AnekLatin-VariableFont_wdth,wght.ttf")
+    format("truetype");
+  font-display: swap;
+}
 
-/* =====================================================
-   IMPORT MODULAR STYLE FILES
-   All @import rules must come first before any other CSS rules
-   ===================================================== */
-   @import url("assets/styles/colors.css");
-   @import url("assets/styles/typography.css");
-   @import url("assets/styles/inputs.css");
-   @import url("assets/styles/toolbar.css");
-   @import url("assets/styles/buttons.css");
-   @import url("assets/styles/tags.css");
-   @import url("assets/styles/icons.css");
-   @import url("assets/styles/tables.css");
-   @import url("assets/styles/cards.css");
-   @import url("assets/styles/overlays.css");
-   @import url("assets/styles/components.css");
-   @import url("assets/styles/modals.css");
-   @import url("assets/styles/stepper.css");
-   @import url("assets/styles/effects.css");
-   @import url("assets/styles/driver.css");
-   @import url("assets/styles/responsive.css");
-   @import "primeicons/primeicons.css";
+@font-face {
+  font-family: "Anek Devanagari";
+  src: url("assets/fonts/AnekDevanagari-VariableFont_wdth,wght.ttf")
+    format("truetype");
+  font-display: swap;
+}
+
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+   :root {
+    /* ===== BRANDING COLORS ===== */
+    --color-navy-dark: #1c224d;
+    --color-blue-light: #4a7aff;
+    --color-mint-light: #a2f0a1;
+    --color-teal-dark: #176973;
+    --color-light-blue: #b7caffb2;
+    --color-white: #ffffff;
+    --color-light-gray: #e6e6e6;
+    --color-gray-medium: #000000;
+
+    /* ===== COLOR VARIATIONS ===== */
+    --color-navy-lighter: #2a3066;
+    --color-navy-darker: #141a3d;
+    --color-blue-lighter: #6b8fff;
+    --color-blue-darker: #2954ff;
+    --color-mint-lighter: #b8f5b7;
+    --color-mint-darker: #7ed47d;
+
+    /* ===== STATE COLORS ===== */
+    --color-success: var(--color-mint-light);
+    --color-info: var(--color-blue-light);
+    --color-warning: #ffa726;
+    --color-danger: #ef5350;
+
+    /* ===== GRAY SCALE ===== */
+    --color-gray-dark: #4a5568;
+    --color-gray-light: #f7fafc;
+    --color-gray-lighter: #edf2f7;
+
+    /* ===== PRIMENG COLORS ===== */
+    --p-primary-color: #1c224d;
+    --p-secondary-color: #4a7aff;
+    --p-gray-color: #e6e6e6;
+
+    /* ===== LAYOUT COLORS ===== */
+    --layout-header-bg: var(--p-primary-color);
+    --layout-sidebar-bg: #f5f8fc;
+    --layout-footer-bg: #151515;
+    --layout-main-bg: #ffffff;
+    --primary-content-color: #ffffff;
+
+    /* ===== TEXT COLORS ===== */
+    --texto-content-color: #000000;
+    --texto-header-color: #ffffff;
+    --texto-footer-color: #ffffff;
+    --texto-sidebar-color: #ffffff;
+
+    /* ===== TYPOGRAPHY - FONT SIZES ===== */
+    /* Headings */
+    --font-size-h1: 2.5rem;
+    --font-size-h2: 2rem;
+    --font-size-h3: 1.75rem;
+    --font-size-h4: 1.5rem;
+    --font-size-h5: 1.25rem;
+    --font-size-h6: 1.125rem;
+    /* Content */
+    --font-size-large: 1.125rem;
+    --font-size-base: 1rem;
+    --font-size-medium: 0.875rem;
+    --font-size-small: 0.75rem;
+    --font-size-xs: 0.625rem;
+    /* Components */
+    --font-size-button: 0.875rem;
+    --font-size-input: 1rem;
+    --font-size-menu: 0.875rem;
+    --font-size-breadcrumb: 0.875rem;
+    --font-size-caption: 0.75rem;
+    --font-size-tooltip: 0.75rem;
+
+    /* ===== TYPOGRAPHY - FONT WEIGHTS ===== */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+
+    /* ===== TYPOGRAPHY - LINE HEIGHT ===== */
+    --line-height-tight: 1.2;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.6;
+    --line-height-loose: 1.8;
+
+    /* ===== TYPOGRAPHY - LETTER SPACING ===== */
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.025em;
+    --letter-spacing-wider: 0.05em;
+
+    /* ===== BRAND COLORS - VERSION 1 ===== */
+    --color-primary: #082853;
+    --color-primary-hover: #22436f;
+    --color-primary-active: #2b5da1;
+    --color-primary-disabled: #6b7280;
+    --color-secondary: #3f8cf9;
+    --color-secondary-hover: #5a9ffc;
+    --color-secondary-active: #5398f8;
+    --color-secondary-disabled: #cad8f1;
+    --color-success: #2ba5cd;
+    --color-success-hover: #45b1ce;
+    --color-success-active: #3caac8;
+    --color-success-disabled: #d6e5fa;
+    --color-export: #09718a;
+    --color-export-hover: #258fa6;
+    --color-export-active: #1a859d;
+    --color-export-disabled: #8cc3d7;
+    --color-warning: #d57952;
+    --color-warning-hover: #d78158;
+    --color-warning-active: #de956a;
+    --color-warning-disabled: #e4dbe7;
+    --color-danger: #dc2626;
+    --color-danger-hover: #ef4444;
+    --color-danger-active: #b91c1c;
+    --color-danger-disabled: #fecaca;
+    --color-info: #66a6fb;
+    --color-info-hover: #7cb2fa;
+    --color-info-active: #b4d3fd;
+    --color-info-disabled: #abc9f9;
+    --color-text-light: #ffffff;
+    --color-text-dark: #082853;
 
 
-   /* =====================================================
-      DARK MODE SUPPORT
-      ===================================================== */
+  /* ===== BRAND COLORS - VERSION 2 ===== */
+  --v2-primary: #edf4ff;
+  --v2-primary-hover: #eef4ff;
+  --v2-primary-active: #336dd9;
+  --v2-primary-disabled: #0a1d49;
+  --v2-secondary: #3a72e0;
+  --v2-secondary-hover: #2b5fbc;
+  --v2-secondary-active: #1f498e;
+  --v2-secondary-disabled: #0c3d5c;
+  --v2-success: #6ecbcd;
+  --v2-success-hover: #19819d;
+  --v2-success-active: #0c566f;
+  --v2-success-disabled: #0c3d5c;
+  --v2-warning: #f4b33c;
+  --v2-warning-hover: #f2a61e;
+  --v2-warning-active: #ca8825;
+  --v2-warning-disabled: #9d6a2d;
+  --v2-info: #69a7ed;
+  --v2-info-hover: #5389db;
+  --v2-info-active: #4775bf;
+  --v2-info-disabled: #40609b;
+  --v2-text-dark: #0a1d49;
+  --v2-text-light: #ffffff;
+}
 
-   /* Modo claro (por defecto) */
-   * {
-     box-sizing: border-box;
-   }
 
-   html, body {
-     margin: 0;
-     padding: 0;
-     width: 100%;
-     height: 100%;
-     overflow: hidden;
-     background-color: #ffffff;
-     color: #2d3748;
-     transition: background-color 0.3s ease, color 0.3s ease;
-   }
+html,
+body {
+  overflow-x: hidden;
+  font-family: "Anek Latin", sans-serif !important;
 
-   app-root {
-     display: block;
-     width: 100%;
-     height: 100vh;
-     margin: 0;
-     padding: 0;
-     overflow: hidden;
-   }
+}
 
-   /* Modo oscuro - cuando tiene la clase .app-dark en el elemento html */
-   html.app-dark {
-     background-color: #1a202c !important;
-     margin: 0 !important;
-     padding: 0 !important;
-     width: 100% !important;
-     height: 100% !important;
-     overflow: hidden !important;
-   }
+body {
+  max-height: 100vh !important;
+  overflow-y: auto !important;
+}
 
-   html.app-dark body {
-     background-color: #1a202c !important;
-     color: #ffffff !important;
-     margin: 0 !important;
-     padding: 0 !important;
-     width: 100% !important;
-     height: 100% !important;
-     overflow: hidden !important;
-   }
+* {
+  -webkit-overflow-scrolling: touch;
+}
 
-   html.app-dark .container-fluid {
-     background-color: #1a202c !important;
-     color: #ffffff !important;
-   }
 
-   html.app-dark h1,
-   html.app-dark h2,
-   html.app-dark h3,
-   html.app-dark h4,
-   html.app-dark h5,
-   html.app-dark h6,
-   html.app-dark p {
-     color: #ffffff !important;
-   }
 
-   /* =====================================================
-      ADDITIONAL BUTTON MODIFICATIONS
-      ===================================================== */
 
-   /* Mejorando botones modificados */
-   .p-button-modificado .p-button {
-     width: 100% !important;
-     font-size: var(--font-size-button) !important;
+.p-password,
+.p-password > input {
+  width: 100% !important;
+}
+
+
+
+.p-drawer {
+  border: 0 !important;
+}
+
+.p-menu-item.p-focus .p-menu-item-content {
+  background: transparent !important;
+}
+
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+/* Spacing Utilities */
+.tabs-top-spacing {
+  margin-top: 0.75rem;
+}
+
+.panel-top-spacing {
+  margin-top: 0.75rem;
+}
+
+/* Text Truncate */
+.text-truncate,
+.truncate {
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+  display: inline-block !important;
+}
+
+.text-truncate-2,
+.truncate-2 {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  max-height: calc(var(--line-height-normal) * 2em) !important;
+}
+
+.text-truncate-3,
+.truncate-3 {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  max-height: calc(var(--line-height-normal) * 3em) !important;
+}
+
+/* Glass Effect */
+.glass-effect {
+  backdrop-filter: blur(10px) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.glass-effect-dark {
+  backdrop-filter: blur(10px) !important;
+  background: rgba(28, 34, 77, 0.1) !important;
+  border: 1px solid rgba(28, 34, 77, 0.2) !important;
+}
+
+/* Animation Utilities */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight 0.6s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+
+/* ============================================
+   PRIMENG OVERRIDES - LABELS
+   ============================================ */
+   .p-field label,
+   .p-float-label label {
+     font-size: var(--font-size-medium) !important;
      font-weight: var(--font-weight-medium) !important;
-     letter-spacing: var(--letter-spacing-wide) !important;
+     color: var(--color-navy-dark) !important;
    }
 
-   /* =====================================================
-      BOOTSTRAP UTILITIES - Asegurar que funcionen
-      ===================================================== */
+/* ============================================
+   PRIMENG OVERRIDES - BUTTONS
+   ============================================ */
 
-   /* Display Flex */
-   .d-flex {
-     display: flex !important;
+  .p-fileupload .p-button {
+    color: var(--color-navy-dark) !important;
+    background-color: var(--color-mint-darker) !important;
+  }
+
+  .p-fileupload .p-button:hover {
+    background-color: var(--color-mint-light) !important;
+  }
+
+/* ============================================
+   PRIMENG OVERRIDES - MENUS
+   ============================================ */
+   .p-menu .p-menuitem-text,
+   .p-megamenu .p-menuitem-text {
+     font-size: var(--font-size-menu) !important;
+     font-weight: var(--font-weight-medium) !important;
    }
 
-   .d-inline-flex {
-     display: inline-flex !important;
+   .p-menu {
+     border-radius: 12px !important;
+     border: 1px solid rgba(28, 34, 77, 0.1) !important;
+     box-shadow: 0 10px 25px rgba(28, 34, 77, 0.15), 0 5px 10px rgba(28, 34, 77, 0.08) !important;
+     backdrop-filter: blur(10px) !important;
+     padding: 0.5rem !important;
    }
 
-   /* Gap Utilities */
-   .gap-0 {
-     gap: 0 !important;
+   .p-menu .p-menuitem-link {
+     border-radius: 8px !important;
+     margin: 2px 0 !important;
+     padding: 0.75rem 1rem !important;
+     transition: all 0.2s ease !important;
    }
 
-   .gap-1 {
-     gap: 0.25rem !important;
+   .p-menu .p-menuitem-link:hover {
+     background: linear-gradient(135deg, rgba(74, 122, 255, 0.08), rgba(162, 240, 161, 0.06)) !important;
+     transform: translateX(4px) !important;
    }
 
-   .gap-2 {
-     gap: 0.5rem !important;
+   .p-menu .p-menuitem-icon {
+     margin-right: 0.75rem !important;
+     color: var(--color-blue-light) !important;
    }
+/* ============================================
+   PRIMENG OVERRIDES - TOOLTIPS
+   ============================================ */
+   .p-tooltip .p-tooltip-text {
+    font-size: var(--font-size-tooltip) !important;
+    font-weight: var(--font-weight-normal) !important;
+    line-height: var(--line-height-tight) !important;
+    background: rgba(28, 34, 77, 0.95) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 0.75rem 1rem !important;
+    box-shadow: 0 8px 24px rgba(28, 34, 77, 0.2) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
 
-   .gap-3 {
-     gap: 1rem !important;
-   }
+  .p-tooltip .p-tooltip-arrow {
+    border-bottom-color: rgba(28, 34, 77, 0.95) !important;
+  }
 
-   .gap-4 {
-     gap: 1.5rem !important;
-   }
 
-   .gap-5 {
-     gap: 3rem !important;
-   }
+/* ============================================
+   PRIMENG OVERRIDES - PANELS
+   ============================================ */
+   .p-panel {
+    border-radius: 14px !important;
+    border: 1px solid rgba(28, 34, 77, 0.08) !important;
+    box-shadow: 0 4px 12px rgba(28, 34, 77, 0.06) !important;
+    overflow: hidden !important;
+  }
 
-   /* Flex Direction */
-   .flex-row {
-     flex-direction: row !important;
-   }
+  .p-panel .p-panel-content {
+    padding: 1.5rem !important;
+  }
 
-   .flex-column {
-     flex-direction: column !important;
-   }
+  .p-panel .p-panel-header {
+    font-size: var(--font-size-h5) !important;
+    font-weight: var(--font-weight-semibold) !important;
+  }
 
-   /* Justify Content */
-   .justify-content-start {
-     justify-content: flex-start !important;
-   }
+  .p-panel .p-panel-header .p-panel-title {
+    font-weight: var(--font-weight-semibold) !important;
+  }
 
-   .justify-content-end {
-     justify-content: flex-end !important;
-   }
+  .p-tabpanels {
+    padding: 0 !important;
+  }
 
-   .justify-content-center {
-     justify-content: center !important;
-   }
+/* ============================================
+   PRIMENG OVERRIDES - TABVIEW
+   ============================================ */
+   .p-tabview .p-tabview-nav {
+    background: rgba(28, 34, 77, 0.02) !important;
+    border-bottom: 1px solid rgba(28, 34, 77, 0.08) !important;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 0.5rem !important;
+  }
 
-   .justify-content-between {
-     justify-content: space-between !important;
-   }
+  .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    border-radius: 8px !important;
+    padding: 0.75rem 1.5rem !important;
+    margin-right: 0.25rem !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+    background: transparent !important;
+  }
 
-   .justify-content-around {
-     justify-content: space-around !important;
-   }
+  .p-tabview .p-tabview-nav li:not(.p-highlight) .p-tabview-nav-link:hover {
+    background: rgba(74, 122, 255, 0.08) !important;
+    transform: translateY(-2px) !important;
+  }
 
-   /* Align Items */
-   .align-items-start {
-     align-items: flex-start !important;
-   }
+  .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    background: linear-gradient(135deg, var(--color-blue-light), var(--color-mint-light)) !important;
+    color: white !important;
+    font-weight: var(--font-weight-semibold) !important;
+    box-shadow: 0 4px 12px rgba(74, 122, 255, 0.25) !important;
+  }
 
-   .align-items-end {
-     align-items: flex-end !important;
-   }
+  .p-tabview .p-tabview-panels {
+    background: white !important;
+    border-radius: 0 0 12px 12px !important;
+  }
 
-   .align-items-center {
-     align-items: center !important;
-   }
+/* ============================================
+   PRIMENG OVERRIDES - ACCORDION
+   ============================================ */
+   .p-accordion .p-accordion-tab {
+    margin-bottom: 0.5rem !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(28, 34, 77, 0.08) !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 8px rgba(28, 34, 77, 0.06) !important;
+  }
+
+  .p-accordion .p-accordion-header .p-accordion-header-link {
+    background: linear-gradient(135deg, rgba(74, 122, 255, 0.05), rgba(162, 240, 161, 0.03)) !important;
+    padding: 1.25rem 1.5rem !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:hover {
+    background: linear-gradient(135deg, rgba(74, 122, 255, 0.08), rgba(162, 240, 161, 0.06)) !important;
+  }
+
+  .p-accordion .p-accordion-header.p-highlight .p-accordion-header-link {
+    background: linear-gradient(135deg, var(--color-blue-light), var(--color-mint-light)) !important;
+    color: white !important;
+  }
+
+  .p-accordion .p-accordion-content {
+    padding: 1.5rem !important;
+  }
+
+/* ============================================
+   PRIMENG OVERRIDES - PROGRESSBAR
+   ============================================ */
+   .p-progressbar {
+    border-radius: 50px !important;
+    height: 8px !important;
+    background: rgba(28, 34, 77, 0.1) !important;
+    overflow: hidden !important;
+    box-shadow: inset 0 2px 4px rgba(28, 34, 77, 0.1) !important;
+  }
+
+  .p-progressbar .p-progressbar-value {
+    background: linear-gradient(90deg, var(--color-blue-light), var(--color-mint-light)) !important;
+    border-radius: inherit !important;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+  }
+
+  .p-progressbar .p-progressbar-value::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+  }
+/* ============================================
+   PRIMENG OVERRIDES - DIVIDER
+   ============================================ */
+   .p-divider {
+    margin: 0.3rem 0 !important;
+    border-color: var(--color-gray-dark) !important;
+  }
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+   @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* ============================================
+     RESPONSIVE STYLES
+     ============================================ */
+  /* Spacing Utilities - Mobile */
+  @media (max-width: 768px) {
+    .tabs-top-spacing {
+      margin-top: 0.5rem;
+    }
+
+    .panel-top-spacing {
+      margin-top: 0.5rem;
+    }
+  }
+
+  /* PrimeNG Components - Mobile */
+  @media (max-width: 767.98px) {
+    .p-inputtext {
+      padding: 0.625rem 0.75rem !important;
+      font-size: var(--font-size-medium) !important;
+    }
+
+    .p-dialog {
+      margin: 1rem !important;
+      width: calc(100vw - 2rem) !important;
+      max-width: none !important;
+    }
+  }
+
+  /* Tablet */
+  @media (min-width: 768px) and (max-width: 991.98px) {
+    .p-dialog {
+      width: 80vw !important;
+      max-width: 600px !important;
+    }
+  }
+
+  /* Inputs - Tablet */
+  @media (max-width: 900px) {
+    .p-inputnumber {
+      height: 36px !important;
+    }
+
+    .p-inputtext {
+      padding: 0.4rem 0.6rem !important;
+    }
+  }
+
+  /* Inputs - Mobile Small */
+  @media (max-width: 480px) {
+    .p-inputnumber {
+      height: 32px !important;
+    }
+
+    .p-inputnumber input {
+      padding: 0.3rem 0.5rem !important;
+      font-size: 0.875rem !important;
+    }
+
+    .p-inputtext {
+      padding: 0.3rem 0.5rem !important;
+      font-size: 0.875rem !important;
+    }
+  }
+  .p-breadcrumb {
+    background-color: transparent !important;
+    padding: 0rem 0.2rem !important;
+    color: var(--v2-primary) !important;
+  }
+  .p-breadcrumb-item-link{
+    color: var(--v2-primary) !important;
+  }
+  .p-breadcrumb-item-label {
+    color: var(--v2-primary) !important;
+  }

@@ -1,5 +1,6 @@
 import { AccordionModule } from 'primeng/accordion';
 import { AvatarModule } from 'primeng/avatar';
+import { AvatarGroupModule } from 'primeng/avatargroup';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { BadgeModule } from 'primeng/badge';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
@@ -75,6 +76,7 @@ export const PrimeNGModules = [
   // PrimeNG Components
   AccordionModule,
   AvatarModule,
+  AvatarGroupModule,
   AutoCompleteModule,
   BadgeModule,
   BreadcrumbModule,

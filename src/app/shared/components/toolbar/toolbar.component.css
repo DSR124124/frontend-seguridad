@@ -1,0 +1,49 @@
+/* Desktop */
+.m-toolbar {
+  width: 100%;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.m-row-actions {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toolbar-search {
+  width: 100%;
+}
+
+.toolbar-search-input {
+  padding-left: 2.5rem !important;
+}
+
+.toolbar-actions-left {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.toolbar-actions-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Mobile */
+@media (max-width: 912px) {
+  .m-toolbar {
+    flex-direction: column;
+  }
+
+  :host ::ng-deep .m-row-actions .p-button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  :host ::ng-deep .m-row-actions .p-button .p-button-label {
+    display: none;
+  }
+}

@@ -1,0 +1,429 @@
+:host {
+  display: block;
+  min-height: 350px;
+}
+
+.data-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+  min-height: 500px;
+}
+
+/* Toolbar */
+.table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #ffffff;
+  border-bottom: none;
+  min-height: auto;
+}
+
+.toolbar-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.row-count,
+.error-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #5f6368;
+  padding: 5px 12px;
+  background: #f0f2f5;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-weight: 600;
+}
+
+.row-count i,
+.error-count i {
+  font-size: 0.9rem;
+  display: none;
+}
+
+.error-count {
+  color: #d32f2f;
+  background: #ffebee;
+  border-color: #d32f2f;
+}
+
+.error-count i {
+  color: #d32f2f;
+  display: inline;
+}
+
+/* File name tag */
+.file-name-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #0f2648;
+  padding: 5px 8px 5px 12px;
+  background: #e3f2fd;
+  border-radius: 4px;
+  border: 1px solid #90caf9;
+  font-weight: 600;
+  max-width: 250px;
+}
+
+.file-name-tag i.pi-file-excel {
+  font-size: 0.9rem;
+  color: #2e7d32;
+  display: inline;
+}
+
+.file-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+}
+
+.clear-file-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  color: #5f6368;
+  margin-left: 4px;
+}
+
+.clear-file-btn:hover {
+  background: rgba(211, 47, 47, 0.1);
+  color: #d32f2f;
+}
+
+.clear-file-btn i {
+  font-size: 0.75rem;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Estilo para el botón de agregar fila */
+::ng-deep .table-toolbar .p-button {
+  background-color: #4285f4 !important;
+  border-color: #4285f4 !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+}
+
+::ng-deep .table-toolbar .p-button:hover {
+  background-color: #3367d6 !important;
+  border-color: #3367d6 !important;
+}
+
+::ng-deep .table-toolbar .p-button .p-button-icon {
+  font-size: 1rem !important;
+}
+
+/* Contenedor de tabla */
+.table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Hacer que p-table ocupe todo el espacio */
+::ng-deep .data-table-wrapper .p-datatable {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+::ng-deep .data-table-wrapper .p-datatable-table-container {
+  flex: 1;
+  min-height: 0;
+}
+
+::ng-deep .data-table-wrapper .p-datatable-scrollable .p-datatable-wrapper {
+  overflow: hidden !important;
+}
+
+/* Headers */
+::ng-deep .data-table-wrapper .p-datatable .p-datatable-thead > tr > th {
+  background: #0f2648;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 12px 20px;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+.row-number-header,
+.actions-header {
+  width: 60px !important;
+  text-align: center;
+}
+
+.required-mark {
+  color: #ff6b6b;
+  margin-left: 2px;
+}
+
+/* Body */
+::ng-deep .data-table-wrapper .p-datatable .p-datatable-tbody > tr {
+  transition: background 0.2s ease;
+}
+
+::ng-deep .data-table-wrapper .p-datatable .p-datatable-tbody > tr:hover {
+  background: #f9f9f9;
+}
+
+::ng-deep .data-table-wrapper .p-datatable .p-datatable-tbody > tr.row-error {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+::ng-deep .data-table-wrapper .p-datatable .p-datatable-tbody > tr > td {
+  padding: 5px 5px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.row-number {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #0f2648;
+  font-weight: 700;
+}
+
+/* Celdas */
+.cell-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cell-input {
+  width: 100%;
+}
+
+::ng-deep .data-table-wrapper .p-inputtext,
+::ng-deep .data-table-wrapper .p-inputnumber,
+::ng-deep .data-table-wrapper .p-inputnumber-input,
+::ng-deep .data-table-wrapper .p-datepicker input {
+  width: 100%;
+  font-size: 0.95rem;
+  height: 50%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+::ng-deep .data-table-wrapper .p-inputtext:focus,
+::ng-deep .data-table-wrapper .p-inputnumber-input:focus {
+  border-color: #178b90;
+  box-shadow: 0 0 0 3px rgba(23, 139, 144, 0.1);
+}
+
+::ng-deep .data-table-wrapper .p-inputtext.ng-invalid,
+::ng-deep .data-table-wrapper .p-inputnumber-input.ng-invalid {
+  border-color: #d32f2f;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+/* Agregar padding derecho cuando hay error para evitar superposición con el icono */
+.cell-error .cell-input ::ng-deep .p-inputtext,
+.cell-error .cell-input ::ng-deep .p-inputnumber-input {
+  padding-right: 28px !important;
+}
+
+.error-indicator {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #d32f2f;
+  cursor: help;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.error-indicator i {
+  font-size: 0.875rem;
+}
+
+/* Acciones de fila */
+.row-actions {
+  text-align: center;
+}
+
+::ng-deep .row-actions .p-button {
+  color: #999 !important;
+  background: none !important;
+  border: none !important;
+  padding: 5px !important;
+  border-radius: 4px !important;
+  transition: all 0.2s !important;
+}
+
+::ng-deep .row-actions .p-button:hover {
+  color: #d32f2f !important;
+  background-color: #ffebee !important;
+}
+
+/* Estado vacío */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  gap: 15px;
+  color: #5f6368;
+  min-height: 300px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  opacity: 0.4;
+  color: #0f2648;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  margin: 0 0 20px 0;
+  font-size: 0.95rem;
+  color: #5f6368;
+}
+
+/* Botón de agregar primera fila en estado vacío */
+::ng-deep .empty-state .p-button {
+  background-color: #178b90 !important;
+  border-color: #178b90 !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  padding: 10px 20px !important;
+  border-radius: 6px !important;
+}
+
+::ng-deep .empty-state .p-button:hover {
+  background-color: #137a7f !important;
+  border-color: #137a7f !important;
+}
+
+
+/* Panel de errores */
+.errors-panel {
+  border-top: 1px solid var(--border-color);
+}
+
+.errors-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-danger-disabled);
+  color: var(--color-danger);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+}
+
+.errors-list {
+  padding: var(--spacing-sm) var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.error-item {
+  display: flex;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-small);
+  padding: var(--spacing-xs);
+  background: var(--color-background-light);
+  border-radius: var(--radius-xs);
+  border-left: 3px solid var(--color-danger);
+}
+
+.error-location {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-danger);
+  white-space: nowrap;
+}
+
+.error-message {
+  color: var(--color-text-primary);
+}
+
+.error-more {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: var(--spacing-xs);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .table-toolbar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .toolbar-info {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .toolbar-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .row-count,
+  .error-count {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+
+  ::ng-deep .data-table-wrapper .p-datatable .p-datatable-thead > tr > th {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  ::ng-deep .data-table-wrapper .p-datatable .p-datatable-tbody > tr > td {
+    padding: 8px 12px;
+  }
+
+  .empty-state {
+    padding: 40px 20px;
+    min-height: 250px;
+  }
+}

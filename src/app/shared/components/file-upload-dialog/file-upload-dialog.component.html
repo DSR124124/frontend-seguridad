@@ -1,0 +1,137 @@
+<div class="file-upload-dialog">
+  <!-- Header con selector de modo -->
+  <div
+    class="dialog-header" style="padding-bottom: 2rem;"
+    *ngIf="config.allowFileUpload && config.allowManualEntry"
+  >
+    <div class="row w-100 g-2">
+      <div
+        class="col-12 col-sm-6"
+        *ngFor="let item of carouselItems; let i = index"
+      >
+        <button
+          class="mode-tab w-100"
+          [class.active]="activeIndex === i"
+          (click)="navigateToSlide(i)"
+        >
+          <i class="pi" [ngClass]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Contenido principal con Carousel -->
+  <div class="dialog-content">
+    <!-- Botón descargar plantilla (fuera del carousel para mejor control) -->
+    <div
+      class="template-download-row p-3"
+      *ngIf="config.allowFileUpload && config.showTemplateDownload && tableData.length === 0 && activeIndex === 0"
+    >
+      <p-button
+        styleClass="btn-success btn-v2"
+        (click)="downloadTemplate()"
+        pTooltip="Descargar plantilla Excel con el formato correcto"
+        tooltipPosition="right"
+      >
+        <i class="pi pi-file-excel"></i>
+        <span>Descargar Plantilla</span>
+      </p-button>
+    </div>
+
+    <p-carousel
+      #carousel
+      [value]="carouselItems"
+      [numVisible]="1"
+      [numScroll]="1"
+      [circular]="false"
+      [showIndicators]="false"
+      [showNavigators]="false"
+      (onPage)="onCarouselPageChange($event)"
+      *ngIf="config.allowFileUpload && config.allowManualEntry"
+    >
+      <ng-template let-item pTemplate="item">
+        <!-- Slide 1: Carga de archivo -->
+        <div *ngIf="item.id === 'file'" class="carousel-slide">
+          <!-- Drop Zone -->
+          <app-file-drop-zone
+            *ngIf="tableData.length === 0"
+            [allowedExtensions]="config.allowedExtensions || ['.xlsx', '.xls']"
+            [maxFileSizeMB]="config.maxFileSizeMB || 5"
+            (fileSelected)="onFileSelected($event)"
+            (fileCleared)="onFileCleared()"
+            (templateDownload)="downloadTemplate()"
+          ></app-file-drop-zone>
+
+          <!-- Tabla de datos cargados -->
+          <app-editable-data-table
+            *ngIf="tableData.length > 0"
+            [columns]="config.columns"
+            [data]="tableData"
+            [minRows]="config.minRows || 1"
+            [maxRows]="config.maxRows || 1000"
+            [editable]="true"
+            [fileName]="selectedFile?.name ?? null"
+            (dataChange)="onTableDataChange($event)"
+            (clearFile)="onFileCleared()"
+          ></app-editable-data-table>
+        </div>
+
+        <!-- Slide 2: Ingreso manual -->
+        <div *ngIf="item.id === 'manual'" class="carousel-slide">
+          <app-editable-data-table
+            [columns]="config.columns"
+            [data]="tableData"
+            [minRows]="config.minRows || 1"
+            [maxRows]="config.maxRows || 1000"
+            [editable]="true"
+            [emptyMessage]="
+              'Haz clic en Agregar fila para comenzar el ingreso manual'
+            "
+            (dataChange)="onTableDataChange($event)"
+          ></app-editable-data-table>
+        </div>
+      </ng-template>
+    </p-carousel>
+
+    <!-- Solo carga de archivo -->
+    <div *ngIf="config.allowFileUpload && !config.allowManualEntry">
+      <app-file-drop-zone
+        *ngIf="tableData.length === 0"
+        [allowedExtensions]="config.allowedExtensions || ['.xlsx', '.xls']"
+        [maxFileSizeMB]="config.maxFileSizeMB || 5"
+        (fileSelected)="onFileSelected($event)"
+        (fileCleared)="onFileCleared()"
+      ></app-file-drop-zone>
+
+      <app-editable-data-table
+        *ngIf="tableData.length > 0"
+        [columns]="config.columns"
+        [data]="tableData"
+        [minRows]="config.minRows || 1"
+        [maxRows]="config.maxRows || 1000"
+        [editable]="true"
+        [fileName]="selectedFile?.name ?? null"
+        (dataChange)="onTableDataChange($event)"
+        (clearFile)="onFileCleared()"
+      ></app-editable-data-table>
+    </div>
+
+    <!-- Solo ingreso manual -->
+    <div *ngIf="!config.allowFileUpload && config.allowManualEntry">
+      <app-editable-data-table
+        [columns]="config.columns"
+        [data]="tableData"
+        [minRows]="config.minRows || 1"
+        [maxRows]="config.maxRows || 1000"
+        [editable]="true"
+        (dataChange)="onTableDataChange($event)"
+      ></app-editable-data-table>
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+    <p>Procesando archivo...</p>
+  </div>
+</div>

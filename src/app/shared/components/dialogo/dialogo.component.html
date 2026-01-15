@@ -1,0 +1,14 @@
+<div class="dialog-body">
+  <span [innerHTML]="mensaje"></span>
+</div>
+
+<p-footer class="p-dialog-footer d-flex align-items-center justify-content-center gap-2">
+  <div *ngIf="mostrarBotones; else soloBotonCerrar" class="d-flex gap-2">
+    <p-button styleClass="btn-success btn-md" [label]="labelAceptar" (click)="aceptar()"></p-button>
+    <p-button styleClass="btn-danger btn-md" [label]="labelCerrar" (click)="cerrar()"></p-button>
+  </div>
+
+  <ng-template #soloBotonCerrar>
+    <p-button styleClass="btn-primary btn-md" [label]="labelCerrar" (click)="cerrar()"></p-button>
+  </ng-template>
+</p-footer>

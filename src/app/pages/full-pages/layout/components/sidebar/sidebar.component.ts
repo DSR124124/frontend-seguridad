@@ -1,19 +1,21 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { SidebarItemComponent } from '../sidebar-item/sidebar-item.component';
 import { SidebarService } from '../../services/sidebar.service';
-import { NotificacionCounterService } from '../../../../features/notificaciones/services/notificacion-counter.service';
 import { SidebarItem } from '../../interfaces/sidebar-item.interface';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [
+    ...PrimeNGModules,
     CommonModule,
     RouterModule,
-    SidebarItemComponent
+    SidebarItemComponent,
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
@@ -25,15 +27,16 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
 
   menuItems: SidebarItem[] = [];
   private itemsSubscription?: Subscription;
-  private notificationCounterSubscription?: Subscription;
-  private notificacionCounterService = inject(NotificacionCounterService);
+  private routerSubscription?: Subscription;
 
   open: boolean = true;
   sidebarVisible: boolean = true;
-  titulo: string = 'MENÚ';
   currentExpandedItemIndex: number[] = [];
 
-  constructor(private sidebarService: SidebarService) {}
+  constructor(
+    private sidebarService: SidebarService,
+    private router: Router
+  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['visible']) {
@@ -54,32 +57,22 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     this.sidebarVisible = this.visible;
     this.open = !this.collapsed;
 
-    // Inicializar el servicio de contador de notificaciones
-    this.notificacionCounterService.initialize();
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.expandActiveItems();
+      });
 
-    // Suscribirse a los cambios del contador y actualizar el badge del sidebar
-    this.notificationCounterSubscription = this.notificacionCounterService.getUnreadCount().subscribe({
-      next: (count: number) => {
-        this.updateNotificationBadge(count);
-      }
-    });
+    this.expandActiveItems();
   }
 
   ngOnDestroy() {
     if (this.itemsSubscription) {
       this.itemsSubscription.unsubscribe();
     }
-    if (this.notificationCounterSubscription) {
-      this.notificationCounterSubscription.unsubscribe();
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
     }
-  }
-
-  private updateNotificationBadge(count: number): void {
-    const badgeText = count > 0 ? (count > 99 ? '99+' : count.toString()) : undefined;
-    this.sidebarService.updateItem('mis-notificaciones-asignadas', {
-      badge: badgeText,
-      badgeClass: count > 0 ? 'badge-danger' : undefined
-    });
   }
 
   onToggle() {
@@ -92,11 +85,40 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
         this.currentExpandedItemIndex.push(-1);
       }
       this.currentExpandedItemIndex[event.depth] = event.index;
-    } else {
-      if (this.currentExpandedItemIndex.length > event.depth) {
-        this.currentExpandedItemIndex = this.currentExpandedItemIndex.slice(0, event.depth);
-      }
+    } else if (this.currentExpandedItemIndex.length > event.depth) {
+      this.currentExpandedItemIndex = this.currentExpandedItemIndex.slice(0, event.depth);
     }
+  }
+
+  private expandActiveItems() {
+    const currentUrl = this.router.url.replace(/^\/+/, '').replace(/\/+$/, '');
+
+    this.menuItems.forEach((item, index) => {
+      if (this.hasActiveChild(item, currentUrl)) {
+        if (this.currentExpandedItemIndex.length === 0) {
+          this.currentExpandedItemIndex.push(-1);
+        }
+        this.currentExpandedItemIndex[0] = index;
+      }
+    });
+  }
+
+  private hasActiveChild(item: SidebarItem, currentUrl: string): boolean {
+    if (!item.items?.length) return false;
+
+    return item.items.some(subItem => {
+      if (subItem.routerLink) {
+        const subRoute = (Array.isArray(subItem.routerLink)
+          ? subItem.routerLink.join('/')
+          : subItem.routerLink).replace(/^\/+/, '').replace(/\/+$/, '');
+
+        if (currentUrl === subRoute || currentUrl.startsWith(subRoute + '/')) {
+          return true;
+        }
+      }
+
+      return !!(subItem.items && subItem.items.length > 0 && this.hasActiveChild(subItem, currentUrl));
+    });
   }
 }
 

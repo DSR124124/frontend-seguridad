@@ -1,0 +1,17 @@
+<div class="global-drag-overlay"
+     [class.active]="isDragOver"
+     (dragover)="onDragOver($event)"
+     (dragleave)="onDragLeave($event)"
+     (drop)="onDrop($event)">
+  <div class="drag-message">
+    <button class="close-button" (click)="closeOverlay()" type="button" aria-label="Cerrar">
+      <i class="pi pi-times"></i>
+    </button>
+    <i [class]="icon + ' drag-icon'"></i>
+    <h2>{{ title }}</h2>
+    <p>{{ description }}</p>
+    <div class="supported-formats">
+      <span>{{ supportedFormats }}</span>
+    </div>
+  </div>
+</div>

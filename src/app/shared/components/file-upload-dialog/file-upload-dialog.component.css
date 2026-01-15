@@ -1,0 +1,229 @@
+/* ============================= */
+/* CONTENEDOR PRINCIPAL */
+/* ============================= */
+.file-upload-dialog {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  background: var(--color-white);
+}
+
+/* Forzar que el p-dialog-content use altura correcta */
+::ng-deep .p-dialog {
+  display: flex;
+  flex-direction: column;
+}
+
+::ng-deep .p-dialog .p-dialog-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--spacing-xl) !important;
+}
+
+::ng-deep .p-dialog .p-dialog-content > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================= */
+/* HEADER CON TABS ESTILO PILL */
+/* ============================= */
+.dialog-header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.g-2 {
+  gap: 0;
+}
+
+/* Contenedor de tabs estilo pill */
+.dialog-header .row {
+  background-color: #f0f2f5;
+  padding: 4px;
+  border-radius: 50px;
+  display: inline-flex;
+  width: auto !important;
+  gap: 0;
+}
+
+.dialog-header .row .col-12,
+.dialog-header .row .col-sm-6 {
+  width: auto !important;
+  flex: none;
+  padding: 0;
+}
+
+.mode-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 24px;
+  border: none;
+  background: transparent;
+  border-radius: 40px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #5f6368;
+  transition: all 0.3s ease;
+  min-height: auto;
+  white-space: nowrap;
+}
+
+.mode-tab:hover {
+  box-shadow: none;
+  color: #0f2648;
+}
+
+.mode-tab.active {
+  background: #0f2648;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 2px 5px rgba(15, 38, 72, 0.3);
+}
+
+.mode-tab.active:hover {
+  background: #0f2648;
+  border: none;
+  color: #ffffff;
+}
+
+.mode-tab i {
+  font-size: 1rem;
+}
+
+/* ============================= */
+/* BOTÓN DESCARGAR PLANTILLA */
+/* ============================= */
+.template-download-row {
+  display: none;
+}
+
+/* ============================= */
+/* CONTENIDO */
+/* ============================= */
+.dialog-content {
+  flex: 1;
+  overflow: hidden;
+  padding: 0;
+  min-height: 0;
+}
+
+/* Carousel */
+::ng-deep .file-upload-dialog .p-carousel {
+  background: transparent;
+  border: none;
+}
+
+.carousel-slide {
+  animation: fadeIn 0.3s ease;
+  padding: 0;
+  min-height: 350px;
+}
+
+/* Componentes internos del slide */
+.carousel-slide app-file-drop-zone,
+.carousel-slide app-editable-data-table {
+  min-height: 350px;
+}
+
+/* Contenedor cuando no hay carousel (solo un modo) */
+.dialog-content > div:not(.template-download-row):not(p-carousel) app-file-drop-zone,
+.dialog-content > div:not(.template-download-row):not(p-carousel) app-editable-data-table {
+  min-height: 350px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================= */
+/* FOOTER */
+/* ============================= */
+.dialog-footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+  background: var(--color-white);
+}
+
+/* ============================= */
+/* LOADING OVERLAY */
+/* ============================= */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  z-index: 100;
+  border-radius: var(--radius-md);
+}
+
+.loading-overlay p {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ============================= */
+/* RESPONSIVE */
+/* ============================= */
+@media (max-width: 576px) {
+  .dialog-header {
+    gap: var(--spacing-sm);
+  }
+
+  .dialog-header .row {
+    flex-direction: column;
+    border-radius: 12px;
+  }
+
+  .mode-tab {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    min-height: auto;
+    border-radius: 8px;
+  }
+
+  .mode-tab i {
+    font-size: 0.9rem;
+  }
+
+  .dialog-footer {
+    flex-direction: column-reverse;
+  }
+
+  ::ng-deep .dialog-footer .p-button {
+    width: 100%;
+  }
+}

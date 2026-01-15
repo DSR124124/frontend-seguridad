@@ -1,10 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { RouterOutlet, Router } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
-import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { LayoutService } from '../../services/layout.service';
 import { LayoutConfig } from '../../interfaces/layout-config.interface';
 import { Subscription } from 'rxjs';
@@ -17,24 +16,18 @@ import { Subscription } from 'rxjs';
     RouterOutlet,
     SidebarComponent,
     HeaderComponent,
-    FooterComponent,
-    BreadcrumbComponent
+    FooterComponent
   ],
   templateUrl: './layout-main.component.html',
   styleUrl: './layout-main.component.css'
 })
 export class LayoutMainComponent implements OnInit, OnDestroy {
   config: LayoutConfig;
-  hasToken: boolean = false;
   private configSubscription?: Subscription;
   private resizeListener?: () => void;
 
-  constructor(
-    private layoutService: LayoutService,
-    private router: Router
-  ) {
+  constructor(private layoutService: LayoutService) {
     this.config = this.layoutService.getConfig();
-    this.checkToken();
     
     if (window.innerWidth <= 768) {
       this.layoutService.hideSidebar();
@@ -67,17 +60,6 @@ export class LayoutMainComponent implements OnInit, OnDestroy {
 
   toggleSidebar() {
     this.layoutService.toggleSidebar();
-  }
-
-  private checkToken(): void {
-    const token = localStorage.getItem('auth_token');
-    this.hasToken = !!token;
-
-    if (!this.hasToken) {
-      this.router.navigate(['/error'], {
-        queryParams: { type: 'token' }
-      });
-    }
   }
 }
 

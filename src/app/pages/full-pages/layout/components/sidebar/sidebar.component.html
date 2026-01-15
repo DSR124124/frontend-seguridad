@@ -7,14 +7,14 @@
   [hidden]="!sidebarVisible"
 >
   <div class="titulo-wrapper" [ngClass]="{ 'titulo-wrapper-colapsado': !open }">
-    <span class="titulo">{{ titulo }}</span>
+    <img src="img/logo/Logo_Nettalco_slogan_español_3.png" alt="Logo Nettalco"
+    width="250" />
   </div>
-
   <!-- Menú principal -->
   <ul class="menu">
     <li
       *ngFor="let item of menuItems; let i = index"
-      class="elemento menu-item"
+      class="menu-item"
       [ngClass]="{ 'item-activo': currentExpandedItemIndex[0] === i }"
     >
       <!-- Llamamos al componente recursivo -->
@@ -30,5 +30,15 @@
       </app-sidebar-item>
     </li>
   </ul>
+
+  <!-- Botón para cerrar sidebar en responsive -->
+  <div class="sidebar-footer-responsive">
+    <p-button
+      icon="pi pi-arrow-left"
+      styleClass="p-button-secondary p-button-rounded sidebar-close-btn"
+      (onClick)="onToggle()"
+      [attr.aria-label]="'Cerrar menú'">
+    </p-button>
+  </div>
 </div>
 

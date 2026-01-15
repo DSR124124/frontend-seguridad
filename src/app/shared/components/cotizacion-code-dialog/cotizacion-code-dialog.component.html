@@ -1,0 +1,75 @@
+<div class="cotizacion-code-dialog">
+  <!-- Icono y descripción -->
+  <div class="dialog-header-content">
+    <i class="pi pi-search icon-large"></i>
+    <p class="dialog-description">
+      Para acceder a <strong>{{ targetModule }}</strong>, ingresa el código de la cotización.
+    </p>
+  </div>
+
+  <!-- Input de código -->
+  <div class="input-container">
+    <label for="cotizacionCode" class="input-label">Código de Cotización</label>
+    <div class="input-wrapper">
+      <span class="input-icon">
+        <i class="pi pi-hashtag"></i>
+      </span>
+      <input
+        #codeInput
+        id="cotizacionCode"
+        type="text"
+        pInputText
+        [(ngModel)]="cotizacionCode"
+        placeholder="Ej: COT-2024-001"
+        class="p-inputtext code-input"
+        [class.p-invalid]="errorMessage"
+        (input)="errorMessage = ''"
+        autocomplete="off"
+      />
+      <button
+        *ngIf="cotizacionCode"
+        type="button"
+        class="clear-button"
+        (click)="clearInput()"
+        title="Limpiar"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+    <small *ngIf="errorMessage" class="p-error">{{ errorMessage }}</small>
+  </div>
+
+  <!-- Códigos recientes -->
+  <div *ngIf="recentCodes.length > 0" class="recent-codes-section">
+    <span class="recent-label">Recientes:</span>
+    <div class="recent-codes-list">
+      <button
+        *ngFor="let code of recentCodes"
+        type="button"
+        class="recent-code-chip"
+        (click)="selectRecentCode(code)"
+        [title]="'Usar ' + code"
+      >
+        <i class="pi pi-history"></i>
+        {{ code }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Footer con botones -->
+<p-footer class="p-dialog-footer d-flex align-items-center justify-content-end gap-2">
+  <p-button
+    styleClass="btn-secondary-outline btn-md"
+    label="Cancelar"
+    icon="pi pi-times"
+    (click)="cancel()"
+  ></p-button>
+  <p-button
+    styleClass="btn-primary btn-md"
+    label="Ir a {{ targetModule }}"
+    icon="pi pi-arrow-right"
+    [disabled]="!cotizacionCode.trim()"
+    (click)="navigate()"
+  ></p-button>
+</p-footer>

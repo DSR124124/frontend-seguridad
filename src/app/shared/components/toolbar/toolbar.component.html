@@ -1,0 +1,57 @@
+<p-toolbar styleClass="custom-toolbar mt-2">
+  <div class="m-toolbar">
+    <!-- Fila 1: Buscador -->
+    <div>
+      <p-iconfield iconPosition="left" class="toolbar-search">
+        <p-inputicon>
+          <i class="pi pi-search"></i>
+        </p-inputicon>
+        <input
+          pInputText
+          type="text"
+          maxlength="30"
+          (input)="onSearch($event)"
+          [placeholder]="searchPlaceholder"
+          class="toolbar-search-input"
+        />
+      </p-iconfield>
+    </div>
+
+    <!-- Fila 2: Botones -->
+    <div class="m-row-actions">
+      <!-- Botones izquierda -->
+      <div class="toolbar-actions-left">
+        <p-button
+          styleClass="btn-info btn-md"
+          [icon]="filtrosVisibles ? 'pi pi-filter-slash' : 'pi pi-filter'"
+          (click)="onToggleFiltros()"
+          label="Filtros"
+        />
+        <p-button
+          styleClass="btn-danger btn-v2 btn-md"
+          icon="pi pi-eraser"
+          (click)="onClearFilters()"
+          label="Limpiar"
+        />
+      </div>
+
+      <!-- Botones derecha -->
+      <div class="toolbar-actions-right">
+        <p-button
+          *ngIf="showAddButton && canWrite"
+          icon="pi pi-plus"
+          [label]="addButtonLabel"
+          styleClass="btn-primary btn-md"
+          (click)="onAdd()"
+        />
+        <p-button
+          *ngIf="showExportButton && canRead"
+          icon="pi pi-file-export"
+          [label]="exportButtonLabel"
+          styleClass="btn-success btn-md btn-v2"
+          (click)="onExport()"
+        />
+      </div>
+    </div>
+  </div>
+</p-toolbar>

@@ -1,0 +1,220 @@
+<div class="data-table-container">
+  <!-- Tabla principal -->
+  <p-table #dt [value]="config.data" [scrollable]="true" styleClass="tabla-datos"
+    [paginator]="true" [rows]="config.rowsPerPage || 11"
+    [rowsPerPageOptions]="config.rowsPerPageOptions || [10, 20, 30, 50]"
+    [showCurrentPageReport]="config.showCurrentPageReport !== false"
+    [currentPageReportTemplate]="config.currentPageReportTemplate || 'Mostrando {first} a {last} de {totalRecords} registros'"
+    [globalFilterFields]="getGlobalFilterFields()"
+    [(selection)]="selectedItems"
+    [selectAll]="selectAll"
+    [dataKey]="config.dataKey || ''"
+    [selectionMode]="config.selection ? 'multiple' : null"
+    (selectionChange)="onSelectionChange()"
+    responsiveLayout="scroll"
+    showGridlines
+    [loading]="config.loading">
+
+    <!-- Caption con búsqueda global y filtros -->
+    <ng-template pTemplate="caption" *ngIf="config.showGlobalSearch !== false">
+      <div class="d-flex gap-2">
+        <p-iconfield iconPosition="left">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input
+            #searchInput
+            pInputText
+            type="text"
+            (input)="applyGlobalFilter($event)"
+            [placeholder]="config.globalSearchPlaceholder || 'Buscar...'"
+            style="height: 35.19px; padding-left: 2.5rem !important;"
+            [(ngModel)]="filtroGlobalValue" />
+        </p-iconfield>
+        <p-button
+          [icon]="filtrosVisibles ? 'pi pi-filter-slash' : 'pi pi-filter'"
+          (click)="toggleFiltros()"
+          label="Filtros"
+          styleClass="btn-info btn-sm"
+          pTooltip="Mostrar/ocultar filtros por columna"
+          tooltipPosition="top" />
+        <p-button
+          label="Limpiar"
+          styleClass="btn-danger btn-sm"
+          icon="pi pi-eraser"
+          (click)="clear(dt, searchInput)"
+          pTooltip="Limpiar todos los filtros y búsquedas"
+          tooltipPosition="top" />
+      </div>
+    </ng-template>
+
+    <!-- Header de la tabla -->
+    <ng-template pTemplate="header">
+      <tr class="text-center">
+        <!-- Columna de selección (checkbox) -->
+        <th *ngIf="config.selection" class="selection-checkbox-header" [ngStyle]="getCheckboxColumnStyles()">
+          <p-checkbox
+            [(ngModel)]="selectAll"
+            (onChange)="toggleSelectAll()"
+            [indeterminate]="isIndeterminate()"
+            binary="true">
+          </p-checkbox>
+        </th>
+        <th *ngFor="let col of config.columns"
+            [pSortableColumn]="col.sortable !== false ? col.field : undefined"
+            [ngClass]="getColumnClasses(col)"
+            [ngStyle]="getColumnStyles(col)"
+            [style.text-align]="col.align || 'center'">
+          <div class="w-100 d-flex justify-content-center align-items-center text-center">
+            <span>{{ col.header }}</span>
+            <p-sortIcon *ngIf="col.sortable !== false" [field]="col.field">
+              <ng-template pTemplate="default" let-sortOrder>
+                <i *ngIf="sortOrder === 1" class="pi pi-sort-up" style="font-size: 1.2rem"></i>
+                <i *ngIf="sortOrder === -1" class="pi pi-sort-down" style="font-size: 1.2rem"></i>
+                <i *ngIf="sortOrder === 0 || sortOrder == null" class="pi pi-sort" style="font-size: 1.2rem"></i>
+              </ng-template>
+            </p-sortIcon>
+          </div>
+        </th>
+      </tr>
+      <!-- Fila de filtros -->
+      <tr class="filtro" [ngClass]="{'d-none': !filtrosVisibles || config.showColumnFilters === false}">
+        <!-- Celda vacía para la columna de selección -->
+        <th *ngIf="config.selection"></th>
+        <th *ngFor="let col of config.columns"
+            [ngClass]="getColumnClasses(col)"
+            [ngStyle]="getColumnStyles(col)">
+          <div class="w-100 p-1" *ngIf="col.filterType && col.filterType !== FilterType.NONE && !col.isAction">
+            <!-- Filtro de texto -->
+            <input *ngIf="col.filterType === FilterType.TEXT"
+              type="text" pInputText pSize="small" class="w-100 filtro-columna-input"
+              style="padding: 3px; font-size: 10pt !important; text-align:center;"
+              [(ngModel)]="filtros[col.field]"
+              (input)="applyTextFilter($any($event.target).value, col.field, table)"
+              [placeholder]="'Filtrar ' + col.header" />
+
+            <!-- Filtro de número -->
+            <input *ngIf="col.filterType === FilterType.NUMBER"
+              type="number" pInputText pSize="small" class="w-100 filtro-columna-input"
+              style="padding: 3px; font-size: 10pt !important; text-align:center;"
+              [(ngModel)]="filtros[col.field]"
+              (input)="applyNumberFilter($any($event.target).value, col.field, table)"
+              [placeholder]="'Filtrar ' + col.header" />
+
+            <!-- Filtro de dropdown -->
+            <p-select *ngIf="col.filterType === FilterType.DROPDOWN && col.dropdownOptions"
+              [options]="col.dropdownOptions"
+              [(ngModel)]="filtros[col.field]"
+              (onChange)="applyDropdownFilter($event.value, col.field, table)"
+              [placeholder]="'Filtrar ' + col.header"
+              [style]="{'width': '100%', 'font-size': '10pt'}"
+              styleClass="filtro-columna-input"
+              appendTo="body">
+            </p-select>
+
+            <!-- Filtro de fecha -->
+            <p-datePicker *ngIf="col.filterType === FilterType.DATE"
+              [(ngModel)]="filtros[col.field]"
+              selectionMode="range"
+              dateFormat="dd/mm"
+              (onSelect)="onDateRangeSelect($event, col.field, table)"
+              (onClear)="onDateRangeClear(col.field, table)"
+              [showButtonBar]="true"
+              [placeholder]="'Filtrar ' + col.header + ' (rango)'"
+              [style]="{'width': '100%', 'font-size': '10pt'}"
+              inputStyleClass="filtro-columna-input"
+              appendTo="body">
+            </p-datePicker>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+
+    <!-- Cuerpo de la tabla -->
+    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+      <tr [class.table-warning]="row.isModified"
+          [class.cursor-pointer]="!isMobile && !config.selection"
+          [pSelectableRow]="config.selection && !isMobile && isRowSelectable(row) ? row : null"
+          [ngClass]="getRowClass(row)"
+          [attr.data-indicador]="row?.TINDICREA"
+          (click)="onRowClick(row, rowIndex, $event)">
+        <!-- Celda de selección (checkbox) -->
+        <td *ngIf="config.selection" class="selection-checkbox-cell" [ngStyle]="getCheckboxColumnStyles()" (click)="onCheckboxCellClick($event)">
+          <p-tableCheckbox [value]="row" [disabled]="!isRowSelectable(row)"></p-tableCheckbox>
+        </td>
+        <td *ngFor="let col of config.columns"
+            [ngClass]="getColumnClasses(col)"
+            [ngStyle]="getColumnStyles(col)"
+            [style.text-align]="col.align || 'center'"
+            [class.cursor-pointer]="col.clickable"
+            (click)="col.clickable ? onCellClick(row, col, $event) : null">
+          <!-- Contenido de celda normal -->
+          <div *ngIf="!col.isAction" class="cell-content">
+            <div class="cell-description"
+                 [pTooltip]="getCellValue(col, row)"
+                 tooltipPosition="top">
+              {{ getCellValue(col, row) }}
+            </div>
+          </div>
+          <!-- Acciones -->
+          <div *ngIf="col.isAction" class="d-flex justify-content-center gap-1">
+            <ng-container *ngFor="let action of config.rowActions">
+              <p-button *ngIf="action.permission !== false"
+                [icon]="action.icon"
+                [label]="action.label"
+                (onClick)="handleAction(action, row, rowIndex, $event)"
+                [severity]="getActionSeverity(action)"
+                size="small"
+                [text]="!action.label"
+                [disabled]="isActionDisabled(action, row)"
+                [pTooltip]="action.tooltip"
+                tooltipPosition="top">
+              </p-button>
+            </ng-container>
+          </div>
+        </td>
+      </tr>
+      <!-- Fila expandida para móvil - Muestra TODAS las columnas ocultas -->
+      <tr *ngIf="isRowExpanded(rowIndex) && isMobile" class="expanded-row-mobile">
+        <td [attr.colspan]="getMobileVisibleColumnsCount()" style="width: 100%; max-width: 100%;">
+          <div class="expanded-details">
+            <div class="detail-item" *ngFor="let col of getMobileHiddenColumns()">
+              <span class="detail-label">{{ col.header }}:</span>
+              <span class="detail-value">{{ getCellValue(col, row) }}</span>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Mensaje cuando no hay datos -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="(config.selection ? 1 : 0) + config.columns.length" class="text-center p-4">
+          <div class="d-flex flex-column align-items-center gap-3">
+            <i class="pi pi-search" style="font-size: 2rem; color: #6c757d;"></i>
+            <span class="h5 text-muted">{{ config.emptyMessage || 'No se encontraron registros' }}</span>
+            <span class="text-muted">Intenta ajustar los filtros de búsqueda</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Footer de la tabla -->
+    <ng-template pTemplate="footer" *ngIf="shouldShowFooter">
+      <tr>
+        <ng-container *ngFor="let cell of footerCellsCache; let i = index">
+          <td *ngIf="cell"
+              [attr.colspan]="cell.colspan || 1"
+              [style.text-align]="cell.align || 'center'"
+              [ngClass]="cell.cssClass"
+              [style.color]="cell.color">
+            <strong *ngIf="cell.bold">{{ cell.text }}</strong>
+            <span *ngIf="!cell.bold">{{ cell.text }}</span>
+          </td>
+        </ng-container>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+

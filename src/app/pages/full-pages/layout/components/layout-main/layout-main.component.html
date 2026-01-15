@@ -1,21 +1,18 @@
-<div class="layout-container" *ngIf="hasToken">
+<div class="layout-container">
   <!-- Sidebar -->
-  <app-sidebar 
-    *ngIf="config.sidebarVisible" 
-    [visible]="config.sidebarVisible" 
+  <app-sidebar
+    *ngIf="config.sidebarVisible"
+    [visible]="config.sidebarVisible"
     [collapsed]="config.sidebarCollapsed"
     (toggle)="toggleSidebar()">
   </app-sidebar>
 
   <!-- Main Content Area -->
-  <div class="main-content" 
+  <div class="main-content"
        [class.sidebar-collapsed]="!config.sidebarVisible"
        [class.sidebar-mini]="config.sidebarVisible && config.sidebarCollapsed">
     <!-- Header -->
     <app-header *ngIf="config.headerVisible" (toggleSidebar)="toggleSidebar()"></app-header>
-
-    <!-- Breadcrumb -->
-    <app-breadcrumb *ngIf="config.breadcrumbVisible"></app-breadcrumb>
 
     <!-- Main Content -->
     <main class="layout-main">

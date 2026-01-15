@@ -1,0 +1,83 @@
+<div
+  class="drop-zone"
+  [class.dragging]="isDragging"
+  [class.has-file]="selectedFile"
+  [class.has-error]="errorMessage"
+  [class.disabled]="disabled"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  <!-- Estado inicial / Arrastrando -->
+  <div class="drop-content" *ngIf="!selectedFile">
+    <div class="drop-icon" [class.bouncing]="isDragging">
+      <i
+        class="pi"
+        [ngClass]="isDragging ? 'pi-download' : 'pi-cloud-upload'"
+      ></i>
+    </div>
+
+    <div class="drop-text">
+      <h3 *ngIf="!isDragging">Arrastra tu archivo Excel aquí</h3>
+      <h3 *ngIf="isDragging" class="highlight">¡Suelta el archivo!</h3>
+      <p *ngIf="!isDragging">o haz clic en el botón para buscar en tu ordenador</p>
+    </div>
+
+    <div class="drop-actions" *ngIf="!isDragging && !disabled">
+      <p-button
+        styleClass="btn-export"
+        icon="pi pi-file"
+        label="Seleccionar Archivo"
+        (onClick)="fileInput.click()"
+      ></p-button>
+    </div>
+
+    <div class="drop-hint" *ngIf="!isDragging">
+      <span>Formatos soportados: {{ allowedExtensions.join(", ") }} • Máx: {{ maxFileSizeMB }}MB</span>
+    </div>
+
+    <p-button
+      *ngIf="showTemplateDownload && !isDragging && !disabled"
+      styleClass="btn-primary btn-v2 "
+      (click)="onTemplateDownload()"
+      class="boton-descargar"
+    >
+      <i class="pi pi-download"></i>
+      Descargar Plantilla de carga
+    </p-button>
+  </div>
+
+  <!-- Archivo seleccionado -->
+  <div class="file-selected" *ngIf="selectedFile">
+    <div class="file-icon">
+      <i class="pi pi-file-excel"></i>
+    </div>
+    <div class="file-details">
+      <span class="file-name">{{ selectedFile.name }}</span>
+      <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
+    </div>
+    <p-button
+      icon="pi pi-times"
+      [rounded]="true"
+      [text]="true"
+      severity="danger"
+      (onClick)="clearFile()"
+      pTooltip="Quitar archivo"
+    ></p-button>
+  </div>
+
+  <!-- Error -->
+  <div class="drop-error" *ngIf="errorMessage">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <input
+    #fileInput
+    type="file"
+    [accept]="acceptedMimeTypes"
+    (change)="onFileInputChange($event)"
+    [disabled]="disabled"
+    hidden
+  />
+</div>

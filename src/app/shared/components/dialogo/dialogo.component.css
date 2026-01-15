@@ -1,0 +1,9 @@
+/* Estilos específicos del componente diálogo */
+.dialog-body {
+  margin-bottom: 1.5rem;
+}
+
+.dialog-body span {
+  display: block;
+  line-height: 1.5;
+}

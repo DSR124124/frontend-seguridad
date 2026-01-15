@@ -1,0 +1,366 @@
+:host {
+  display: block;
+  min-height: 350px;
+}
+
+/* Variables de color locales */
+.drop-zone {
+  --drop-teal: #178b90;
+  --drop-dark: #0f2648;
+  --drop-bg: #f8fbff;
+
+  border: 2px dashed var(--drop-teal);
+  border-radius: 12px;
+  padding: 40px 30px;
+  background-color: var(--drop-bg);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  width: 95%;
+  /*pruebas*/
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.drop-zone::before {
+  display: none;
+}
+
+.drop-zone:hover:not(.disabled) {
+  border-color: var(--drop-teal);
+  background-color: #f0fcfc;
+  transform: none;
+  box-shadow: none;
+}
+
+.drop-zone:hover::before {
+  opacity: 0;
+}
+
+.drop-zone.dragging {
+  border-color: var(--drop-teal);
+  border-style: solid;
+  border-width: 3px;
+  background-color: #e8f7f7;
+  transform: none;
+  box-shadow: 0 0 20px rgba(23, 139, 144, 0.15);
+}
+
+.drop-zone.dragging::before {
+  display: none;
+}
+
+.boton-descargar {
+    color: #137a7f !important;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.drop-zone.has-file {
+  border-style: solid;
+  border-color: var(--color-success, #22c55e);
+  background: linear-gradient(
+    135deg,
+    rgba(34, 197, 94, 0.05) 0%,
+    #ffffff 100%
+  );
+}
+
+.drop-zone.has-error {
+  border-color: var(--color-danger, #d32f2f);
+}
+
+.drop-zone.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Contenido del drop zone */
+.drop-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Contenedor de acciones (botones) */
+.drop-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.drop-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #0f2648;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(15, 38, 72, 0.3);
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+}
+
+.drop-zone:hover .drop-icon {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(15, 38, 72, 0.4);
+}
+
+.drop-icon.bouncing {
+  animation: bounce 0.5s ease infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.05);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.05);
+  }
+}
+
+.drop-icon i {
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+
+.drop-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.drop-text h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0f2648;
+  transition: color 0.3s ease;
+}
+
+.drop-zone:hover .drop-text h3 {
+  color: #178b90;
+}
+
+.drop-text h3.highlight {
+  color: #178b90;
+  animation: pulseText 1s ease-in-out infinite;
+}
+
+@keyframes pulseText {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.drop-text p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #5f6368;
+}
+
+.drop-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #5f6368;
+  margin-top: 12px;
+  padding: 6px 12px;
+  background: transparent;
+  border-radius: 4px;
+}
+
+.drop-hint i {
+  font-size: 0.85rem;
+  color: #5f6368;
+}
+
+/* Estilo para botón principal */
+::ng-deep .drop-actions .p-button {
+  background-color: #178b90 !important;
+  border-color: #178b90 !important;
+  border-radius: 6px !important;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  transition: background 0.2s ease !important;
+}
+
+::ng-deep .drop-actions .p-button:hover {
+  background-color: #137a7f !important;
+  border-color: #137a7f !important;
+}
+
+::ng-deep .drop-actions .p-button .p-button-icon {
+  font-size: 1rem !important;
+}
+
+/* Enlace de plantilla */
+.template-link {
+  margin-top: 15px;
+  color: #178b90;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.template-link:hover {
+  color: #137a7f;
+  text-decoration: underline;
+}
+
+.template-link i {
+  font-size: 1rem;
+}
+
+/* Archivo seleccionado */
+.file-selected {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  z-index: 1;
+}
+
+.file-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-success) 0%, #16a34a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.file-icon i {
+  font-size: 1.75rem;
+  color: var(--color-white);
+}
+
+.file-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+}
+
+/* Error */
+.drop-error {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-danger-disabled);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-sm);
+  position: relative;
+  z-index: 1;
+}
+
+.drop-error i {
+  color: var(--color-danger);
+  font-size: 1rem;
+}
+
+.drop-error span {
+  font-size: var(--font-size-small);
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .drop-zone {
+    padding: 30px 20px;
+    min-height: 250px;
+  }
+
+  .drop-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .drop-icon i {
+    font-size: 1.25rem;
+  }
+
+  .drop-text h3 {
+    font-size: 1rem;
+  }
+
+  .drop-text p {
+    font-size: 0.85rem;
+  }
+
+  .file-selected {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .file-details {
+    align-items: center;
+  }
+}

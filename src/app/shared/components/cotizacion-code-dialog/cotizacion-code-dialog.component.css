@@ -1,0 +1,138 @@
+/* =====================================================
+   COTIZACION CODE DIALOG - Estilos mínimos
+   Usa clases globales de styles_botones.css y styles_imputs.css
+   ===================================================== */
+
+.cotizacion-code-dialog {
+  padding: 0.5rem 0;
+}
+
+/* Header con icono */
+.dialog-header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.icon-large {
+  font-size: 2.5rem;
+  color: var(--color-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.dialog-description {
+  color: var(--color-gray-dark, #4a5568);
+  font-size: var(--font-size-base, 1rem);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Input container */
+.input-container {
+  margin-bottom: 1rem;
+}
+
+.input-label {
+  display: block;
+  font-size: var(--font-size-medium, 0.875rem);
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-text-dark, #082853);
+  margin-bottom: 0.5rem;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--color-gray-dark, #6b7280);
+  font-size: 1rem;
+  z-index: 1;
+}
+
+.code-input {
+  padding-left: 2.5rem !important;
+  padding-right: 2.5rem !important;
+  font-size: var(--font-size-base, 1rem) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.clear-button {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--color-gray-dark, #6b7280);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm, 0.25rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.clear-button:hover {
+  color: var(--color-danger, #dc2626);
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+/* Sección de códigos recientes */
+.recent-codes-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-gray-light, #e5e7eb);
+}
+
+.recent-label {
+  font-size: var(--font-size-small, 0.75rem);
+  color: var(--color-gray-dark, #6b7280);
+  font-weight: var(--font-weight-medium, 500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.recent-codes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.recent-code-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  font-size: var(--font-size-small, 0.75rem);
+  background-color: var(--v2-primary, #edf4ff);
+  color: var(--color-secondary, #3f8cf9);
+  border: 1px solid var(--color-secondary-disabled, #cad8f1);
+  border-radius: var(--radius-lg, 0.5rem);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: monospace;
+}
+
+.recent-code-chip:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-text-light, #ffffff);
+  border-color: var(--color-secondary);
+}
+
+.recent-code-chip i {
+  font-size: 0.7rem;
+}
+
+/* Error message - usa p-error de PrimeNG */
+.p-error {
+  display: block;
+  margin-top: 0.25rem;
+}

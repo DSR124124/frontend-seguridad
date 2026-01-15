@@ -2,20 +2,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, var(--color-navy-dark), var(--color-blue-light));
+  padding: 0.8rem 1.5rem;
+  background: var(--color-navy-dark);
   color: var(--texto-header-color);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   min-height: 70px;
   position: sticky;
   top: 0;
   z-index: 999;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
 .header-center {
@@ -31,10 +25,32 @@
   margin: 0;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .header-right {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.user-avatar-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  padding: 0rem !important;
+}
+
+.user-avatar-container ::ng-deep .p-avatar {
+  transition: transform 0.2s ease;
+}
+
+.user-avatar-container ::ng-deep .p-avatar:hover {
+  transform: scale(1.1);
 }
 
 @media (max-width: 768px) {

@@ -1,14 +1,4 @@
 <div class="home-container">
-  <div class="home-header">
-    <h1>Análisis de Aglomeración - Rutas y Paraderos</h1>
-    <p-button
-      icon="pi pi-refresh"
-      label="Actualizar"
-      styleClass="p-button-info"
-      (onClick)="actualizar()"
-      [disabled]="loading">
-    </p-button>
-  </div>
 
   <div *ngIf="!loading && estadisticas" class="dashboard-content">
     <!-- KPIs Principales -->

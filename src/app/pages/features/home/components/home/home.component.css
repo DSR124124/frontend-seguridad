@@ -1,22 +1,7 @@
 .home-container {
-  padding: 0;
-  max-width: 1400px;
+  padding: 1rem;
   margin: 0 auto;
 }
-
-.home-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.home-header h1 {
-  margin: 0;
-  font-size: 2rem;
-  color: #333;
-}
-
 .dashboard-content {
   display: flex;
   flex-direction: column;
@@ -78,7 +63,7 @@
   margin: 0;
   padding: 0.5rem;
   font-size: 1.3rem;
-  color: #333;
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -86,7 +71,7 @@
   margin: 0;
   padding: 0 0.5rem;
   font-size: 0.9rem;
-  color: #666;
+  color: #ffffff;
   font-style: italic;
 }
 

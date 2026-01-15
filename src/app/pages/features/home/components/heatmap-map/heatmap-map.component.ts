@@ -12,24 +12,6 @@ declare global {
   }
 }
 
-interface GoogleMapsLatLng {
-  lat(): number;
-  lng(): number;
-}
-
-interface HeatmapDataPoint {
-  location: GoogleMapsLatLng;
-  weight: number;
-}
-
-interface ParaderoConDatos {
-  idParadero: number;
-  nombreParadero: string;
-  latitud: number;
-  longitud: number;
-  cantidadUsuarios: number;
-  peso: number; // Peso normalizado para el heatmap (0-1)
-}
 
 @Component({
   selector: 'app-heatmap-map',
@@ -51,7 +33,7 @@ export class HeatmapMapComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() escalaMax: number = 2000; // Máximo de usuarios para la escala
 
   map: any;
-  heatmap: any;
+  heatmapCircles: any[] = []; // Array de círculos que simulan el heatmap
   markers: any[] = [];
   private mapInitialized = false;
 
@@ -73,7 +55,7 @@ export class HeatmapMapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.mapInitialized) return;
 
     const checkGoogleMaps = () => {
-      if (typeof window !== 'undefined' && window.google && window.google.maps && window.google.maps.visualization) {
+      if (typeof window !== 'undefined' && window.google && window.google.maps) {
         this.initializeMap();
       } else {
         setTimeout(checkGoogleMaps, 100);
@@ -94,10 +76,12 @@ export class HeatmapMapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.heatmap) {
-      this.heatmap.setMap(null);
-    }
+    // Limpiar círculos del heatmap
+    this.heatmapCircles.forEach(circle => circle.setMap(null));
+    this.heatmapCircles = [];
+    // Limpiar marcadores
     this.markers.forEach(marker => marker.setMap(null));
+    this.markers = [];
   }
 
 
@@ -184,51 +168,77 @@ export class HeatmapMapComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    // Preparar datos para el heatmap
-    const heatmapData = this.prepararDatosHeatmap();
+    // Limpiar círculos anteriores
+    this.heatmapCircles.forEach(circle => circle.setMap(null));
+    this.heatmapCircles = [];
 
-    if (heatmapData.length === 0) {
+    // Preparar datos agrupados por paradero
+    const datosPorParadero = this.prepararDatosPorParadero();
+
+    if (datosPorParadero.length === 0) {
       return;
     }
 
-    // Limpiar heatmap anterior si existe
-    if (this.heatmap) {
-      this.heatmap.setMap(null);
-    }
+    // Crear círculos que simulan el heatmap
+    datosPorParadero.forEach(dato => {
+      const color = this.obtenerColorPorIntensidad(dato.cantidadUsuarios);
+      const radio = this.calcularRadioPorIntensidad(dato.cantidadUsuarios);
 
-    // Crear nuevo heatmap con colores según la leyenda
-    // Rangos: 1-600 (Verde), 600-1200 (Amarillo), 1200-1800 (Naranja), 1800-2000 (Rojo)
-    // El gradiente usa 11 valores (0-10) que corresponden a 0%, 10%, 20%, ..., 100% de intensidad
-    // Mapeo: 0-30% Verde, 30-60% Amarillo, 60-90% Naranja, 90-100% Rojo
-    this.heatmap = new window.google.maps.visualization.HeatmapLayer({
-      data: heatmapData,
-      map: this.map,
-      radius: 80, // Radio aumentado para mejor visualización
-      opacity: 0.8, // Opacidad aumentada para mejor contraste y visibilidad del verde
-      maxIntensity: 1, // Intensidad máxima normalizada
-      dissipating: true, // Permite que el heatmap se disipe en los bordes
-      gradient: [
-        'rgba(74, 222, 128, 0)',        // 0% (0.0) - Transparente (sin datos)
-        'rgba(74, 222, 128, 0.3)',      // 10% (0.1) - Verde visible (para 1-200 usuarios)
-        'rgba(74, 222, 128, 0.5)',      // 20% (0.2) - Verde medio (para 200-400 usuarios)
-        'rgba(74, 222, 128, 0.7)',      // 30% (0.3) - Verde intenso (para 400-600 usuarios) - FIN VERDE
-        'rgba(251, 191, 36, 0.7)',      // 40% (0.4) - Transición Verde-Amarillo (600-800)
-        'rgba(251, 191, 36, 0.9)',      // 50% (0.5) - Amarillo medio (800-1000)
-        'rgba(251, 191, 36, 1)',        // 60% (0.6) - Amarillo intenso (1000-1200) - FIN AMARILLO
-        'rgba(249, 115, 22, 0.9)',      // 70% (0.7) - Transición Amarillo-Naranja (1200-1400)
-        'rgba(249, 115, 22, 1)',        // 80% (0.8) - Naranja medio (1400-1600)
-        'rgba(249, 115, 22, 1)',        // 90% (0.9) - Naranja intenso (1600-1800) - FIN NARANJA
-        'rgba(220, 38, 38, 1)'          // 100% (1.0) - Rojo (Máxima: 1800-2000)
-      ]
+      // Crear círculo con gradiente radial simulado usando múltiples círculos
+      const circle = new window.google.maps.Circle({
+        strokeWeight: 0,
+        fillColor: color,
+        fillOpacity: 0.6,
+        map: this.map,
+        center: { lat: dato.latitud, lng: dato.longitud },
+        radius: radio
+      });
+
+      // Círculo exterior más transparente para efecto de difusión
+      const circleOuter = new window.google.maps.Circle({
+        strokeWeight: 0,
+        fillColor: color,
+        fillOpacity: 0.2,
+        map: this.map,
+        center: { lat: dato.latitud, lng: dato.longitud },
+        radius: radio * 1.5
+      });
+
+      this.heatmapCircles.push(circle);
+      this.heatmapCircles.push(circleOuter);
     });
 
     // Agregar marcadores para los paraderos
     this.agregarMarcadores();
   }
 
-  private prepararDatosHeatmap(): HeatmapDataPoint[] {
-    const paraderosConDatos: ParaderoConDatos[] = [];
+  private obtenerColorPorIntensidad(cantidadUsuarios: number): string {
+    if (cantidadUsuarios <= 600) {
+      return '#4ade80'; // Verde
+    } else if (cantidadUsuarios <= 1200) {
+      return '#fbbf24'; // Amarillo
+    } else if (cantidadUsuarios <= 1800) {
+      return '#f97316'; // Naranja
+    } else {
+      return '#dc2626'; // Rojo
+    }
+  }
 
+  private calcularRadioPorIntensidad(cantidadUsuarios: number): number {
+    // Radio base en metros, ajustado según la intensidad
+    const minRadio = 50; // 50 metros para baja intensidad
+    const maxRadio = 200; // 200 metros para máxima intensidad
+
+    const minEscala = this.escalaMin;
+    const maxEscala = this.escalaMax;
+    const usuarios = Math.max(minEscala, Math.min(maxEscala, cantidadUsuarios));
+
+    // Mapeo lineal de usuarios a radio
+    const ratio = (usuarios - minEscala) / (maxEscala - minEscala);
+    return minRadio + (maxRadio - minRadio) * ratio;
+  }
+
+  private prepararDatosPorParadero(): Array<{idParadero: number, latitud: number, longitud: number, cantidadUsuarios: number, nombreParadero: string}> {
     // Agrupar datos por paradero
     const datosPorParadero = new Map<number, { total: number; nombre: string }>();
 
@@ -238,16 +248,16 @@ export class HeatmapMapComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      // Filtrar por ruta si está seleccionada (necesitamos verificar en datosStackedBar)
+      // Filtrar por ruta si está seleccionada
       if (this.rutaSeleccionada !== null) {
         const rutaEncontrada = this.datosStackedBar.find(r => r.idRuta === this.rutaSeleccionada);
         if (rutaEncontrada) {
           const paraderoEnRuta = rutaEncontrada.segmentosParaderos.find(s => s.idParadero === dato.idParadero);
           if (!paraderoEnRuta) {
-            return; // Este paradero no pertenece a la ruta seleccionada
+            return;
           }
         } else {
-          return; // Ruta no encontrada
+          return;
         }
       }
 
@@ -262,73 +272,26 @@ export class HeatmapMapComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-    // Usar escala fija de 1 a 2000 usuarios
-    const minEscala = this.escalaMin;
-    const maxEscala = this.escalaMax;
-
-    // Función para mapear cantidad de usuarios a peso normalizado según rangos de la leyenda
-    // Rangos: 1-600 (Verde: 0.05-0.3), 600-1200 (Amarillo: 0.3-0.6), 1200-1800 (Naranja: 0.6-0.9), 1800-2000 (Rojo: 0.9-1.0)
-    const calcularPeso = (cantidadUsuarios: number): number => {
-      // Clampear el valor entre minEscala y maxEscala
-      const usuarios = Math.max(minEscala, Math.min(maxEscala, cantidadUsuarios));
-
-      if (usuarios <= 600) {
-        // Mapear 1-600 a 0.05-0.3 (usar 0.05 como mínimo para que sea visible en verde)
-        if (usuarios === minEscala) {
-          return 0.05; // Peso mínimo visible para verde
-        }
-        return 0.05 + ((usuarios - minEscala) / (600 - minEscala)) * 0.25;
-      } else if (usuarios <= 1200) {
-        // Mapear 600-1200 a 0.3-0.6
-        return 0.3 + ((usuarios - 600) / (1200 - 600)) * 0.3;
-      } else if (usuarios <= 1800) {
-        // Mapear 1200-1800 a 0.6-0.9
-        return 0.6 + ((usuarios - 1200) / (1800 - 1200)) * 0.3;
-      } else {
-        // Mapear 1800-2000 a 0.9-1.0
-        return 0.9 + ((usuarios - 1800) / (maxEscala - 1800)) * 0.1;
-      }
-    };
-
-    // Crear array de datos para el heatmap
-    const heatmapData: HeatmapDataPoint[] = [];
+    // Convertir a array con coordenadas
+    const resultado: Array<{idParadero: number, latitud: number, longitud: number, cantidadUsuarios: number, nombreParadero: string}> = [];
 
     datosPorParadero.forEach((datos, idParadero) => {
       const paradero = this.paraderos.find(p => p.idPunto === idParadero);
 
       if (paradero && paradero.latitud && paradero.longitud) {
-        const cantidadUsuarios = datos.total;
-        const peso = calcularPeso(cantidadUsuarios);
-
-        // Calcular número de puntos basado en la cantidad de usuarios
-        // Para baja intensidad (1-600), usar más puntos para mejor visibilidad del verde
-        let puntosBase: number;
-        if (cantidadUsuarios <= 600) {
-          // Para baja intensidad, usar más puntos para acumular el efecto visual
-          puntosBase = Math.max(3, Math.ceil(cantidadUsuarios / 50)); // Más puntos para verde
-        } else {
-          puntosBase = Math.max(1, Math.ceil(cantidadUsuarios / 100)); // 1 punto por cada 100 usuarios
-        }
-        const puntos = Math.min(puntosBase, 20); // Máximo 20 puntos por paradero para optimización
-
-        for (let i = 0; i < puntos; i++) {
-          // Variación aleatoria más pequeña para mejor agrupación
-          const latOffset = (Math.random() - 0.5) * 0.0005; // Reducido de 0.001 a 0.0005
-          const lngOffset = (Math.random() - 0.5) * 0.0005;
-
-          heatmapData.push({
-            location: new window.google.maps.LatLng(
-              paradero.latitud + latOffset,
-              paradero.longitud + lngOffset
-            ) as any,
-            weight: peso // Peso normalizado según los rangos de la leyenda
-          });
-        }
+        resultado.push({
+          idParadero,
+          latitud: paradero.latitud,
+          longitud: paradero.longitud,
+          cantidadUsuarios: datos.total,
+          nombreParadero: datos.nombre
+        });
       }
     });
 
-    return heatmapData;
+    return resultado;
   }
+
 
   private agregarMarcadores(): void {
     // Limpiar marcadores anteriores

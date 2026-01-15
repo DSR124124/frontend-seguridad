@@ -135,35 +135,23 @@
   }
 }
 
-.custom-input-number {
-  ::ng-deep .p-inputnumber {
-    width: 100%;
+.field ::ng-deep .p-password {
+  width: 100%;
 
-    .p-inputtext {
-      padding: 0.375rem;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      font-size: 0.875rem;
+  .p-inputtext {
+    padding: 0.375rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
 
-      &:focus {
-        outline: none;
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-      }
-
-      &::placeholder {
-        color: #9ca3af;
-      }
+    &:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
 
-    .p-inputnumber-button {
-      border: 1px solid #d1d5db;
-      background: #f9fafb;
-      color: #374151;
-
-      &:hover {
-        background: #f3f4f6;
-      }
+    &::placeholder {
+      color: #9ca3af;
     }
   }
 }
@@ -204,14 +192,14 @@
   .form-control,
   ::ng-deep .p-inputtext,
   ::ng-deep .p-select,
-  ::ng-deep .p-inputnumber .p-inputtext {
+  ::ng-deep .p-password .p-inputtext {
     border-color: #dc2626 !important;
   }
 
   .form-control:focus,
   ::ng-deep .p-inputtext:focus,
   ::ng-deep .p-select.p-focus,
-  ::ng-deep .p-inputnumber .p-inputtext:focus {
+  ::ng-deep .p-password .p-inputtext:focus {
     border-color: #dc2626 !important;
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
   }
@@ -221,14 +209,14 @@
   .form-control,
   ::ng-deep .p-inputtext,
   ::ng-deep .p-select,
-  ::ng-deep .p-inputnumber .p-inputtext {
+  ::ng-deep .p-password .p-inputtext {
     border-color: #10b981 !important;
   }
 
   .form-control:focus,
   ::ng-deep .p-inputtext:focus,
   ::ng-deep .p-select.p-focus,
-  ::ng-deep .p-inputnumber .p-inputtext:focus {
+  ::ng-deep .p-password .p-inputtext:focus {
     border-color: #10b981 !important;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
   }
@@ -254,7 +242,7 @@
   .form-control,
   ::ng-deep .p-inputtext,
   ::ng-deep .p-select .p-select-label,
-  ::ng-deep .p-inputnumber .p-inputtext {
+  ::ng-deep .p-password .p-inputtext {
     padding: 0.375rem;
     font-size: 0.8rem;
   }
@@ -279,3 +267,4 @@
 ::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon {
   color: white;
 }
+

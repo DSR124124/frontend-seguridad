@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Notificacion } from '../../interfaces/notificacion.interface';
 import { NotificacionService } from '../../services/notificacion.service';
 import { AuthUserService } from '../../../../../core/services/auth-user.service';
@@ -6,9 +6,13 @@ import { MessageService } from 'primeng/api';
 import { LoadingService } from '../../../../../shared/services/loading.service';
 import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
 import { NotificacionFormComponent } from '../notificacion-form/notificacion-form.component';
-import { ConfirmationService } from 'primeng/api';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { LoadingSpinnerComponent } from '../../../../../shared/components/loading-spinner/loading-spinner.component';
 import { NotificacionWebsocketService } from '../../services/notificacion-websocket.service';
+import { Subscription } from 'rxjs';
+import { DataTableComponent } from '../../../../../shared/components/data-table/data-table.component';
+import { ColumnType, FilterType, TableConfig } from '../../../../../shared/components/data-table/interfaces/table-column.interface';
+import { DialogoComponent } from '../../../../../shared/components/dialogo/dialogo.component';
 
 @Component({
   selector: 'app-mis-notificaciones-creadas',
@@ -16,28 +20,47 @@ import { NotificacionWebsocketService } from '../../services/notificacion-websoc
   imports: [
     ...PrimeNGModules,
     NotificacionFormComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    DataTableComponent
   ],
-  providers: [ConfirmationService],
+  providers: [DialogService],
   templateUrl: './mis-notificaciones-creadas.component.html',
   styleUrl: './mis-notificaciones-creadas.component.css'
 })
-export class MisNotificacionesCreadasComponent implements OnInit {
+export class MisNotificacionesCreadasComponent implements OnInit, OnDestroy {
   notificaciones: Notificacion[] = [];
-  notificacionesFiltradas: Notificacion[] = [];
   terminoBusqueda: string = '';
   idUsuario: number | null = null;
+  notificacionesTableConfig!: TableConfig;
+  filtrosVisibles: boolean = false;
+  loading: boolean = false;
+
+  @ViewChild(NotificacionFormComponent) notificacionFormComponent?: NotificacionFormComponent;
+  @ViewChild('dataTable') dataTableComponent?: DataTableComponent;
+
+  private wsSubscription?: Subscription;
+  private loadingSubscription?: Subscription;
 
   constructor(
     private notificacionService: NotificacionService,
     private authUserService: AuthUserService,
     private messageService: MessageService,
     private loadingService: LoadingService,
-    private confirmationService: ConfirmationService,
+    private dialogService: DialogService,
     private notificacionWsService: NotificacionWebsocketService
   ) {}
 
   ngOnInit(): void {
+    // Inicializar configuración de la tabla
+    this.notificacionesTableConfig = this.buildNotificacionesTableConfig([]);
+    // Suscribirse al estado de loading del servicio
+    this.loadingSubscription = this.loadingService.loading$.subscribe(
+      loading => {
+        this.loading = loading;
+        this.notificacionesTableConfig = { ...this.notificacionesTableConfig, loading };
+      }
+    );
+    
     this.idUsuario = this.authUserService.obtenerIdUsuario();
     if (this.idUsuario) {
       this.cargarNotificaciones();
@@ -52,8 +75,17 @@ export class MisNotificacionesCreadasComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    if (this.wsSubscription) {
+      this.wsSubscription.unsubscribe();
+    }
+    if (this.loadingSubscription) {
+      this.loadingSubscription.unsubscribe();
+    }
+  }
+
   private escucharNotificacionesEnTiempoReal(): void {
-    this.notificacionWsService
+    this.wsSubscription = this.notificacionWsService
       .suscribirseANotificacionesCreadasPorMi()
       .subscribe((notificacion) => {
         // Insertar al inicio de la lista y volver a aplicar filtros
@@ -99,7 +131,7 @@ export class MisNotificacionesCreadasComponent implements OnInit {
       );
     }
 
-    this.notificacionesFiltradas = filtradas;
+    this.notificacionesTableConfig = this.buildNotificacionesTableConfig(filtradas);
   }
 
   limpiarFiltros(): void {
@@ -107,36 +139,14 @@ export class MisNotificacionesCreadasComponent implements OnInit {
     this.aplicarFiltros();
   }
 
-  getTagClaseTipo(tipo: string): string[] {
-    const base = ['tag-sm', 'tag-rounded'];
-    const map: { [key: string]: string } = {
-      'info': 'tag-info',
-      'warning': 'tag-warning',
-      'error': 'tag-danger',
-      'success': 'tag-success',
-      'critical': 'tag-danger'
-    };
-    const colorClass = map[tipo] || 'tag-info';
-    return ['p-tag', ...base, colorClass];
+  toggleFiltrosColumnas(): void {
+    if (this.dataTableComponent) {
+      this.dataTableComponent.toggleFiltros();
+      // Sincronizar el estado de visibilidad
+      this.filtrosVisibles = !this.filtrosVisibles;
+    }
   }
 
-  getTagClasePrioridad(prioridad: string): string[] {
-    const base = ['tag-sm', 'tag-rounded'];
-    const map: { [key: string]: string } = {
-      'baja': 'tag-priority-low',
-      'normal': 'tag-priority-medium',
-      'alta': 'tag-priority-high',
-      'urgente': 'tag-priority-urgent'
-    };
-    const colorClass = map[prioridad] || 'tag-priority-medium';
-    return ['p-tag', ...base, colorClass];
-  }
-
-  getTagClaseEstado(activo: boolean): string[] {
-    const base = ['tag-sm', 'tag-rounded'];
-    const estadoClass = activo ? 'tag-status-active' : 'tag-status-inactive';
-    return ['p-tag', ...base, estadoClass];
-  }
 
   getLabelTipo(tipo: string): string {
     const labels: { [key: string]: string } = {
@@ -175,8 +185,6 @@ export class MisNotificacionesCreadasComponent implements OnInit {
     }
   }
 
-  @ViewChild(NotificacionFormComponent) notificacionFormComponent?: NotificacionFormComponent;
-
   editarNotificacion(notificacion: Notificacion): void {
     if (this.notificacionFormComponent) {
       this.notificacionFormComponent.showDialog(notificacion);
@@ -190,14 +198,22 @@ export class MisNotificacionesCreadasComponent implements OnInit {
   }
 
   confirmarEliminar(notificacion: Notificacion): void {
-    this.confirmationService.confirm({
-      message: `¿Está seguro de que desea eliminar la notificación "${notificacion.titulo}"?`,
+    const ref: DynamicDialogRef = this.dialogService.open(DialogoComponent, {
       header: 'Confirmar Eliminación',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
-      acceptLabel: 'Sí, eliminar',
-      rejectLabel: 'Cancelar',
-      accept: () => {
+      width: '500px',
+      modal: true,
+      closable: true,
+      data: {
+        mensaje: `¿Está seguro de que desea eliminar la notificación "<strong>${notificacion.titulo}</strong>"?`,
+        severidad: 'warn',
+        mostrarBotones: true,
+        labelAceptar: 'Sí, eliminar',
+        labelCerrar: 'Cancelar'
+      }
+    });
+
+    ref.onClose.subscribe((result: string | undefined) => {
+      if (result === 'aceptar') {
         this.eliminarNotificacion(notificacion.idNotificacion);
       }
     });
@@ -235,6 +251,129 @@ export class MisNotificacionesCreadasComponent implements OnInit {
 
   onNotificacionActualizada(): void {
     this.cargarNotificaciones();
+  }
+
+  private buildNotificacionesTableConfig(data: Notificacion[]): TableConfig {
+    return {
+      loading: this.loading,
+      rowsPerPage: 10,
+      rowsPerPageOptions: [10, 25, 50],
+      showCurrentPageReport: true,
+      showGlobalSearch: false,
+      currentPageReportTemplate: 'Mostrando {first} a {last} de {totalRecords} notificaciones',
+      emptyMessage: 'No se encontraron notificaciones creadas',
+      globalSearchPlaceholder: 'Buscar por título o mensaje...',
+      columns: [
+        {
+          field: 'idNotificacion',
+          header: 'ID',
+          type: ColumnType.NUMBER,
+          filterType: FilterType.NUMBER,
+          width: '80px',
+          mobileVisible: true,
+        },
+        {
+          field: 'titulo',
+          header: 'Título',
+          type: ColumnType.TEXT,
+          filterType: FilterType.TEXT,
+          align: 'left',
+          width: '200px',
+          mobileVisible: true,
+        },
+        {
+          field: 'tipoNotificacionText',
+          header: 'Tipo',
+          type: ColumnType.DROPDOWN,
+          filterType: FilterType.DROPDOWN,
+          dropdownOptions: [
+            { label: 'Info', value: 'Info' },
+            { label: 'Advertencia', value: 'Advertencia' },
+            { label: 'Error', value: 'Error' },
+            { label: 'Éxito', value: 'Éxito' },
+            { label: 'Crítica', value: 'Crítica' },
+          ],
+          width: '120px',
+          mobileVisible: true,
+        },
+        {
+          field: 'prioridadText',
+          header: 'Prioridad',
+          type: ColumnType.DROPDOWN,
+          filterType: FilterType.DROPDOWN,
+          dropdownOptions: [
+            { label: 'Baja', value: 'Baja' },
+            { label: 'Normal', value: 'Normal' },
+            { label: 'Alta', value: 'Alta' },
+            { label: 'Urgente', value: 'Urgente' },
+          ],
+          width: '120px',
+          mobileVisible: false,
+        },
+        {
+          field: 'estadoText',
+          header: 'Estado',
+          type: ColumnType.DROPDOWN,
+          filterType: FilterType.DROPDOWN,
+          dropdownOptions: [
+            { label: 'Activa', value: 'Activa' },
+            { label: 'Inactiva', value: 'Inactiva' },
+          ],
+          width: '120px',
+          mobileVisible: true,
+        },
+        {
+          field: 'destinatariosText',
+          header: 'Destinatarios',
+          type: ColumnType.TEXT,
+          filterType: FilterType.TEXT,
+          width: '150px',
+          mobileVisible: false,
+        },
+        {
+          field: 'fechaCreacionText',
+          header: 'Fecha Creación',
+          type: ColumnType.TEXT,
+          filterType: FilterType.TEXT,
+          width: '150px',
+          mobileVisible: false,
+        },
+        {
+          field: 'acciones',
+          header: 'Acciones',
+          type: ColumnType.TEXT,
+          isAction: true,
+          sortable: false,
+          filterType: FilterType.NONE,
+          width: '140px',
+          align: 'center',
+          mobileVisible: true,
+        },
+      ],
+      rowActions: [
+        {
+          icon: 'pi pi-pencil',
+          severity: 'success',
+          tooltip: 'Editar',
+          action: (row: Notificacion) => this.editarNotificacion(row),
+        },
+        {
+          icon: 'pi pi-trash',
+          severity: 'danger',
+          tooltip: 'Eliminar',
+          action: (row: Notificacion) => this.confirmarEliminar(row),
+        },
+      ],
+      globalFilterFields: ['titulo', 'mensaje', 'tipoNotificacionText', 'prioridadText'],
+      data: data.map(n => ({
+        ...n,
+        tipoNotificacionText: this.getLabelTipo(n.tipoNotificacion),
+        prioridadText: this.getLabelPrioridad(n.prioridad),
+        estadoText: n.activo ? 'Activa' : 'Inactiva',
+        destinatariosText: `${n.totalDestinatarios || 0} total, ${n.totalLeidas || 0} leídas`,
+        fechaCreacionText: this.formatearFecha(n.fechaCreacion),
+      })),
+    };
   }
 }
 

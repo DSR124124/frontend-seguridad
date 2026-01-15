@@ -8,11 +8,15 @@
   (onHide)="hideDialog()"
 >
   <form [formGroup]="conductorForm" (ngSubmit)="guardar()">
-    <div class="form-grid">
-      <!-- Usuario (Conductor) -->
-      <div class="field">
-        <label for="idUsuarioGestion" class="required">
-          Usuario Conductor <span class="required-asterisk">*</span>
+    <div class="form-two-columns">
+      <!-- Columna Izquierda -->
+      <div class="form-column">
+        <p-tag value="Información del Conductor" icon="pi pi-user" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+
+        <!-- Usuario (Conductor) -->
+        <label class="field-label required">
+          <i class="pi pi-user icon-bg-primary icon-bg"></i>
+          Usuario Conductor
         </label>
         <p-select
           id="idUsuarioGestion"
@@ -26,34 +30,34 @@
           [filter]="true"
           filterBy="nombreCompleto,username,email"
           [showClear]="!modoEdicion"
-          styleClass="w-full"
+          styleClass="w-full custom-select mb-1"
           appendTo="body"
+          (onChange)="onFieldChange('idUsuarioGestion')"
         >
           <ng-template let-usuario pTemplate="item">
-            <div>
-              <div><strong>{{ usuario.nombreCompleto || usuario.username }}</strong></div>
-              <small class="text-muted">{{ usuario.email }} - {{ usuario.nombreRol }}</small>
+            <div class="flex align-items-center">
+              <div>
+                <div>{{ usuario.nombreCompleto || usuario.username }}</div>
+                <small class="text-secondary">{{ usuario.email }} - {{ usuario.nombreRol }}</small>
+              </div>
             </div>
           </ng-template>
           <ng-template let-usuario pTemplate="selectedItem">
             <div>
-              <div><strong>{{ usuario.nombreCompleto || usuario.username }}</strong></div>
-              <small class="text-muted">{{ usuario.email }}</small>
+              <div>{{ usuario.nombreCompleto || usuario.username }}</div>
+              <small class="text-secondary">{{ usuario.email }}</small>
             </div>
           </ng-template>
         </p-select>
-        <small
-          *ngIf="isFieldInvalid('idUsuarioGestion')"
-          class="p-error"
-        >
-          <span *ngIf="f['idUsuarioGestion'].errors?.['required']">El usuario conductor es obligatorio</span>
-        </small>
-      </div>
+        <div class="field-helper error" *ngIf="isFieldInvalid('idUsuarioGestion')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['idUsuarioGestion'].errors?.['required']">El usuario conductor es requerido</span>
+        </div>
 
-      <!-- Número de Licencia -->
-      <div class="field">
-        <label for="licenciaNumero" class="required">
-          Número de Licencia <span class="required-asterisk">*</span>
+        <!-- Número de Licencia -->
+        <label class="field-label required">
+          <i class="pi pi-id-card icon-bg-primary icon-bg"></i>
+          Número de Licencia
         </label>
         <input
           id="licenciaNumero"
@@ -63,19 +67,18 @@
           [class.ng-invalid]="isFieldInvalid('licenciaNumero')"
           placeholder="Ej: ABC123456"
           maxlength="20"
+          class="form-control w-100 mb-1"
+          (input)="onFieldChange('licenciaNumero')"
         />
-        <small
-          *ngIf="isFieldInvalid('licenciaNumero')"
-          class="p-error"
-        >
-          <span *ngIf="f['licenciaNumero'].errors?.['required']">El número de licencia es obligatorio</span>
+        <div class="field-helper error" *ngIf="isFieldInvalid('licenciaNumero')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['licenciaNumero'].errors?.['required']">El número de licencia es requerido</span>
           <span *ngIf="f['licenciaNumero'].errors?.['maxlength']">El número de licencia no puede exceder 20 caracteres</span>
-        </small>
-      </div>
+        </div>
 
-      <!-- Categoría -->
-      <div class="field">
-        <label for="categoria">
+        <!-- Categoría -->
+        <label class="field-label">
+          <i class="pi pi-bookmark icon-bg-primary icon-bg"></i>
           Categoría
         </label>
         <p-select
@@ -86,14 +89,19 @@
           optionValue="value"
           placeholder="Seleccione una categoría"
           [showClear]="true"
-          styleClass="w-full"
+          styleClass="w-full custom-select mb-1"
           appendTo="body"
+          (onChange)="onFieldChange('categoria')"
         ></p-select>
       </div>
 
-      <!-- Teléfono de Contacto -->
-      <div class="field">
-        <label for="telefonoContacto">
+      <!-- Columna Derecha -->
+      <div class="form-column">
+        <p-tag value="Contacto y Estado" icon="pi pi-phone" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+
+        <!-- Teléfono de Contacto -->
+        <label class="field-label">
+          <i class="pi pi-phone icon-bg-primary icon-bg"></i>
           Teléfono de Contacto
         </label>
         <input
@@ -104,18 +112,17 @@
           [class.ng-invalid]="isFieldInvalid('telefonoContacto')"
           placeholder="Ej: +504 9999-9999"
           maxlength="20"
+          class="form-control w-100 mb-1"
+          (input)="onFieldChange('telefonoContacto')"
         />
-        <small
-          *ngIf="isFieldInvalid('telefonoContacto')"
-          class="p-error"
-        >
+        <div class="field-helper error" *ngIf="isFieldInvalid('telefonoContacto')">
+          <i class="pi pi-exclamation-circle"></i>
           <span *ngIf="f['telefonoContacto'].errors?.['maxlength']">El teléfono no puede exceder 20 caracteres</span>
-        </small>
-      </div>
+        </div>
 
-      <!-- Estado -->
-      <div class="field">
-        <label for="estado">
+        <!-- Estado -->
+        <label class="field-label">
+          <i class="pi pi-power-off icon-bg-primary icon-bg"></i>
           Estado
         </label>
         <p-select
@@ -125,32 +132,30 @@
           optionLabel="label"
           optionValue="value"
           placeholder="Seleccione un estado"
-          styleClass="w-full"
+          styleClass="w-full custom-select mb-1"
           appendTo="body"
+          (onChange)="onFieldChange('estado')"
         ></p-select>
       </div>
     </div>
   </form>
 
-  <ng-template pTemplate="footer">
-    <div class="dialog-footer">
-      <button
-        pButton
-        type="button"
-        label="Cancelar"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="hideDialog()"
-      ></button>
-      <button
-        pButton
-        type="button"
-        [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
-        icon="pi pi-check"
-        (click)="guardar()"
-        [disabled]="conductorForm.invalid"
-      ></button>
-    </div>
-  </ng-template>
+  <!-- Footer con botones -->
+  <p-toolbar>
+    <ng-template #start></ng-template>
+    <ng-template #end>
+      <div class="d-flex gap-2">
+        <p-button label="Cancelar" icon="pi pi-times" (onClick)="hideDialog()" styleClass="btn-danger btn-md" />
+        <p-button
+          [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
+          [icon]="modoEdicion ? 'pi pi-check' : 'pi pi-plus'"
+          (onClick)="guardar()"
+          [styleClass]="modoEdicion ? 'btn-info btn-md' : 'btn-success btn-md'"
+          [disabled]="conductorForm.invalid"
+          [loading]="loading"
+        />
+      </div>
+    </ng-template>
+  </p-toolbar>
 </p-dialog>
 

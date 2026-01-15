@@ -17,6 +17,16 @@
           />
         </p-iconfield>
         <p-button
+          class="button-fiter"
+          [icon]="filtrosVisibles ? 'pi pi-filter-slash' : 'pi pi-filter'"
+          label="Filtros"
+          styleClass="btn-info btn-v2 btn-md"
+          tooltipPosition="bottom"
+          (onClick)="toggleFiltrosColumnas()"
+          [loading]="loading"
+        >
+        </p-button>
+        <p-button
           *ngIf="terminoBusqueda"
           icon="pi pi-times" label="Limpiar" styleClass="p-button-danger"
           (onClick)="limpiarFiltros()"></p-button>
@@ -27,88 +37,13 @@
       <div class="d-flex gap-2">
         <p-button icon="pi pi-plus" label="Nueva Notificación" styleClass="p-button-primary"
           (onClick)="abrirDialogoCrear()"></p-button>
-        <p-button icon="pi pi-refresh" label="Actualizar" styleClass="p-button-info"
-          (onClick)="cargarNotificaciones()"></p-button>
       </div>
     </ng-template>
   </p-toolbar>
 
   <p-divider></p-divider>
 
-  <p-table [value]="notificacionesFiltradas" [paginator]="true" [rows]="10"
-    [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} notificaciones"
-    styleClass="tabla-datos">
-    <ng-template pTemplate="header">
-      <tr>
-        <th style="width: 5%">ID</th>
-        <th style="width: 20%">Título</th>
-        <th style="width: 10%">Tipo</th>
-        <th style="width: 8%">Prioridad</th>
-        <th style="width: 8%">Estado</th>
-        <th style="width: 10%">Destinatarios</th>
-        <th style="width: 15%">Fecha Creación</th>
-        <th style="width: 24%">Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-notificacion>
-      <tr>
-        <td>{{ notificacion.idNotificacion }}</td>
-        <td>
-          <strong>{{ notificacion.titulo }}</strong>
-          <br>
-          <small class="text-secondary">{{ notificacion.mensaje.substring(0, 50) }}...</small>
-        </td>
-        <td>
-          <p-tag
-            [value]="getLabelTipo(notificacion.tipoNotificacion)"
-            [ngClass]="getTagClaseTipo(notificacion.tipoNotificacion)">
-          </p-tag>
-        </td>
-        <td>
-          <p-tag
-            [value]="getLabelPrioridad(notificacion.prioridad)"
-            [ngClass]="getTagClasePrioridad(notificacion.prioridad)">
-          </p-tag>
-        </td>
-        <td>
-          <p-tag
-            [value]="notificacion.activo ? 'Activa' : 'Inactiva'"
-            [ngClass]="getTagClaseEstado(notificacion.activo)">
-          </p-tag>
-        </td>
-        <td>
-          <div class="d-flex flex-column gap-1">
-            <span><strong>{{ notificacion.totalDestinatarios || 0 }}</strong> total</span>
-            <span class="text-success">{{ notificacion.totalLeidas || 0 }} leídas</span>
-          </div>
-        </td>
-        <td>
-          <span [title]="formatearFecha(notificacion.fechaCreacion)">
-            {{ formatearFecha(notificacion.fechaCreacion) }}
-          </span>
-        </td>
-        <td>
-          <div class="acciones-cell">
-            <p-button icon="pi pi-pencil" styleClass="btn-success btn-v2" pTooltip="Editar" tooltipPosition="top"
-              (click)="editarNotificacion(notificacion)"></p-button>
-            <p-button icon="pi pi-trash" styleClass="btn-danger btn-v2" pTooltip="Eliminar"
-              tooltipPosition="top" (click)="confirmarEliminar(notificacion)"></p-button>
-          </div>
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="emptymessage">
-      <tr>
-        <td colspan="8" class="text-center p-4">
-          <div class="empty-message">
-            <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-            <p>No se encontraron notificaciones creadas</p>
-          </div>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+  <shared-data-table #dataTable [config]="notificacionesTableConfig"></shared-data-table>
 </div>
 
 <!-- Componente de crear/editar notificación -->
@@ -117,9 +52,4 @@
   (notificacionCreada)="onNotificacionCreada()"
   (notificacionActualizada)="onNotificacionActualizada()">
 </app-notificacion-form>
-
-<!-- Confirmación de eliminación -->
-<p-confirmDialog></p-confirmDialog>
-
-<p-toast></p-toast>
 

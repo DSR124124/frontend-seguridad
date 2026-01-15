@@ -28,6 +28,7 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
   modoEdicion: boolean = false;
   conductorId: number | null = null;
   usuariosDisponibles: UsuarioGestion[] = [];
+  loading: boolean = false;
   private subscriptions: Subscription[] = [];
 
   estados = [
@@ -171,18 +172,21 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
       estado: this.conductorForm.value.estado
     };
 
+    this.loading = true;
     this.loadingService.show();
 
     if (this.modoEdicion && this.conductorId) {
       // Actualizar conductor existente
       const sub = this.conductorService.actualizarConductor(this.conductorId, conductorData).subscribe({
         next: () => {
+          this.loading = false;
           this.loadingService.hide();
           this.messageService.success('Conductor actualizado correctamente', 'Éxito', 5000);
           this.hideDialog();
           this.conductorActualizado.emit();
         },
         error: (error) => {
+          this.loading = false;
           this.loadingService.hide();
           const errorMessage = error?.error?.message || error?.message || 'Error al actualizar el conductor';
           this.messageService.error(errorMessage, 'Error', 6000);
@@ -193,12 +197,14 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
       // Crear nuevo conductor
       const sub = this.conductorService.crearConductor(conductorData).subscribe({
         next: () => {
+          this.loading = false;
           this.loadingService.hide();
           this.messageService.success('Conductor registrado correctamente', 'Registro exitoso', 5000);
           this.hideDialog();
           this.conductorCreado.emit();
         },
         error: (error) => {
+          this.loading = false;
           this.loadingService.hide();
           const errorMessage = error?.error?.message || error?.message || 'Error al crear el conductor';
           this.messageService.error(errorMessage, 'Error', 6000);
@@ -219,6 +225,13 @@ export class ConductorFormComponent implements OnInit, OnDestroy {
 
   getUsuarioLabel(usuario: UsuarioGestion): string {
     return usuario.nombreCompleto || usuario.username || usuario.email || '';
+  }
+
+  onFieldChange(fieldName: string): void {
+    const field = this.conductorForm.get(fieldName);
+    if (field) {
+      field.markAsTouched();
+    }
   }
 }
 

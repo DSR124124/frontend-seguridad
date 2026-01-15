@@ -4,13 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Ruta } from '../../interfaces/ruta.interface';
 import { RutaService } from '../../services/ruta.service';
-import { ConfirmationService } from 'primeng/api';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { MessageService } from '../../../../../core/services/message.service';
 import { LoadingService } from '../../../../../shared/services/loading.service';
 import { PrimeNGModules } from '../../../../../prime-ng/prime-ng';
 import { RutaFormComponent } from '../ruta-form/ruta-form.component';
 import { RutaPuntosComponent } from '../ruta-puntos/ruta-puntos.component';
 import { Subscription } from 'rxjs';
+import { DataTableComponent } from '../../../../../shared/components/data-table/data-table.component';
+import { ColumnType, FilterType, TableConfig } from '../../../../../shared/components/data-table/interfaces/table-column.interface';
+import { DialogoComponent } from '../../../../../shared/components/dialogo/dialogo.component';
 
 @Component({
   selector: 'app-ruta-list',
@@ -20,34 +23,42 @@ import { Subscription } from 'rxjs';
     FormsModule,
     ...PrimeNGModules,
     RutaFormComponent,
-    RutaPuntosComponent
+    RutaPuntosComponent,
+    DataTableComponent
   ],
-  providers: [ConfirmationService],
+  providers: [DialogService],
   templateUrl: './ruta-list.component.html',
   styleUrl: './ruta-list.component.css'
 })
 export class RutaListComponent implements OnInit, OnDestroy {
   rutas: Ruta[] = [];
-  rutasFiltradas: Ruta[] = [];
   loading: boolean = false;
   terminoBusqueda: string = '';
+  rutasTableConfig!: TableConfig;
+  filtrosVisibles: boolean = false;
   private loadingSubscription?: Subscription;
 
   @ViewChild(RutaFormComponent) rutaFormComponent?: RutaFormComponent;
   @ViewChild(RutaPuntosComponent) rutaPuntosComponent?: RutaPuntosComponent;
+  @ViewChild('dataTable') dataTableComponent?: DataTableComponent;
 
   constructor(
     private rutaService: RutaService,
     private router: Router,
-    private confirmationService: ConfirmationService,
     private messageService: MessageService,
+    private dialogService: DialogService,
     private loadingService: LoadingService
   ) {}
 
   ngOnInit(): void {
+    // Inicializar configuración de la tabla
+    this.rutasTableConfig = this.buildRutasTableConfig([]);
     // Suscribirse al estado de loading del servicio
     this.loadingSubscription = this.loadingService.loading$.subscribe(
-      loading => this.loading = loading
+      loading => {
+        this.loading = loading;
+        this.rutasTableConfig = { ...this.rutasTableConfig, loading };
+      }
     );
     this.cargarRutas();
   }
@@ -60,46 +71,46 @@ export class RutaListComponent implements OnInit, OnDestroy {
 
   cargarRutas(): void {
     this.loadingService.show();
-
     this.rutaService.listarRutas().subscribe({
       next: (rutas) => {
         this.rutas = rutas || [];
-        this.rutasFiltradas = this.rutas;
+        this.rutasTableConfig = this.buildRutasTableConfig(this.rutas);
         this.loadingService.hide();
-
-        // Mostrar notificación si no hay rutas
-        if (this.rutas.length === 0) {
-          this.messageService.info('No hay rutas registradas. Puede crear una nueva usando el botón "Nueva Ruta".', 'Sin rutas', 6000);
-        } else {
-          // Mostrar notificación de éxito al cargar
-          this.messageService.success(`Se cargaron ${this.rutas.length} ruta(s) correctamente`, 'Rutas cargadas', 3000);
-        }
       },
       error: (error) => {
         this.loadingService.hide();
-        const errorMessage = error?.error?.message || error?.message || 'Error al cargar las rutas';
-        this.messageService.error(errorMessage, 'Error al cargar', 6000);
+        const errorMessage = error?.message || error?.error?.message || 'Error al cargar las rutas';
+        this.messageService.error(errorMessage, 'Error', 5000);
       }
     });
   }
 
   filtrarRutas(): void {
     if (!this.terminoBusqueda || this.terminoBusqueda.trim() === '') {
-      this.rutasFiltradas = this.rutas;
+      this.rutasTableConfig = this.buildRutasTableConfig(this.rutas);
       return;
     }
 
     const termino = this.terminoBusqueda.toLowerCase().trim();
-    this.rutasFiltradas = this.rutas.filter(ruta =>
+    const filtradas = this.rutas.filter(ruta =>
       ruta.nombre.toLowerCase().includes(termino) ||
       (ruta.descripcion && ruta.descripcion.toLowerCase().includes(termino)) ||
       (ruta.colorMapa && ruta.colorMapa.toLowerCase().includes(termino))
     );
+    this.rutasTableConfig = this.buildRutasTableConfig(filtradas);
   }
 
   limpiarBusqueda(): void {
     this.terminoBusqueda = '';
-    this.rutasFiltradas = this.rutas;
+    this.rutasTableConfig = this.buildRutasTableConfig(this.rutas);
+  }
+
+  aplicarFiltros(): void {
+    if (this.dataTableComponent) {
+      this.dataTableComponent.toggleFiltros();
+      // Sincronizar el estado de visibilidad
+      this.filtrosVisibles = !this.filtrosVisibles;
+    }
   }
 
   abrirDialogoCrear(): void {
@@ -109,7 +120,6 @@ export class RutaListComponent implements OnInit, OnDestroy {
   }
 
   onRutaCreada(rutaId: number): void {
-    this.messageService.success('Ruta registrada correctamente', 'Registro exitoso', 5000);
     this.cargarRutas();
     // Opcional: Abrir gestión de puntos automáticamente
     // if (this.rutaPuntosComponent) {
@@ -129,7 +139,6 @@ export class RutaListComponent implements OnInit, OnDestroy {
   }
 
   onRutaActualizada(): void {
-    this.messageService.success('Ruta actualizada correctamente', 'Actualización exitosa', 5000);
     this.cargarRutas();
   }
 
@@ -140,14 +149,22 @@ export class RutaListComponent implements OnInit, OnDestroy {
   }
 
   confirmarEliminar(ruta: Ruta): void {
-    this.confirmationService.confirm({
-      message: `¿Está seguro de que desea eliminar la ruta "${ruta.nombre}"?`,
+    const ref: DynamicDialogRef = this.dialogService.open(DialogoComponent, {
       header: 'Confirmar Eliminación',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
-      acceptLabel: 'Sí, eliminar',
-      rejectLabel: 'Cancelar',
-      accept: () => {
+      width: '500px',
+      modal: true,
+      closable: true,
+      data: {
+        mensaje: `¿Está seguro de que desea eliminar la ruta "<strong>${ruta.nombre}</strong>"?`,
+        severidad: 'warn',
+        mostrarBotones: true,
+        labelAceptar: 'Sí, eliminar',
+        labelCerrar: 'Cancelar'
+      }
+    });
+
+    ref.onClose.subscribe((result: string | undefined) => {
+      if (result === 'aceptar') {
         this.eliminarRuta(ruta.idRuta);
       }
     });
@@ -163,18 +180,122 @@ export class RutaListComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.loadingService.hide();
-        const errorMessage = error?.error?.message || error?.message || 'Error al eliminar la ruta';
-        this.messageService.error(errorMessage, 'Error', 6000);
+        const errorMessage = error?.message || error?.error?.message || 'Error al eliminar la ruta';
+        this.messageService.error(errorMessage, 'Error', 5000);
       }
     });
   }
 
-  getClaseTagEstado(estado: boolean): string {
-    return estado ? 'tag-success' : 'tag-danger';
-  }
-
   getEstadoLabel(estado: boolean): string {
     return estado ? 'Activa' : 'Inactiva';
+  }
+
+  private buildRutasTableConfig(data: Ruta[]): TableConfig {
+    return {
+      loading: this.loading,
+      rowsPerPage: 10,
+      rowsPerPageOptions: [10, 25, 50],
+      showCurrentPageReport: true,
+      showGlobalSearch: false,
+      currentPageReportTemplate: 'Mostrando {first} a {last} de {totalRecords} rutas',
+      emptyMessage: 'No se encontraron rutas',
+      globalSearchPlaceholder: 'Buscar por nombre, descripción o color...',
+      columns: [
+        {
+          field: 'idRuta',
+          header: 'ID',
+          type: ColumnType.NUMBER,
+          filterType: FilterType.NUMBER,
+          width: '80px',
+          mobileVisible: true,
+        },
+        {
+          field: 'nombre',
+          header: 'Nombre',
+          type: ColumnType.TEXT,
+          filterType: FilterType.TEXT,
+          align: 'left',
+          width: '200px',
+          mobileVisible: true,
+        },
+        {
+          field: 'descripcion',
+          header: 'Descripción',
+          type: ColumnType.TEXT,
+          filterType: FilterType.TEXT,
+          align: 'left',
+          width: '250px',
+          mobileVisible: false,
+          getLabel: (value: any) => value || '-',
+        },
+        {
+          field: 'colorMapa',
+          header: 'Color Mapa',
+          type: ColumnType.TEXT,
+          filterType: FilterType.TEXT,
+          width: '150px',
+          mobileVisible: false,
+          getLabel: (value: any) => value || '#0000FF',
+        },
+        {
+          field: 'puntosCount',
+          header: 'Puntos',
+          type: ColumnType.NUMBER,
+          filterType: FilterType.NUMBER,
+          width: '100px',
+          mobileVisible: false,
+        },
+        {
+          field: 'estadoText',
+          header: 'Estado',
+          type: ColumnType.DROPDOWN,
+          filterType: FilterType.DROPDOWN,
+          dropdownOptions: [
+            { label: 'Activa', value: 'Activa' },
+            { label: 'Inactiva', value: 'Inactiva' },
+          ],
+          width: '120px',
+          mobileVisible: true,
+        },
+        {
+          field: 'acciones',
+          header: 'Acciones',
+          type: ColumnType.TEXT,
+          isAction: true,
+          sortable: false,
+          filterType: FilterType.NONE,
+          width: '200px',
+          align: 'center',
+          mobileVisible: true,
+        },
+      ],
+      rowActions: [
+        {
+          icon: 'pi pi-map',
+          severity: 'info',
+          tooltip: 'Gestionar puntos',
+          action: (row: Ruta) => this.gestionarPuntos(row),
+        },
+        {
+          icon: 'pi pi-pencil',
+          severity: 'success',
+          tooltip: 'Editar ruta',
+          action: (row: Ruta) => this.editarRuta(row),
+        },
+        {
+          icon: 'pi pi-trash',
+          severity: 'danger',
+          tooltip: 'Eliminar ruta',
+          action: (row: Ruta) => this.confirmarEliminar(row),
+        },
+      ],
+      globalFilterFields: ['nombre', 'descripcion', 'colorMapa'],
+      data: data.map(r => ({
+        ...r,
+        puntosCount: r.puntos?.length || 0,
+        estadoText: this.getEstadoLabel(r.estado),
+      })),
+    };
   }
 }
 

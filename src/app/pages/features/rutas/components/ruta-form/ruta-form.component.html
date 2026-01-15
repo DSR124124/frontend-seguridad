@@ -8,11 +8,15 @@
   (onHide)="hideDialog()"
 >
   <form [formGroup]="rutaForm" (ngSubmit)="guardar()">
-    <div class="form-grid">
-      <!-- Nombre -->
-      <div class="field">
-        <label for="nombre" class="required">
-          Nombre <span class="required-asterisk">*</span>
+    <div class="form-two-columns">
+      <!-- Columna Izquierda -->
+      <div class="form-column">
+        <p-tag value="Información de la Ruta" icon="pi pi-map" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+
+        <!-- Nombre -->
+        <label class="field-label required">
+          <i class="pi pi-tag icon-bg-primary icon-bg"></i>
+          Nombre
         </label>
         <input
           id="nombre"
@@ -22,19 +26,18 @@
           [class.ng-invalid]="isFieldInvalid('nombre')"
           placeholder="Ej: Ruta Centro - Norte"
           maxlength="100"
+          class="form-control w-100 mb-1"
+          (input)="onFieldChange('nombre')"
         />
-        <small
-          *ngIf="isFieldInvalid('nombre')"
-          class="p-error"
-        >
-          <span *ngIf="f['nombre'].errors?.['required']">El nombre es obligatorio</span>
+        <div class="field-helper error" *ngIf="isFieldInvalid('nombre')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['nombre'].errors?.['required']">El nombre es requerido</span>
           <span *ngIf="f['nombre'].errors?.['maxlength']">El nombre no puede exceder 100 caracteres</span>
-        </small>
-      </div>
+        </div>
 
-      <!-- Descripción -->
-      <div class="field full-width">
-        <label for="descripcion">
+        <!-- Descripción -->
+        <label class="field-label">
+          <i class="pi pi-file-edit icon-bg-primary icon-bg"></i>
           Descripción
         </label>
         <textarea
@@ -45,27 +48,32 @@
           placeholder="Descripción de la ruta..."
           [rows]="3"
           maxlength="500"
+          class="form-control w-100 mb-1"
+          (input)="onFieldChange('descripcion')"
         ></textarea>
-        <small
-          *ngIf="isFieldInvalid('descripcion')"
-          class="p-error"
-        >
+        <div class="field-helper error" *ngIf="isFieldInvalid('descripcion')">
+          <i class="pi pi-exclamation-circle"></i>
           <span *ngIf="f['descripcion'].errors?.['maxlength']">La descripción no puede exceder 500 caracteres</span>
-        </small>
+        </div>
       </div>
 
-      <!-- Color Mapa -->
-      <div class="field">
-        <label for="colorMapa">
+      <!-- Columna Derecha -->
+      <div class="form-column">
+        <p-tag value="Configuración Visual" icon="pi pi-palette" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+
+        <!-- Color Mapa -->
+        <label class="field-label">
+          <i class="pi pi-palette icon-bg-primary icon-bg"></i>
           Color en Mapa
         </label>
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 mb-1">
           <input
             id="colorMapa"
             type="color"
             formControlName="colorMapa"
             [class.ng-invalid]="isFieldInvalid('colorMapa')"
-            style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+            class="color-picker"
+            (input)="onFieldChange('colorMapa')"
           />
           <input
             type="text"
@@ -74,45 +82,41 @@
             [class.ng-invalid]="isFieldInvalid('colorMapa')"
             placeholder="#0000FF"
             maxlength="7"
-            style="flex: 1;"
+            class="form-control w-100"
+            (input)="onFieldChange('colorMapa')"
           />
         </div>
-        <small
-          *ngIf="isFieldInvalid('colorMapa')"
-          class="p-error"
-        >
+        <div class="field-helper error" *ngIf="isFieldInvalid('colorMapa')">
+          <i class="pi pi-exclamation-circle"></i>
           <span *ngIf="f['colorMapa'].errors?.['pattern']">El color debe estar en formato hexadecimal (ej: #0000FF)</span>
-        </small>
+        </div>
       </div>
     </div>
 
     <div class="info-message mt-3">
-      <p class="text-muted">
+      <p class="text-secondary">
         <i class="pi pi-info-circle"></i>
         Después de crear la ruta, podrá agregar puntos usando el botón "Gestionar Puntos" en la lista de rutas.
       </p>
     </div>
   </form>
 
-  <ng-template pTemplate="footer">
-    <div class="dialog-footer">
-      <button
-        pButton
-        type="button"
-        label="Cancelar"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="hideDialog()"
-      ></button>
-      <button
-        pButton
-        type="button"
-        [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
-        icon="pi pi-check"
-        (click)="guardar()"
-        [disabled]="rutaForm.invalid"
-      ></button>
-    </div>
-  </ng-template>
+  <!-- Footer con botones -->
+  <p-toolbar>
+    <ng-template #start></ng-template>
+    <ng-template #end>
+      <div class="d-flex gap-2">
+        <p-button label="Cancelar" icon="pi pi-times" (onClick)="hideDialog()" styleClass="btn-danger btn-md" />
+        <p-button
+          [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
+          [icon]="modoEdicion ? 'pi pi-check' : 'pi pi-plus'"
+          (onClick)="guardar()"
+          [styleClass]="modoEdicion ? 'btn-info btn-md' : 'btn-success btn-md'"
+          [disabled]="rutaForm.invalid"
+          [loading]="loading"
+        />
+      </div>
+    </ng-template>
+  </p-toolbar>
 </p-dialog>
 

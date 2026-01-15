@@ -1,18 +1,22 @@
 <p-dialog
   [(visible)]="visible"
   [modal]="true"
-  [style]="{ width: '800px' }"
+  [style]="{ width: '700px' }"
   [draggable]="false"
   [resizable]="false"
   [header]="modoEdicion ? 'Editar Notificación' : 'Crear Nueva Notificación'"
   (onHide)="hideDialog()"
 >
   <form [formGroup]="notificacionForm" (ngSubmit)="guardar()">
-    <div class="form-grid">
-      <!-- Título -->
-      <div class="field col-12">
-        <label for="titulo" class="required">
-          Título <span class="required-asterisk">*</span>
+    <div class="form-two-columns">
+      <!-- Columna Izquierda -->
+      <div class="form-column">
+        <p-tag value="Información de la Notificación" icon="pi pi-bell" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+
+        <!-- Título -->
+        <label class="field-label required">
+          <i class="pi pi-tag icon-bg-primary icon-bg"></i>
+          Título
         </label>
         <input
           id="titulo"
@@ -22,20 +26,18 @@
           [class.ng-invalid]="isFieldInvalid('titulo')"
           placeholder="Ej: Nueva actualización disponible"
           maxlength="200"
+          class="form-control w-100 mb-1"
         />
-        <small
-          *ngIf="isFieldInvalid('titulo')"
-          class="p-error"
-        >
-          <span *ngIf="f['titulo'].errors?.['required']">El título es obligatorio</span>
+        <div class="field-helper error" *ngIf="isFieldInvalid('titulo')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['titulo'].errors?.['required']">El título es requerido</span>
           <span *ngIf="f['titulo'].errors?.['maxlength']">El título no puede exceder 200 caracteres</span>
-        </small>
-      </div>
+        </div>
 
-      <!-- Mensaje -->
-      <div class="field col-12">
-        <label for="mensaje" class="required">
-          Mensaje <span class="required-asterisk">*</span>
+        <!-- Mensaje -->
+        <label class="field-label required">
+          <i class="pi pi-file-edit icon-bg-primary icon-bg"></i>
+          Mensaje
         </label>
         <textarea
           id="mensaje"
@@ -45,20 +47,18 @@
           placeholder="Escriba el mensaje de la notificación..."
           [rows]="4"
           maxlength="1000"
+          class="form-control w-100 mb-1"
         ></textarea>
-        <small
-          *ngIf="isFieldInvalid('mensaje')"
-          class="p-error"
-        >
-          <span *ngIf="f['mensaje'].errors?.['required']">El mensaje es obligatorio</span>
+        <div class="field-helper error" *ngIf="isFieldInvalid('mensaje')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['mensaje'].errors?.['required']">El mensaje es requerido</span>
           <span *ngIf="f['mensaje'].errors?.['maxlength']">El mensaje no puede exceder 1000 caracteres</span>
-        </small>
-      </div>
+        </div>
 
-      <!-- Tipo y Prioridad -->
-      <div class="field col-6">
-        <label for="tipoNotificacion" class="required">
-          Tipo <span class="required-asterisk">*</span>
+        <!-- Tipo -->
+        <label class="field-label required">
+          <i class="pi pi-info-circle icon-bg-primary icon-bg"></i>
+          Tipo
         </label>
         <p-select
           id="tipoNotificacion"
@@ -67,21 +67,24 @@
           optionLabel="label"
           optionValue="value"
           placeholder="Seleccione un tipo"
-          styleClass="w-full"
-          appendTo="body"
           [class.ng-invalid]="isFieldInvalid('tipoNotificacion')"
+          styleClass="w-full custom-select mb-1"
+          appendTo="body"
         ></p-select>
-        <small
-          *ngIf="isFieldInvalid('tipoNotificacion')"
-          class="p-error"
-        >
-          <span *ngIf="f['tipoNotificacion'].errors?.['required']">El tipo es obligatorio</span>
-        </small>
+        <div class="field-helper error" *ngIf="isFieldInvalid('tipoNotificacion')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['tipoNotificacion'].errors?.['required']">El tipo es requerido</span>
+        </div>
       </div>
 
-      <div class="field col-6">
-        <label for="prioridad" class="required">
-          Prioridad <span class="required-asterisk">*</span>
+      <!-- Columna Derecha -->
+      <div class="form-column">
+        <p-tag value="Configuración y Destinatarios" icon="pi pi-cog" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+
+        <!-- Prioridad -->
+        <label class="field-label required">
+          <i class="pi pi-exclamation-triangle icon-bg-primary icon-bg"></i>
+          Prioridad
         </label>
         <p-select
           id="prioridad"
@@ -90,39 +93,44 @@
           optionLabel="label"
           optionValue="value"
           placeholder="Seleccione una prioridad"
-          styleClass="w-full"
-          appendTo="body"
           [class.ng-invalid]="isFieldInvalid('prioridad')"
+          styleClass="w-full custom-select mb-1"
+          appendTo="body"
         ></p-select>
-        <small
-          *ngIf="isFieldInvalid('prioridad')"
-          class="p-error"
-        >
-          <span *ngIf="f['prioridad'].errors?.['required']">La prioridad es obligatoria</span>
-        </small>
-      </div>
+        <div class="field-helper error" *ngIf="isFieldInvalid('prioridad')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['prioridad'].errors?.['required']">La prioridad es requerida</span>
+        </div>
 
-      <!-- Fecha de envío -->
-      <div class="field col-12 md:col-6">
-        <label for="fechaEnvio">
+        <!-- Fecha de envío -->
+        <label class="field-label">
+          <i class="pi pi-calendar icon-bg-primary icon-bg"></i>
           Fecha de Envío
         </label>
-        <p-datePicker
+        <p-calendar
           id="fechaEnvio"
           formControlName="fechaEnvio"
           [showTime]="true"
-          [showIcon]="true"
+          [hourFormat]="'24'"
           dateFormat="dd/mm/yy"
           placeholder="Seleccione fecha y hora"
-          styleClass="w-full"
-          appendTo="body"
-        ></p-datePicker>
+          styleClass="w-full mb-1"
+        ></p-calendar>
+        <div class="field-helper info">
+          <i class="pi pi-info-circle"></i>
+          Si no se especifica, se enviará inmediatamente
+        </div>
       </div>
+    </div>
 
-      <!-- Usuarios Destinatarios -->
-      <div class="field col-12">
-        <label for="usuarios" class="required">
-          Usuarios Destinatarios <span class="required-asterisk">*</span>
+    <!-- Usuarios Destinatarios - Full Width -->
+    <div class="form-two-columns">
+      <div class="form-column full-width">
+        <p-tag value="Usuarios Destinatarios" icon="pi pi-users" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+        
+        <label class="field-label required">
+          <i class="pi pi-user icon-bg-primary icon-bg"></i>
+          Seleccionar Usuarios
         </label>
         <p-multiSelect
           id="usuarios"
@@ -134,77 +142,77 @@
           placeholder="Seleccione uno o más usuarios"
           [filter]="true"
           [showClear]="true"
-          styleClass="w-full"
+          styleClass="w-full mb-1"
           appendTo="body"
         ></p-multiSelect>
-        <small class="p-text-secondary">
+        <div class="field-helper info">
+          <i class="pi pi-info-circle"></i>
           Debe seleccionar al menos un usuario destinatario
-        </small>
+        </div>
       </div>
+    </div>
 
-      <!-- Opciones -->
-      <div class="field col-12">
-        <p-fieldset legend="Opciones de Notificación" [toggleable]="false" styleClass="w-full">
-          <div class="checkbox-group">
-            <div class="checkbox-item">
-              <p-checkbox
-                formControlName="requiereConfirmacion"
-                inputId="requiereConfirmacion"
-                [binary]="true"
-              ></p-checkbox>
-              <label for="requiereConfirmacion" class="checkbox-label">
-                <strong>Requiere Confirmación</strong>
-                <small class="checkbox-description">El usuario debe confirmar explícitamente que ha leído y entendido la notificación</small>
-              </label>
-            </div>
-
-            <div class="checkbox-item">
-              <p-checkbox
-                formControlName="mostrarComoRecordatorio"
-                inputId="mostrarComoRecordatorio"
-                [binary]="true"
-              ></p-checkbox>
-              <label for="mostrarComoRecordatorio" class="checkbox-label">
-                <strong>Mostrar como Recordatorio</strong>
-                <small class="checkbox-description">La notificación aparecerá como recordatorio hasta que sea leída</small>
-              </label>
-            </div>
-
-            <div class="checkbox-item">
-              <p-checkbox
-                formControlName="activo"
-                inputId="activo"
-                [binary]="true"
-              ></p-checkbox>
-              <label for="activo" class="checkbox-label">
-                <strong>Notificación Activa</strong>
-                <small class="checkbox-description">La notificación estará disponible para los usuarios destinatarios</small>
-              </label>
-            </div>
+    <!-- Opciones - Full Width -->
+    <div class="form-two-columns">
+      <div class="form-column full-width">
+        <p-tag value="Opciones de Notificación" icon="pi pi-sliders-h" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+        
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <p-checkbox
+              formControlName="requiereConfirmacion"
+              inputId="requiereConfirmacion"
+              [binary]="true"
+            ></p-checkbox>
+            <label for="requiereConfirmacion" class="checkbox-label">
+              <strong>Requiere Confirmación</strong>
+              <small class="checkbox-description">El usuario debe confirmar explícitamente que ha leído y entendido la notificación</small>
+            </label>
           </div>
-        </p-fieldset>
+
+          <div class="checkbox-item">
+            <p-checkbox
+              formControlName="mostrarComoRecordatorio"
+              inputId="mostrarComoRecordatorio"
+              [binary]="true"
+            ></p-checkbox>
+            <label for="mostrarComoRecordatorio" class="checkbox-label">
+              <strong>Mostrar como Recordatorio</strong>
+              <small class="checkbox-description">La notificación aparecerá como recordatorio hasta que sea leída</small>
+            </label>
+          </div>
+
+          <div class="checkbox-item">
+            <p-checkbox
+              formControlName="activo"
+              inputId="activo"
+              [binary]="true"
+            ></p-checkbox>
+            <label for="activo" class="checkbox-label">
+              <strong>Notificación Activa</strong>
+              <small class="checkbox-description">La notificación estará disponible para los usuarios destinatarios</small>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   </form>
 
-  <ng-template pTemplate="footer">
-    <div class="dialog-footer">
-      <button
-        pButton
-        type="button"
-        label="Cancelar"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="hideDialog()"
-      ></button>
-      <button
-        pButton
-        type="button"
-        [label]="modoEdicion ? 'Actualizar' : 'Crear'"
-        icon="pi pi-check"
-        (click)="guardar()"
-      ></button>
-    </div>
-  </ng-template>
+  <!-- Footer con botones -->
+  <p-toolbar>
+    <ng-template #start></ng-template>
+    <ng-template #end>
+      <div class="d-flex gap-2">
+        <p-button label="Cancelar" icon="pi pi-times" (onClick)="hideDialog()" styleClass="btn-danger btn-md" />
+        <p-button
+          [label]="modoEdicion ? 'Actualizar' : 'Crear'"
+          [icon]="modoEdicion ? 'pi pi-check' : 'pi pi-plus'"
+          (onClick)="guardar()"
+          [styleClass]="modoEdicion ? 'btn-info btn-md' : 'btn-success btn-md'"
+          [disabled]="notificacionForm.invalid || usuariosSeleccionados.length === 0"
+        />
+      </div>
+    </ng-template>
+  </p-toolbar>
 </p-dialog>
 

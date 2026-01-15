@@ -1,56 +1,226 @@
-.form-grid {
+/* ===== LAYOUT ===== */
+.form-two-columns {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
-.field {
+.form-column {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  background: #ffffff;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.field.col-12 {
-  grid-column: span 12;
+.form-column.full-width {
+  grid-column: 1 / -1;
 }
 
-.field.col-6 {
-  grid-column: span 6;
-}
-
-.field label {
-  font-weight: 500;
-  color: #333;
-}
-
-.field label.required {
-  color: #333;
-}
-
-.required-asterisk {
-  color: #e74c3c;
-}
-
-.dialog-footer {
+/* ===== FIELD CONTAINERS ===== */
+.field-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.0625rem;
+}
+
+.field-label.required::after {
+  content: " *";
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.icon-bg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.icon-bg-primary {
+  background: var(--v2-primary-active);
+  color: white;
+}
+
+.icon-1x2 {
+  width: 1.25rem;
+  height: 1.25rem;
+  font-size: 0.75rem;
+}
+
+.optional-text {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-weight: normal;
+  font-style: italic;
+  margin-left: 0.5rem;
+}
+
+/* ===== FORM CONTROLS ===== */
+.form-control {
+  padding: 0.375rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background-color: #fff;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-control::placeholder {
+  color: #9ca3af;
+}
+
+.form-control.readonly-field {
+  background-color: #f9fafb;
+  cursor: not-allowed;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.gap-2 {
   gap: 0.5rem;
 }
 
-.p-error {
-  color: #e74c3c;
+/* ===== PRIMENG COMPONENTS ===== */
+.custom-select {
+  ::ng-deep .p-select {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+
+    &.p-focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .p-select-label {
+      padding: 0.375rem;
+      font-size: 0.875rem;
+
+      &.p-placeholder {
+        color: #9ca3af;
+      }
+    }
+  }
+}
+
+.field ::ng-deep .p-calendar,
+.field ::ng-deep .p-datepicker {
+  width: 100%;
+
+  .p-inputtext {
+    padding: 0.375rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+
+    &:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+}
+
+.field ::ng-deep .p-multiselect {
+  width: 100%;
+
+  .p-multiselect-label {
+    padding: 0.375rem;
+    font-size: 0.875rem;
+  }
+
+  &.p-focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+}
+
+/* ===== FIELD HELPERS ===== */
+.field-helper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  padding: 0.25rem 0.375rem;
+  border-radius: 4px;
+  background: #f8fafc;
+  border-left: 3px solid #e2e8f0;
+}
+
+.field-helper i {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.field-helper.info {
+  color: #2563eb;
+  background: #eff6ff;
+  border-left-color: #3b82f6;
+}
+
+.field-helper.error {
+  color: #dc2626;
+  background: #fef2f2;
+  border-left-color: #ef4444;
+}
+
+.text-secondary {
+  color: #6b7280;
   font-size: 0.875rem;
 }
 
-.p-text-secondary {
-  color: #6c757d;
-  font-size: 0.875rem;
-}
-
+/* ===== CHECKBOX GROUP ===== */
 .checkbox-group {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   padding: 0.5rem 0;
 }
 
@@ -70,21 +240,110 @@
 }
 
 .checkbox-label strong {
-  color: #333;
-  font-size: 0.95rem;
+  color: #374151;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
 .checkbox-description {
-  color: #6c757d;
-  font-size: 0.85rem;
+  color: #6b7280;
+  font-size: 0.75rem;
   line-height: 1.4;
   margin: 0;
 }
 
-@media (max-width: 768px) {
-  .field.col-6 {
-    grid-column: span 12;
+/* ===== VALIDATION STATES ===== */
+.ng-invalid.ng-touched {
+  .form-control,
+  ::ng-deep .p-inputtext,
+  ::ng-deep .p-select,
+  ::ng-deep .p-calendar .p-inputtext,
+  ::ng-deep .p-datepicker .p-inputtext,
+  ::ng-deep .p-multiselect,
+  ::ng-deep .p-password .p-inputtext {
+    border-color: #dc2626 !important;
   }
+
+  .form-control:focus,
+  ::ng-deep .p-inputtext:focus,
+  ::ng-deep .p-select.p-focus,
+  ::ng-deep .p-calendar .p-inputtext:focus,
+  ::ng-deep .p-datepicker .p-inputtext:focus,
+  ::ng-deep .p-multiselect.p-focus,
+  ::ng-deep .p-password .p-inputtext:focus {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+  }
+}
+
+.ng-valid.ng-touched {
+  .form-control,
+  ::ng-deep .p-inputtext,
+  ::ng-deep .p-select,
+  ::ng-deep .p-calendar .p-inputtext,
+  ::ng-deep .p-datepicker .p-inputtext,
+  ::ng-deep .p-multiselect,
+  ::ng-deep .p-password .p-inputtext {
+    border-color: #10b981 !important;
+  }
+
+  .form-control:focus,
+  ::ng-deep .p-inputtext:focus,
+  ::ng-deep .p-select.p-focus,
+  ::ng-deep .p-calendar .p-inputtext:focus,
+  ::ng-deep .p-datepicker .p-inputtext:focus,
+  ::ng-deep .p-multiselect.p-focus,
+  ::ng-deep .p-password .p-inputtext:focus {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .form-two-columns {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .form-column {
+    padding: 0.375rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .field-label {
+    font-size: 0.8rem;
+  }
+
+  .form-control,
+  ::ng-deep .p-inputtext,
+  ::ng-deep .p-select .p-select-label,
+  ::ng-deep .p-calendar .p-inputtext,
+  ::ng-deep .p-datepicker .p-inputtext,
+  ::ng-deep .p-password .p-inputtext {
+    padding: 0.375rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* ===== DIALOG STYLES ===== */
+:host ::ng-deep .p-dynamic-dialog .p-dialog-content {
+  overflow: hidden;
+  padding: 0;
+}
+
+::ng-deep .p-dialog .p-dialog-header {
+  color: var(--color-navy-dark);
+  border-radius: 6px 6px 0 0;
+}
+
+::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
+  color: var(--color-navy-dark);
+  font-weight: var(--font-weight-semibold);
+}
+
+::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon {
+  color: white;
 }
 

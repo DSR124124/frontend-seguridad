@@ -9,83 +9,33 @@
           <input type="text" pInputText placeholder="Buscar por licencia, nombre, email, usuario o ID..."
             [(ngModel)]="terminoBusqueda" (input)="filtrarConductores()" />
         </p-iconfield>
-
-        <p-button *ngIf="terminoBusqueda" icon="pi pi-times" label="Limpiar" styleClass="p-button-danger"
+        <p-button
+          class="button-fiter"
+          [icon]="filtrosVisibles ? 'pi pi-filter-slash' : 'pi pi-filter'"
+          label="Filtrar"
+          styleClass="btn-info btn-v2 btn-md"
+          tooltipPosition="bottom"
+          (onClick)="aplicarFiltros()"
+          [loading]="loading"
+        >
+        </p-button>
+        <p-button icon="pi pi-times" label="Limpiar" styleClass="p-button-danger"
           (onClick)="limpiarBusqueda()"></p-button>
-
-        <p-button icon="pi pi-filter" label="filtros" styleClass="p-button-info" [disabled]="loading"></p-button>
       </div>
+
     </ng-template>
 
     <ng-template #end>
       <div class="d-flex gap-2">
         <p-button icon="pi pi-plus" label="Nuevo Conductor" styleClass="p-button-primary"
-          (onClick)="abrirDialogoCrear()" [disabled]="loading"></p-button>
-        <p-button icon="pi pi-refresh" label="Actualizar" styleClass="p-button-info" (onClick)="cargarConductores()"
-          [disabled]="loading"></p-button>
+          (onClick)="abrirDialogoCrear()"></p-button>
       </div>
     </ng-template>
   </p-toolbar>
 
   <p-divider></p-divider>
 
-  <p-table [value]="conductoresFiltrados" [loading]="loading" [paginator]="true" [rows]="10"
-    [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} conductores"
-    [globalFilterFields]="['licenciaNumero', 'categoria', 'telefonoContacto']"
-    styleClass="tabla-datos">
-    <ng-template pTemplate="header">
-      <tr>
-        <th style="width: 10%">ID Usuario</th>
-        <th style="width: 15%">Nombre Completo</th>
-        <th style="width: 12%">Usuario</th>
-        <th style="width: 15%">Email</th>
-        <th style="width: 12%">Número de Licencia</th>
-        <th style="width: 10%">Categoría</th>
-        <th style="width: 10%">Teléfono</th>
-        <th style="width: 10%">Estado</th>
-        <th style="width: 6%">Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-conductor>
-      <tr>
-        <td>{{ conductor.idUsuarioGestion }}</td>
-        <td>
-          <strong>{{ conductor.nombreCompleto || '-' }}</strong>
-          <br>
-          <small class="text-muted" *ngIf="conductor.nombreRol">{{ conductor.nombreRol }}</small>
-        </td>
-        <td>{{ conductor.username || '-' }}</td>
-        <td>{{ conductor.email || '-' }}</td>
-        <td>
-          <strong>{{ conductor.licenciaNumero }}</strong>
-        </td>
-        <td>{{ conductor.categoria || '-' }}</td>
-        <td>{{ conductor.telefonoContacto || '-' }}</td>
-        <td>
-          <p-tag [value]="conductor.estado" [class]="getClaseTagEstado(conductor.estado)"></p-tag>
-        </td>
-        <td>
-          <div class="acciones-cell">
-            <p-button icon="pi pi-pencil" styleClass="btn-success btn-v2" pTooltip="Editar conductor"
-              tooltipPosition="top" (click)="editarConductor(conductor)"></p-button>
-            <p-button icon="pi pi-trash" styleClass="btn-danger btn-v2" pTooltip="Eliminar conductor"
-              tooltipPosition="top" (click)="confirmarEliminar(conductor)"></p-button>
-          </div>
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="emptymessage">
-      <tr>
-        <td colspan="9" class="text-center p-4">
-          <div class="empty-message">
-            <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-            <p>No se encontraron conductores</p>
-          </div>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+  <shared-data-table #dataTable [config]="conductoresTableConfig"></shared-data-table>
 </div>
 
 <!-- Formulario de conductor -->
@@ -93,9 +43,4 @@
   (conductorCreado)="onConductorCreado()"
   (conductorActualizado)="onConductorActualizado()">
 </app-conductor-form>
-
-<!-- Confirmación de eliminación -->
-<p-confirmDialog></p-confirmDialog>
-
-<p-toast></p-toast>
 

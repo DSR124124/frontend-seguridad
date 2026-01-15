@@ -8,11 +8,15 @@
   (onHide)="hideDialog()"
 >
   <form [formGroup]="busForm" (ngSubmit)="guardar()">
-    <div class="form-grid">
-      <!-- Placa -->
-      <div class="field">
-        <label for="placa" class="required">
-          Placa <span class="required-asterisk">*</span>
+    <div class="form-two-columns">
+      <!-- Columna Izquierda -->
+      <div class="form-column">
+        <p-tag value="Información del Bus" icon="pi pi-car" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+
+        <!-- Placa -->
+        <label class="field-label required">
+          <i class="pi pi-tag icon-bg-primary icon-bg"></i>
+          Placa
         </label>
         <input
           id="placa"
@@ -22,19 +26,18 @@
           [class.ng-invalid]="isFieldInvalid('placa')"
           placeholder="Ej: ABC-123"
           maxlength="10"
+          class="form-control w-100 mb-1"
+          (input)="onFieldChange('placa')"
         />
-        <small
-          *ngIf="isFieldInvalid('placa')"
-          class="p-error"
-        >
-          <span *ngIf="f['placa'].errors?.['required']">La placa es obligatoria</span>
+        <div class="field-helper error" *ngIf="isFieldInvalid('placa')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['placa'].errors?.['required']">La placa es requerida</span>
           <span *ngIf="f['placa'].errors?.['maxlength']">La placa no puede exceder 10 caracteres</span>
-        </small>
-      </div>
+        </div>
 
-      <!-- Modelo -->
-      <div class="field">
-        <label for="modelo">
+        <!-- Modelo -->
+        <label class="field-label">
+          <i class="pi pi-cog icon-bg-primary icon-bg"></i>
           Modelo
         </label>
         <input
@@ -45,19 +48,18 @@
           [class.ng-invalid]="isFieldInvalid('modelo')"
           placeholder="Ej: Mercedes-Benz"
           maxlength="50"
+          class="form-control w-100 mb-1"
+          (input)="onFieldChange('modelo')"
         />
-        <small
-          *ngIf="isFieldInvalid('modelo')"
-          class="p-error"
-        >
+        <div class="field-helper error" *ngIf="isFieldInvalid('modelo')">
+          <i class="pi pi-exclamation-circle"></i>
           <span *ngIf="f['modelo'].errors?.['maxlength']">El modelo no puede exceder 50 caracteres</span>
-        </small>
-      </div>
+        </div>
 
-      <!-- Capacidad -->
-      <div class="field">
-        <label for="capacidad" class="required">
-          Capacidad <span class="required-asterisk">*</span>
+        <!-- Capacidad -->
+        <label class="field-label required">
+          <i class="pi pi-users icon-bg-primary icon-bg"></i>
+          Capacidad
         </label>
         <p-inputNumber
           id="capacidad"
@@ -67,20 +69,23 @@
           [showButtons]="true"
           [useGrouping]="false"
           [class.ng-invalid]="isFieldInvalid('capacidad')"
-          styleClass="w-full"
+          styleClass="w-full custom-input-number mb-1"
+          (onInput)="onFieldChange('capacidad')"
         ></p-inputNumber>
-        <small
-          *ngIf="isFieldInvalid('capacidad')"
-          class="p-error"
-        >
-          <span *ngIf="f['capacidad'].errors?.['required']">La capacidad es obligatoria</span>
+        <div class="field-helper error" *ngIf="isFieldInvalid('capacidad')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['capacidad'].errors?.['required']">La capacidad es requerida</span>
           <span *ngIf="f['capacidad'].errors?.['min']">La capacidad debe ser mayor a 0</span>
-        </small>
+        </div>
       </div>
 
-      <!-- IMEI GPS -->
-      <div class="field">
-        <label for="imeiGps">
+      <!-- Columna Derecha -->
+      <div class="form-column">
+        <p-tag value="Configuración y Estado" icon="pi pi-wrench" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+
+        <!-- IMEI GPS -->
+        <label class="field-label">
+          <i class="pi pi-map-marker icon-bg-primary icon-bg"></i>
           IMEI GPS
         </label>
         <input
@@ -91,18 +96,17 @@
           [class.ng-invalid]="isFieldInvalid('imeiGps')"
           placeholder="Ej: 123456789012345"
           maxlength="50"
+          class="form-control w-100 mb-1"
+          (input)="onFieldChange('imeiGps')"
         />
-        <small
-          *ngIf="isFieldInvalid('imeiGps')"
-          class="p-error"
-        >
+        <div class="field-helper error" *ngIf="isFieldInvalid('imeiGps')">
+          <i class="pi pi-exclamation-circle"></i>
           <span *ngIf="f['imeiGps'].errors?.['maxlength']">El IMEI GPS no puede exceder 50 caracteres</span>
-        </small>
-      </div>
+        </div>
 
-      <!-- Estado -->
-      <div class="field">
-        <label for="estado">
+        <!-- Estado -->
+        <label class="field-label">
+          <i class="pi pi-power-off icon-bg-primary icon-bg"></i>
           Estado
         </label>
         <p-select
@@ -112,31 +116,29 @@
           optionLabel="label"
           optionValue="value"
           placeholder="Seleccione un estado"
-          styleClass="w-full"
+          styleClass="w-full custom-select mb-1"
           appendTo="body"
+          (onChange)="onFieldChange('estado')"
         ></p-select>
       </div>
     </div>
   </form>
 
-  <ng-template pTemplate="footer">
-    <div class="dialog-footer">
-      <button
-        pButton
-        type="button"
-        label="Cancelar"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="hideDialog()"
-      ></button>
-      <button
-        pButton
-        type="button"
-        [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
-        icon="pi pi-check"
-        (click)="guardar()"
-        [disabled]="busForm.invalid"
-      ></button>
-    </div>
-  </ng-template>
+  <!-- Footer con botones -->
+  <p-toolbar>
+    <ng-template #start></ng-template>
+    <ng-template #end>
+      <div class="d-flex gap-2">
+        <p-button label="Cancelar" icon="pi pi-times" (onClick)="hideDialog()" styleClass="btn-danger btn-md" />
+        <p-button
+          [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
+          [icon]="modoEdicion ? 'pi pi-check' : 'pi pi-plus'"
+          (onClick)="guardar()"
+          [styleClass]="modoEdicion ? 'btn-info btn-md' : 'btn-success btn-md'"
+          [disabled]="busForm.invalid"
+          [loading]="loading"
+        />
+      </div>
+    </ng-template>
+  </p-toolbar>
 </p-dialog>

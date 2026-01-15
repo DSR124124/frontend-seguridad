@@ -27,6 +27,7 @@ export class BusFormComponent implements OnInit, OnDestroy {
   submitted: boolean = false;
   modoEdicion: boolean = false;
   busId: number | null = null;
+  loading: boolean = false;
   private subscriptions: Subscription[] = [];
 
   estados = [
@@ -116,12 +117,14 @@ export class BusFormComponent implements OnInit, OnDestroy {
       estado: this.busForm.value.estado
     };
 
+    this.loading = true;
     this.loadingService.show();
 
     if (this.modoEdicion && this.busId) {
       // Actualizar bus existente
       const sub = this.busService.actualizarBus(this.busId, busData).subscribe({
         next: () => {
+          this.loading = false;
           this.loadingService.hide();
           this.messageService.add({
             severity: 'success',
@@ -133,6 +136,7 @@ export class BusFormComponent implements OnInit, OnDestroy {
           this.busActualizado.emit();
         },
         error: (error) => {
+          this.loading = false;
           this.loadingService.hide();
           const errorMessage = error?.message || error?.error?.message || 'Error al actualizar el bus';
           this.messageService.add({
@@ -148,6 +152,7 @@ export class BusFormComponent implements OnInit, OnDestroy {
       // Crear nuevo bus
       const sub = this.busService.crearBus(busData).subscribe({
         next: () => {
+          this.loading = false;
           this.loadingService.hide();
           this.messageService.add({
             severity: 'success',
@@ -159,6 +164,7 @@ export class BusFormComponent implements OnInit, OnDestroy {
           this.busCreado.emit();
         },
         error: (error) => {
+          this.loading = false;
           this.loadingService.hide();
           const errorMessage = error?.message || error?.error?.message || 'Error al crear el bus';
           this.messageService.add({
@@ -180,5 +186,12 @@ export class BusFormComponent implements OnInit, OnDestroy {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.busForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched || this.submitted));
+  }
+
+  onFieldChange(fieldName: string): void {
+    const field = this.busForm.get(fieldName);
+    if (field) {
+      field.markAsTouched();
+    }
   }
 }

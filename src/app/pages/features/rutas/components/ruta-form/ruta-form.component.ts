@@ -28,6 +28,7 @@ export class RutaFormComponent implements OnInit, OnDestroy {
   submitted: boolean = false;
   modoEdicion: boolean = false;
   rutaId: number | null = null;
+  loading: boolean = false;
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -99,18 +100,21 @@ export class RutaFormComponent implements OnInit, OnDestroy {
       colorMapa: this.rutaForm.value.colorMapa || '#0000FF'
     };
 
+    this.loading = true;
     this.loadingService.show();
 
     if (this.modoEdicion && this.rutaId) {
       // Actualizar ruta (solo campos básicos, los puntos se gestionan por separado)
       const sub = this.rutaService.actualizarRuta(this.rutaId!, rutaData).subscribe({
         next: () => {
+          this.loading = false;
           this.loadingService.hide();
           this.messageService.success('Ruta actualizada correctamente', 'Éxito', 5000);
           this.hideDialog();
           this.rutaActualizada.emit();
         },
         error: (error) => {
+          this.loading = false;
           this.loadingService.hide();
           const errorMessage = error?.error?.message || error?.error?.error || error?.message || 'Error al actualizar la ruta';
           this.messageService.error(errorMessage, 'Error', 6000);
@@ -121,12 +125,14 @@ export class RutaFormComponent implements OnInit, OnDestroy {
       // Crear nueva ruta (los puntos se agregan después usando el botón "Gestionar Puntos")
       const sub = this.rutaService.crearRuta(rutaData).subscribe({
         next: (rutaCreada) => {
+          this.loading = false;
           this.loadingService.hide();
           this.messageService.success('Ruta creada correctamente. Ahora puede agregar puntos usando el botón "Gestionar Puntos".', 'Éxito', 6000);
           this.hideDialog();
           this.rutaCreada.emit(rutaCreada.idRuta);
         },
         error: (error) => {
+          this.loading = false;
           this.loadingService.hide();
           const errorMessage = error?.error?.message || error?.error?.error || error?.message || 'Error al crear la ruta';
           this.messageService.error(errorMessage, 'Error', 6000);
@@ -143,5 +149,12 @@ export class RutaFormComponent implements OnInit, OnDestroy {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.rutaForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched || this.submitted));
+  }
+
+  onFieldChange(fieldName: string): void {
+    const field = this.rutaForm.get(fieldName);
+    if (field) {
+      field.markAsTouched();
+    }
   }
 }

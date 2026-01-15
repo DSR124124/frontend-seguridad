@@ -1,0 +1,165 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '700px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="modoEdicion ? 'Editar Usuario' : 'Crear Nuevo Usuario'"
+  (onHide)="hideDialog()"
+>
+  <form [formGroup]="usuarioForm" (ngSubmit)="guardar()">
+    <div class="form-two-columns">
+      <!-- Columna Izquierda -->
+      <div class="form-column">
+        <p-tag value="Información del Usuario" icon="pi pi-user" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+        
+        <!-- Username -->
+        <label class="field-label required">
+          <i class="pi pi-user icon-bg-primary icon-bg icon-1x2"></i>
+          Usuario
+        </label>
+        <input
+          id="username"
+          type="text"
+          pInputText
+          formControlName="username"
+          [class.ng-invalid]="isFieldInvalid('username')"
+          placeholder="Ingrese el nombre de usuario"
+          maxlength="100"
+          class="form-control w-100 mb-1"
+        />
+        <div class="field-helper error" *ngIf="isFieldInvalid('username')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['username'].errors?.['required']">El usuario es requerido</span>
+          <span *ngIf="f['username'].errors?.['maxlength']">El usuario no puede exceder 100 caracteres</span>
+        </div>
+
+        <!-- Email -->
+        <label class="field-label required">
+          <i class="pi pi-envelope icon-bg-primary icon-bg"></i>
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          pInputText
+          formControlName="email"
+          [class.ng-invalid]="isFieldInvalid('email')"
+          placeholder="usuario@ejemplo.com"
+          maxlength="255"
+          class="form-control w-100 mb-1"
+        />
+        <div class="field-helper error" *ngIf="isFieldInvalid('email')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['email'].errors?.['required']">El email es requerido</span>
+          <span *ngIf="f['email'].errors?.['email']">El email debe tener un formato válido</span>
+          <span *ngIf="f['email'].errors?.['maxlength']">El email no puede exceder 255 caracteres</span>
+        </div>
+
+        <!-- Nombre Completo -->
+        <label class="field-label">
+          <i class="pi pi-id-card icon-bg-primary icon-bg"></i>
+          Nombre Completo
+        </label>
+        <input
+          id="nombreCompleto"
+          type="text"
+          pInputText
+          formControlName="nombreCompleto"
+          [class.ng-invalid]="isFieldInvalid('nombreCompleto')"
+          placeholder="Nombre completo del usuario"
+          maxlength="255"
+          class="form-control w-100 mb-1"
+        />
+        <div class="field-helper error" *ngIf="isFieldInvalid('nombreCompleto')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['nombreCompleto'].errors?.['maxlength']">El nombre no puede exceder 255 caracteres</span>
+        </div>
+      </div>
+
+      <!-- Columna Derecha -->
+      <div class="form-column">
+        <p-tag value="Configuración y Seguridad" icon="pi pi-cog" styleClass="tag-primary-light tag-lg" class="mb-1 w-100" />
+        
+        <!-- Password -->
+        <label class="field-label" [class.required]="!modoEdicion">
+          <i class="pi pi-lock icon-bg-primary icon-bg"></i>
+          Contraseña
+          <span *ngIf="modoEdicion" class="optional-text">(opcional)</span>
+        </label>
+        <p-password
+          id="password"
+          formControlName="password"
+          [class.ng-invalid]="isFieldInvalid('password')"
+          [toggleMask]="true"
+          [feedback]="false"
+          [placeholder]="modoEdicion ? 'Dejar en blanco para mantener la actual' : 'Mínimo 6 caracteres'"
+          styleClass="w-full mb-1"
+        ></p-password>
+        <div class="field-helper info" *ngIf="modoEdicion">
+          <i class="pi pi-info-circle"></i>
+          Deje en blanco para mantener la contraseña actual
+        </div>
+        <div class="field-helper error" *ngIf="isFieldInvalid('password')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['password'].errors?.['required']">La contraseña es requerida</span>
+          <span *ngIf="f['password'].errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</span>
+        </div>
+
+        <!-- Rol -->
+        <label class="field-label required">
+          <i class="pi pi-shield icon-bg-primary icon-bg"></i>
+          Rol
+        </label>
+        <p-select
+          id="idRol"
+          formControlName="idRol"
+          [options]="roles"
+          optionLabel="nombreRol"
+          optionValue="idRol"
+          placeholder="Seleccione un rol"
+          [class.ng-invalid]="isFieldInvalid('idRol')"
+          [showClear]="true"
+          styleClass="w-full custom-select mb-1"
+          appendTo="body"
+        ></p-select>
+        <div class="field-helper error" *ngIf="isFieldInvalid('idRol')">
+          <i class="pi pi-exclamation-circle"></i>
+          <span *ngIf="f['idRol'].errors?.['required']">El rol es requerido</span>
+        </div>
+
+        <!-- Estado -->
+        <label class="field-label">
+          <i class="pi pi-check-circle icon-bg-primary icon-bg"></i>
+          Estado
+        </label>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <p-checkbox
+            id="activo"
+            formControlName="activo"
+            binary="true"
+            inputId="activo-checkbox"
+          ></p-checkbox>
+          <label for="activo-checkbox" class="mb-0">Usuario activo</label>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Footer con botones -->
+  <p-toolbar>
+    <ng-template #start></ng-template>
+    <ng-template #end>
+      <div class="d-flex gap-2">
+        <p-button label="Cancelar" icon="pi pi-times" (onClick)="hideDialog()" styleClass="btn-danger btn-md" />
+        <p-button
+          [label]="modoEdicion ? 'Actualizar' : 'Guardar'"
+          [icon]="modoEdicion ? 'pi pi-check' : 'pi pi-plus'"
+          (onClick)="guardar()"
+          [styleClass]="modoEdicion ? 'btn-info btn-md' : 'btn-success btn-md'"
+          [disabled]="usuarioForm.invalid" />
+      </div>
+    </ng-template>
+  </p-toolbar>
+</p-dialog>
+

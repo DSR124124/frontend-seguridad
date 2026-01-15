@@ -6,7 +6,7 @@
     var(--p-primary-600) 100%
   ) !important;
   color: var(--p-primary-inverse-color) !important;
-  padding: 1rem 1.5rem !important;
+  padding: 0.2rem 1rem !important;
   border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 -2px 8px rgba(28, 34, 77, 0.1) !important;
 }

@@ -11,19 +11,17 @@
   <i *ngIf="item.icon" [ngClass]="item.icon.split(' ')" class="menu-icon"></i>
   <i *ngIf="!item.icon" class="pi pi-circle menu-icon"></i>
   <span class="menu-text">{{ item.label }}</span>
-  <span *ngIf="item.badge" class="menu-badge" [ngClass]="item.badgeClass || 'badge-default'">
-    {{ item.badge }}
-  </span>
   <ng-container *ngIf="item.items">
     <i
       class="pi pi-chevron-down"
       [ngStyle]="{
-        transform: isExpanded() ? 'rotate(180deg)' : 'rotate(0deg)'
+        transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)'
       }"
     ></i>
   </ng-container>
 </a>
 
+<!-- Submenú que se muestra solo si el item está expandido y el sidebar NO está colapsado -->
 <ul
   [ngClass]="{ submenu: true, expanded: expanded }"
   class="submenu-container pb-1"
@@ -35,6 +33,7 @@
     class="submenu-item"
     [ngStyle]="{ '--depth': depth + 1 }"
   >
+    <!-- Llamada recursiva para submenús -->
     <app-sidebar-item
       [item]="subItem"
       [depth]="depth + 1"
@@ -42,9 +41,8 @@
       [expanded]="currentExpandedItemIndex[depth + 1] === i"
       [currentExpandedItemIndex]="currentExpandedItemIndex"
       [sidebarCollapsed]="sidebarCollapsed"
-      (expandChange)="handleExpandChange($event)"
+      (expandChange)="expandChange.emit($event)"
     >
     </app-sidebar-item>
   </li>
 </ul>
-
